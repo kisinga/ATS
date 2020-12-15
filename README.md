@@ -25,8 +25,10 @@ meter
 token  
 user  
 
+![structure](/assets/structure.png)
+
 Every type is isolated in it's own package  
-Every package associated with these elemets has 2 go files: interactor and repository  
+Every package associated with these types has 2 go files: interactor and repository  
 Respository contains a private pointer to the database implementation, as well as methods of all the possible operations on this type  
 This allows for the package to implement the database locally, and the only externally visible methods are the operations.  
 Interactor contains all the higher-level abstractions of the possible operations that might include interacting with other packages.  
