@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gobuffalo/packr"
 	"github.com/kisinga/ATS/app/storage"
 )
 
@@ -24,9 +23,7 @@ func NewApp(d *storage.Database, prod bool) App {
 		searchHandler = disableCors(searchHandler)
 	}
 	app.handlers["/api"] = searchHandler
-	box := packr.NewBox("../frontend/dist")
-
-	app.handlers["/"] = http.FileServer(box).ServeHTTP
+	app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
 	return app
 }
 
