@@ -22,7 +22,11 @@ func NewApp(d *storage.Database, prod bool) App {
 	if !prod {
 		apiHandler = disableCors(apiHandler)
 	}
-	app.handlers["/"] = http.FileServer(http.Dir("./frontend/dist")).ServeHTTP
+	if prod {
+		app.handlers["/"] = http.FileServer(http.Dir("./frontend/dist")).ServeHTTP
+	} else {
+		app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
+	}
 	app.handlers["/api"] = apiHandler
 	return app
 }
