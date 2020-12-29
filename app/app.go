@@ -22,8 +22,8 @@ func NewApp(d *storage.Database, prod bool) App {
 	if !prod {
 		searchHandler = disableCors(searchHandler)
 	}
-	app.handlers["/api"] = searchHandler
 	app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
+	app.handlers["/api"] = searchHandler
 	return app
 }
 
