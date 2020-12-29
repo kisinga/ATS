@@ -12,7 +12,7 @@ Folder structure
 
 Infrastructure  
 Backend: GoLang (Hosted on Heroku)   
-FrontEnd: svelte/javascript, SPA  
+FrontEnd: angular/javascript, SPA  
 API: GraphQL  
 WebHooks: (GraphQL, JSON, REST) either  
 Database: MongoDB (Hosted on Atlas)  
