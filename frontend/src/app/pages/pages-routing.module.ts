@@ -9,14 +9,14 @@ const routes: Routes = [{
   component: PagesComponent,
   children: [
     {
-      path: 'dashboard',
+      path: '',
       component: DashboardComponent,
     },
-    {
-      path: '',
-      redirectTo: 'dashboard',
-      pathMatch: 'full',
-    },
+    // {
+    //   path: '',
+    //   redirectTo: 'dashboard',
+    //   pathMatch: 'full',
+    // },
   ],
 }];
 
