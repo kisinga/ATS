@@ -18,7 +18,7 @@ func main() {
 	}
 	db := storage.New()
 	// CORS is enabled only in prod profile
-	app := app.NewApp(db, prod)
+	app := app.NewApp(db, true)
 	err := app.Serve(getPort())
 	log.Println("Error", err)
 }

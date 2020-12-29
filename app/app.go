@@ -18,12 +18,12 @@ func NewApp(d *storage.Database, prod bool) App {
 		d:        d,
 		handlers: make(map[string]http.HandlerFunc),
 	}
-	searchHandler := app.Api
+	apiHandler := app.Api
 	if !prod {
-		searchHandler = disableCors(searchHandler)
+		apiHandler = disableCors(apiHandler)
 	}
 	app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
-	app.handlers["/api"] = searchHandler
+	app.handlers["/api"] = apiHandler
 	return app
 }
 
