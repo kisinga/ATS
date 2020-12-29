@@ -1,4 +1,4 @@
-# ATS
+# ATS ![logo](assets/logo/orange.png)
 This hosts code for Automated Token System
 
 Folder structure  
