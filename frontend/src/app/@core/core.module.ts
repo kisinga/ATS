@@ -11,21 +11,7 @@ import { UserService } from './mock/users.service';
 import { MockDataModule } from './mock/mock-data.module';
 
 const socialLinks = [
-  {
-    url: 'https://github.com/akveo/nebular',
-    target: '_blank',
-    icon: 'github',
-  },
-  {
-    url: 'https://www.facebook.com/akveo/',
-    target: '_blank',
-    icon: 'facebook',
-  },
-  {
-    url: 'https://twitter.com/akveo_inc',
-    target: '_blank',
-    icon: 'twitter',
-  },
+
 ];
 
 const DATA_SERVICES = [
