@@ -14,7 +14,7 @@ import {
   NbThemeModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { NbSecurityModule } from '@nebular/security';
+// import { NbSecurityModule } from '@nebular/security';
 
 import {
   FooterComponent,
@@ -48,7 +48,7 @@ const NB_MODULES = [
   NbSearchModule,
   NbSidebarModule,
   NbContextMenuModule,
-  NbSecurityModule,
+  // NbSecurityModule,
   NbButtonModule,
   NbSelectModule,
   NbIconModule,
@@ -86,7 +86,7 @@ export class ThemeModule {
           {
             name: 'default',
           },
-          [ DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME ],
+          [DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME],
         ).providers,
       ],
     };
