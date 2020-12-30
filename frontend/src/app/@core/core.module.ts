@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NbAuthModule, NbDummyAuthStrategy } from '@nebular/auth';
+import { NbAuthJWTToken, NbAuthModule, NbDummyAuthStrategy, NbPasswordAuthStrategy } from '@nebular/auth';
 import { NbSecurityModule, NbRoleProvider } from '@nebular/security';
 import { of as observableOf } from 'rxjs';
 
@@ -29,21 +29,88 @@ export const NB_CORE_PROVIDERS = [
   ...MockDataModule.forRoot().providers,
   ...DATA_SERVICES,
   ...NbAuthModule.forRoot({
-
+    // strategies: [
+    //   NbDummyAuthStrategy.setup({
+    //     name: 'email',
+    //     delay: 3000,
+    //   }),
+    // ],
+    // forms: {
+    //   login: {
+    //     socialLinks: socialLinks,
+    //   },
+    //   register: {
+    //     socialLinks: socialLinks,
+    //   },
+    // },
     strategies: [
-      NbDummyAuthStrategy.setup({
+      NbPasswordAuthStrategy.setup({
         name: 'email',
-        delay: 3000,
+        token: {
+          class: NbAuthJWTToken,
+        },
+        baseEndpoint: '',
+        login: {
+          alwaysFail: false,
+          method: 'post',
+          requireValidToken: true,
+          redirect: {
+            success: '/',
+            failure: null,
+          },
+          defaultErrors: ['Login/Email combination is not correct, please try again.'],
+          defaultMessages: ['You have been successfully logged in.'],
+          endpoint: '/api/auth/login',
+        },
+        logout: {
+          alwaysFail: false,
+          method: 'delete',
+          redirect: {
+            success: '/',
+            failure: null,
+          },
+          defaultErrors: ['Something went wrong, please try again.'],
+          defaultMessages: ['You have been successfully logged out.'],
+          endpoint: '/api/auth/sign-out',
+        },
+        refreshToken: {
+          endpoint: 'refresh-token',
+          method: 'post',
+          requireValidToken: true,
+          redirect: {
+            success: null,
+            failure: null,
+          },
+          defaultErrors: ['Something went wrong, please try again.'],
+          defaultMessages: ['Your token has been successfully refreshed.'],
+        },
+
       }),
     ],
     forms: {
-      login: {
-        socialLinks: socialLinks,
+      redirectDelay: 500, // delay before redirect after a successful login, while success message is shown to the user
+      strategy: 'email',  // strategy id key.
+      rememberMe: false,   // whether to show or not the `rememberMe` checkbox
+      showMessages: {     // show/not show success/error messages
+        success: true,
+        error: true,
       },
-      register: {
-        socialLinks: socialLinks,
+      socialLinks: socialLinks, // social links at the bottom of a page
+      logout: {
+        redirectDelay: 500,
+        strategy: 'email',
       },
-    },
+      validation: {
+        password: {
+          required: true,
+          minLength: 5,
+          maxLength: 50,
+        },
+        email: {
+          required: true,
+        },
+      },
+    }
   }).providers,
 
   NbSecurityModule.forRoot({
