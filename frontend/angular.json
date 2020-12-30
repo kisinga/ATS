@@ -21,8 +21,13 @@
             "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
+              "src/android-chrome-192x192.png",
+              "src/android-chrome-512x512.png",
+              "src/apple-touch-icon.png",
+              "src/favicon-16x16.png",
+              "src/favicon-16x16.png",
               "src/favicon.ico",
-              "src/favicon.png"
+              "src/site.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -103,8 +108,13 @@
             ],
             "assets": [
               "src/assets",
+              "src/android-chrome-512x512.png",
+              "src/android-chrome-192x192.png",
+              "src/apple-touch-icon.png",
+              "src/favicon-16x16.png",
+              "src/favicon-16x16.png",
               "src/favicon.ico",
-              "src/favicon.png"
+              "src/site.webmanifest"
             ]
           }
         },
