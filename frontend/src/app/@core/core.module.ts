@@ -110,7 +110,7 @@ export const NB_CORE_PROVIDERS = [
           required: true,
         },
       },
-    }
+    },
   }).providers,
 
   NbSecurityModule.forRoot({

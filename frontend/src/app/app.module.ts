@@ -42,7 +42,7 @@ import {
   ],
   providers: [
     // ...
-    AuthGuard
+    AuthGuard,
   ],
   bootstrap: [AppComponent],
 })

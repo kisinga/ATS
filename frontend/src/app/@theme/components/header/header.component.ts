@@ -41,13 +41,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userMenu: NbMenuItem[] = [
     {
       title: 'Profile',
-      icon: "person-outline",
+      icon: 'person-outline',
     },
     {
       title: 'Log out',
       icon: 'log-out-outline',
 
-    }
+    },
   ];
 
   constructor(private sidebarService: NbSidebarService,
@@ -76,11 +76,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.menuService.onItemClick()
       .pipe(takeUntil(this.destroy$))
       .subscribe((menuBag) => {
-        console.log("here", menuBag)
         switch (menuBag.item.title) {
-          case "Log out":
-            this.nbAuth.logout("email")
-            return
+          case 'Log out':
+            this.nbAuth.logout('email');
+            return;
 
           default:
             break;
