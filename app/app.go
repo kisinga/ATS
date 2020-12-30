@@ -18,12 +18,16 @@ func NewApp(d *storage.Database, prod bool) App {
 		d:        d,
 		handlers: make(map[string]http.HandlerFunc),
 	}
-	searchHandler := app.Api
+	apiHandler := app.Api
 	if !prod {
-		searchHandler = disableCors(searchHandler)
+		apiHandler = disableCors(apiHandler)
 	}
-	app.handlers["/api"] = searchHandler
-	app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
+	if prod {
+		app.handlers["/"] = http.FileServer(http.Dir("./frontend/dist")).ServeHTTP
+	} else {
+		app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
+	}
+	app.handlers["/api"] = apiHandler
 	return app
 }
 
