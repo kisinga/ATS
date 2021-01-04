@@ -6,8 +6,9 @@ import {
   NbLogoutComponent,
 } from '@nebular/auth';
 import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
+import { LoginComponent } from './auth/login/login.component';
 
-const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['auth/login']);
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/login']);
 const redirectLoggedInToDashboard = () => redirectLoggedInTo(['']);
 
 
@@ -20,28 +21,33 @@ export const routes: Routes = [
       .then(m => m.PagesModule),
   },
   {
-    path: 'auth',
-    component: NbAuthComponent,
+    path: 'login',
+    component: LoginComponent,
     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToDashboard },
-    children: [
-      {
-        path: '',
-        redirectTo: 'login',
-        pathMatch: 'full',
-      },
-      {
-        path: 'login',
-        component: NbLoginComponent,
-      },
+    //   children: [
+    //     {
+    //       path: '',
+    //       redirectTo: 'login',
+    //       pathMatch: 'full',
+    //     },
+    //     {
+    //       path: 'login',
+    //       component: NbLoginComponent,
+    //     },
 
-      {
-        path: 'logout',
-        component: NbLogoutComponent,
-      },
-      { path: '**', redirectTo: 'login' },
-    ],
+    //     {
+    //       path: 'logout',
+    //       component: NbLogoutComponent,
+    //     },
+    //     { path: '**', redirectTo: 'login' },
+    //   ],
   },
-  { path: '**', redirectTo: 'dashboard' },
+  {
+    path: 'unauthorised',
+    component: LoginComponent,
+    canActivate: [AngularFireAuthGuard],
+  },
+  { path: '**', redirectTo: '' },
 ];
 
 const config: ExtraOptions = {

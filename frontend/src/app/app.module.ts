@@ -7,15 +7,17 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { CoreModule } from './@core/core.module';
+// import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import {
+  NbCardModule,
   NbChatModule,
   NbDatepickerModule,
   NbDialogModule,
+  NbLayoutModule,
   NbMenuModule,
   NbSidebarModule,
   NbToastrModule,
@@ -23,9 +25,11 @@ import {
 } from '@nebular/theme';
 import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
+import { LoginComponent } from './auth/login/login.component';
+import { UnauthorisedComponent } from './auth/unauthorised/unauthorised.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, LoginComponent, UnauthorisedComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -37,10 +41,10 @@ import { AngularFireModule } from '@angular/fire';
     NbDialogModule.forRoot(),
     NbWindowModule.forRoot(),
     NbToastrModule.forRoot(),
-    NbChatModule.forRoot({
-      messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
-    }),
-    CoreModule.forRoot(),
+    NbLayoutModule,
+    NbCardModule,
+
+    // CoreModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     ThemeModule.forRoot(),
   ],

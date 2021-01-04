@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
 
-import { UserData } from '../../../@core/data/users';
+// import { UserData } from '../../../@core/data/users';
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { NbAuthService } from '@nebular/auth';
+import { AngularFireAuth } from '@angular/fire/auth';
+// import { NbAuthService } from '@nebular/auth';
 
 @Component({
   selector: 'ngx-header',
@@ -53,17 +54,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private sidebarService: NbSidebarService,
     private menuService: NbMenuService,
     private themeService: NbThemeService,
-    private userService: UserData,
-    private nbAuth: NbAuthService,
+    // private userService: UserData,
+    // private nbAuth: NbAuthService,
+    public auth: AngularFireAuth,
     private breakpointService: NbMediaBreakpointsService) {
   }
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
 
-    this.userService.getUsers()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((users: any) => this.user = users.kisinga);
+    // this.userService.getUsers()
+    //   .pipe(takeUntil(this.destroy$))
+    //   .subscribe((users: any) => this.user = users.kisinga);
 
     const { xl } = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()
@@ -78,7 +80,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe((menuBag) => {
         switch (menuBag.item.title) {
           case 'Log out':
-            this.nbAuth.logout('email');
+            this.auth.signOut();
             return;
 
           default:
