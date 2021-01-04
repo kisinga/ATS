@@ -10,7 +10,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
-import { AppRoutingModule, AuthGuard } from './app-routing.module';
+import { AppRoutingModule } from './app-routing.module';
+import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import {
   NbChatModule,
   NbDatepickerModule,
@@ -20,6 +21,8 @@ import {
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
+import { environment } from '../environments/environment';
+import { AngularFireModule } from '@angular/fire';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,11 +41,12 @@ import {
       messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
     }),
     CoreModule.forRoot(),
+    AngularFireModule.initializeApp(environment.firebase),
     ThemeModule.forRoot(),
   ],
   providers: [
     // ...
-    AuthGuard,
+    AngularFireAuthGuard,
   ],
   bootstrap: [AppComponent],
 })

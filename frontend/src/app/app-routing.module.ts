@@ -4,42 +4,25 @@ import {
   NbAuthComponent,
   NbLoginComponent,
   NbLogoutComponent,
-  NbRegisterComponent,
-  NbRequestPasswordComponent,
-  NbResetPasswordComponent,
 } from '@nebular/auth';
-import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { NbAuthService } from '@nebular/auth';
-import { tap } from 'rxjs/operators';
+import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
 
-@Injectable()
-export class AuthGuard implements CanActivate {
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['auth/login']);
+const redirectLoggedInToDashboard = () => redirectLoggedInTo(['']);
 
-  constructor(private authService: NbAuthService, private router: Router) {
-  }
 
-  canActivate() {
-    return this.authService.isAuthenticated()
-      .pipe(
-        tap(authenticated => {
-          if (!authenticated) {
-            this.router.navigate(['auth/login']);
-          }
-        }),
-      );
-  }
-}
 export const routes: Routes = [
   {
     path: '',
-    canActivate: [AuthGuard], // here we tell Angular to check the access with our AuthGuard
+    canActivate: [AngularFireAuthGuard], // here we tell Angular to check the access with our AuthGuard
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
     loadChildren: () => import('./pages/pages.module')
       .then(m => m.PagesModule),
   },
   {
     path: 'auth',
     component: NbAuthComponent,
+    canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToDashboard },
     children: [
       {
         path: '',
