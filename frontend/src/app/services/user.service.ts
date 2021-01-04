@@ -13,7 +13,9 @@ export class UserService {
     auth.authState.subscribe(state => {
 
       if (state) {
-
+        if (router.routerState.snapshot.url !== "/") {
+          router.navigate(["/"]);
+        }
       } else {
         if (router.routerState.snapshot.url !== "/login") {
           router.navigate(["/login"]);
