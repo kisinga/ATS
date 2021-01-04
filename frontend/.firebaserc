@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "ats-ke": {
+      "hosting": {
+        "ats": [
+          "ats-ke"
+        ]
+      }
+    }
+  }
+}

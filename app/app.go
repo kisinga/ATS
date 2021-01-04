@@ -19,14 +19,11 @@ func NewApp(d *storage.Database, prod bool) App {
 		handlers: make(map[string]http.HandlerFunc),
 	}
 	apiHandler := app.Api
-	if !prod {
-		apiHandler = disableCors(apiHandler)
-	}
-	if prod {
-		app.handlers["/"] = http.FileServer(http.Dir("./frontend/dist")).ServeHTTP
-	} else {
-		app.handlers["/"] = http.FileServer(http.Dir("../frontend/dist")).ServeHTTP
-	}
+	// For now use cors
+	apiHandler = disableCors(apiHandler)
+	// if !prod {
+	// 	apiHandler = disableCors(apiHandler)
+	// }
 	app.handlers["/api"] = apiHandler
 	return app
 }

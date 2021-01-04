@@ -34,3 +34,18 @@ This allows for the package to implement the database locally, and the only exte
 Interactor contains all the higher-level abstractions of the possible operations that might include interacting with other packages.  
 This allows for inter-package communication as well as grouping several operations into one function. The same method might be visible from different packages  
 There is one shared database implementation that is shared across all the packages.
+
+
+# Authentication   
+Factors we considered:  
+1. The user-base is small, but needs to be scalabble  
+2. We need to have some control over the user signup  
+3. Simplicity is the ultimate sophistication (~Einstein)  
+  
+The original plan was to have contol over the entire stack, but since **efficient and secure** auth by itself is a very broad and complex, we decided to combine firebase auth and mongo.  
+Merits:  
+1. Secure auth on-the-fly  
+2. Rich API  
+3. Generous free tier  
+4. We can leverage on the free hosting as well (Hence leave backend to host API ONLY)  
+5. The backend retains full control  

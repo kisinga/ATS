@@ -28,6 +28,7 @@
     "@angular/common": "^10.0.10",
     "@angular/compiler": "^10.0.10",
     "@angular/core": "^10.0.10",
+    "@angular/fire": "^6.1.4",
     "@angular/forms": "^10.0.10",
     "@angular/platform-browser": "^10.0.10",
     "@angular/platform-browser-dynamic": "^10.0.10",
@@ -54,7 +55,8 @@
     "tslib": "^2.0.0",
     "typeface-exo": "0.0.22",
     "web-animations-js": "^2.3.2",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.10.2",
+    "firebase": "^7.0 || ^8.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.6",
@@ -83,6 +85,12 @@
     "ts-node": "3.2.2",
     "tslint": "~6.1.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "@angular-devkit/architect": ">= 0.900 < 0.1200",
+    "firebase-tools": "^8.0.0",
+    "fuzzy": "^0.1.3",
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "open": "^7.0.3"
   }
 }
