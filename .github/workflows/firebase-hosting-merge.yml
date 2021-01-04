@@ -14,8 +14,6 @@ jobs:
       - name: Install deps
         working-directory: ./frontend
       - run: npm ci && npm run build
-      - name: Deploy to Firebase
-        working-directory: ./frontend
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -24,3 +22,5 @@ jobs:
           projectId: ats-ke
         env:
           FIREBASE_CLI_PREVIEWS: hostingchannels
+      - name: Deploy to Firebase
+        working-directory: ./frontend
