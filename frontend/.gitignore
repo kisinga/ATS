@@ -1,5 +1,5 @@
 # compiled output
-# /dist  needed for heroku deployment
+/dist 
 /tmp
 /out-tsc
 
