@@ -4,7 +4,7 @@
   $auth-layout-padding: 2.5rem;
 
   nb-card {
-    margin: 0;
+    margin-top: 25px;
     height: calc(100vh - 2 * #{$auth-layout-padding});
   }
 
@@ -47,4 +47,10 @@
     //   }
     }
   }
+  
 }
+
+.responsive {
+    width: 100%;
+    height: auto;
+  }

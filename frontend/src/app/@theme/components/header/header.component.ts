@@ -5,7 +5,8 @@ import { NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService,
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/auth';
-// import { NbAuthService } from '@nebular/auth';
+import { UserService } from 'app/services/user.service';
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'ngx-header',
@@ -16,7 +17,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
-  user: any;
+  user: firebase.UserInfo;
 
   themes = [
     {
@@ -54,7 +55,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private sidebarService: NbSidebarService,
     private menuService: NbMenuService,
     private themeService: NbThemeService,
-    // private userService: UserData,
+    private userService: UserService,
     // private nbAuth: NbAuthService,
     public auth: AngularFireAuth,
     private breakpointService: NbMediaBreakpointsService) {
@@ -63,9 +64,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
 
-    // this.userService.getUsers()
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe((users: any) => this.user = users.kisinga);
+    this.userService.user
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user: any) => this.user = user);
 
     const { xl } = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()

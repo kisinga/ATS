@@ -13,10 +13,12 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import {
+  NbButtonModule,
   NbCardModule,
   NbChatModule,
   NbDatepickerModule,
   NbDialogModule,
+  NbIconModule,
   NbLayoutModule,
   NbMenuModule,
   NbSidebarModule,
@@ -27,6 +29,7 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { LoginComponent } from './auth/login/login.component';
 import { UnauthorisedComponent } from './auth/unauthorised/unauthorised.component';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 @NgModule({
   declarations: [AppComponent, LoginComponent, UnauthorisedComponent],
@@ -43,7 +46,9 @@ import { UnauthorisedComponent } from './auth/unauthorised/unauthorised.componen
     NbToastrModule.forRoot(),
     NbLayoutModule,
     NbCardModule,
-
+    NbButtonModule,
+    NbEvaIconsModule,
+    NbIconModule,
     // CoreModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     ThemeModule.forRoot(),
