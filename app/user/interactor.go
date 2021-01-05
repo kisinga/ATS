@@ -5,7 +5,6 @@ import "github.com/kisinga/ATS/app/models"
 type Interactor interface {
 	GetUser(email string) (*models.User, error)
 	AddUser(user models.NewUser) (*models.User, error)
-	ValidLogin(email string, tokenID string) bool
 }
 
 type interactor struct {
@@ -29,6 +28,6 @@ func (i *interactor) AddUser(user models.NewUser) (*models.User, error) {
 	return i.repository.Create(newUser)
 }
 
-func (i *interactor) ValidLogin(email string, tokenID string) bool {
-	return true
-}
+// func (i *interactor) ValidLogin(email string, tokenID string) bool {
+// 	return true
+// }

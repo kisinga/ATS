@@ -1,7 +1,6 @@
 package user
 
 import (
-	firebase "firebase.google.com/go"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 )
@@ -14,13 +13,12 @@ type Repository interface {
 	Delete(email string) (*models.User, error)
 }
 
-func NewRepository(database *storage.Database, firebase *firebase.App) Repository {
-	return &repository{database, firebase}
+func NewRepository(database *storage.Database) Repository {
+	return &repository{database}
 }
 
 type repository struct {
-	db       *storage.Database
-	firebase *firebase.App
+	db *storage.Database
 }
 
 func (r repository) Create(models.User) (*models.User, error) {

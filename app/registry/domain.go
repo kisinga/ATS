@@ -1,7 +1,6 @@
 package registry
 
 import (
-	firebase "firebase.google.com/go"
 	"github.com/kisinga/ATS/app/meter"
 	"github.com/kisinga/ATS/app/storage"
 	"github.com/kisinga/ATS/app/token"
@@ -14,9 +13,10 @@ type Domain struct {
 	Token token.Interactor
 }
 
-func NewDomain(db *storage.Database, firebase *firebase.App) *Domain {
+func NewDomain(db *storage.Database) *Domain {
 	meterRepo := meter.NewRepository(db)
-	userRepo := user.NewRepository(db, firebase)
+	userRepo := user.NewRepository(db)
+
 	tokenRepo := token.NewRepository(db)
 	return &Domain{
 		Meter: meter.NewIterator(meterRepo),
