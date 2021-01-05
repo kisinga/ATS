@@ -16,10 +16,14 @@ func main() {
 		fmt.Println("We are in production!! Yeah")
 		prod = true
 	}
-	db := storage.New()
-	// CORS is enabled only in prod profile
-	err := app.NewApp(db, getPort(), prod)
-	log.Println("Error", err)
+	db, firebase, err := storage.New()
+	if err != nil {
+		log.Fatalln("Error", err)
+	}
+	err = app.NewApp(db, firebase, getPort(), prod)
+	if err != nil {
+		log.Fatalln("Error", err)
+	}
 }
 
 // Get the Port from the environment so we can run on Heroku
