@@ -3,3 +3,15 @@ type Meter {
   meterNumber: String!
   location: String
 }
+
+input NewMeter {
+  meterNumber: String!
+  location: String
+}
+
+extend type Query {
+  meters(limit: Int = 10, after: ID = null): [Meter]! @isLoggedIn
+}
+extend type Mutation {
+  createMeter(input: NewMeter!): Meter!
+}

@@ -18,8 +18,7 @@ func main() {
 	}
 	db := storage.New()
 	// CORS is enabled only in prod profile
-	app := app.NewApp(db, prod)
-	err := app.Serve(getPort())
+	err := app.NewApp(db, getPort(), prod)
 	log.Println("Error", err)
 }
 
@@ -28,7 +27,7 @@ func getPort() string {
 	var port = os.Getenv("PORT")
 	// Set a default port if there is nothing in the environment
 	if port == "" {
-		port = "8080"
+		port = "4242"
 		fmt.Println("INFO: No PORT environment variable detected, defaulting to " + port)
 	}
 	return ":" + port

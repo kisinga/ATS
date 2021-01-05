@@ -1,0 +1,16 @@
+type User {
+  ID: ID!
+  email: String!
+}
+
+input NewUser {
+  email: String!
+}
+
+extend type Query {
+  getUsers(limit: Int = 10, after: ID = null): [User]! @isLoggedIn
+}
+
+extend type Mutation {
+  createUser(input: NewMeter!): User!
+}

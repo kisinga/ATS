@@ -1,7 +1,11 @@
 package user
 
+import "github.com/kisinga/ATS/app/models"
+
 type Interactor interface {
-	GetUser()
+	GetUser(email string) (*models.User, error)
+	AddUser(user models.NewUser) (*models.User, error)
+	ValidLogin(email string, tokenID string) bool
 }
 
 type interactor struct {
@@ -9,9 +13,22 @@ type interactor struct {
 }
 
 func NewIterator(repo Repository) Interactor {
-	return &interactor{}
+	return &interactor{
+		repository: repo,
+	}
 }
 
-func (i *interactor) GetUser() {
+func (i *interactor) GetUser(email string) (*models.User, error) {
+	return i.repository.Read(email)
+}
 
+func (i *interactor) AddUser(user models.NewUser) (*models.User, error) {
+	newUser := models.User{
+		Email: user.Email,
+	}
+	return i.repository.Create(newUser)
+}
+
+func (i *interactor) ValidLogin(email string, tokenID string) bool {
+	return true
 }
