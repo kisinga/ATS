@@ -12,10 +12,20 @@ import (
 	"github.com/kisinga/ATS/app/gql/resolvers"
 	"github.com/kisinga/ATS/app/registry"
 	"github.com/kisinga/ATS/app/storage"
+	"github.com/rs/cors"
 )
 
 func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
 	router := chi.NewRouter()
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:4200",
+			"ats-ke.web.app/",
+		},
+		AllowCredentials: true,
+		Debug:            true,
+	}).Handler)
+
 	router.Use(auth.Middleware(firebase))
 
 	domain := registry.NewDomain(db)

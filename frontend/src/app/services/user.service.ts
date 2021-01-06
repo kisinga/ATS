@@ -23,7 +23,7 @@ export class UserService {
       }
     });
   }
- private fetchCookie(){
+ private fetchCookie() {
 
  }
 
