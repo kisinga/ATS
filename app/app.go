@@ -40,10 +40,13 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: r}))
 	router.Handle("/playground", playground.Handler("GraphQL", "/api"))
-	router.Route("/api", func(r chi.Router) {
-		router.Use(auth.Middleware(firebase))
-		router.Handle("/api", srv)
-	})
+	router.Mount("/api", func() http.Handler {
+		r := chi.NewRouter()
+		r.Use(auth.Middleware(firebase))
+		r.Handle("/", srv)
+		return r
+	}(),
+	)
 	router.Post("/sessionInit", auth.SessionInit(firebase))
 	router.Get("/sessionTerm", auth.SessionTerm())
 
