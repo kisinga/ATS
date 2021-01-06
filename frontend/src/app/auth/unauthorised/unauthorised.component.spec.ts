@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { UnauthorisedComponent } from './unauthorised.component';
+import {UnauthorisedComponent} from './unauthorised.component';
 
 describe('UnauthorisedComponent', () => {
   let component: UnauthorisedComponent;
@@ -8,9 +8,9 @@ describe('UnauthorisedComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UnauthorisedComponent ]
+      declarations: [UnauthorisedComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,20 +1,20 @@
 <nb-layout center>
-    <!-- <nb-layout-header>Awesome Company</nb-layout-header> -->
-    <!-- <nb-layout-column class="colored-column-warning">Left column</nb-layout-column> -->
-    <!-- SASS -->
+  <!-- <nb-layout-header>Awesome Company</nb-layout-header> -->
+  <!-- <nb-layout-column class="colored-column-warning">Left column</nb-layout-column> -->
+  <!-- SASS -->
 
-    <nb-layout-column>
-        <img src="assets/images/login.svg" alt="" class="responsive">
-        <nb-card style="height: auto;" accent="danger" size="tiny">
-            <nb-card-header>Please login to proceed</nb-card-header>
-            <nb-card-body>
-                <button size="medium" (click)="login()" nbButton>
-                    <nb-icon icon="google"></nb-icon>
-                    Login with Google
-                </button>
+  <nb-layout-column>
+    <img alt="" class="responsive" src="assets/images/login.svg">
+    <nb-card accent="danger" size="tiny" style="height: auto;">
+      <nb-card-header>Please login to proceed</nb-card-header>
+      <nb-card-body>
+        <button (click)="login()" nbButton size="medium">
+          <nb-icon icon="google"></nb-icon>
+          Login with Google
+        </button>
 
-            </nb-card-body>
-        </nb-card>
-    </nb-layout-column>
+      </nb-card-body>
+    </nb-card>
+  </nb-layout-column>
 
 </nb-layout>

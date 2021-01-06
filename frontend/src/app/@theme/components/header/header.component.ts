@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {NbMediaBreakpointsService, NbMenuItem, NbMenuService, NbSidebarService, NbThemeService} from '@nebular/theme';
 
 // import { UserData } from '../../../@core/data/users';
-import { map, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { UserService } from 'app/services/user.service';
+import {map, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {AngularFireAuth} from '@angular/fire/auth';
+import {UserService} from 'app/services/user.service';
 import firebase from 'firebase/app';
 
 @Component({
@@ -15,10 +15,8 @@ import firebase from 'firebase/app';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
 
-  private destroy$: Subject<void> = new Subject<void>();
   userPictureOnly: boolean = false;
   user: firebase.UserInfo;
-
   themes = [
     {
       value: 'default',
@@ -37,9 +35,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       name: 'Corporate',
     },
   ];
-
   currentTheme = 'default';
-
   userMenu: NbMenuItem[] = [
     {
       title: 'Profile',
@@ -51,14 +47,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     },
   ];
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(private sidebarService: NbSidebarService,
-    private menuService: NbMenuService,
-    private themeService: NbThemeService,
-    private userService: UserService,
-    // private nbAuth: NbAuthService,
-    public auth: AngularFireAuth,
-    private breakpointService: NbMediaBreakpointsService) {
+              private menuService: NbMenuService,
+              private themeService: NbThemeService,
+              private userService: UserService,
+              // private nbAuth: NbAuthService,
+              public auth: AngularFireAuth,
+              private breakpointService: NbMediaBreakpointsService) {
   }
 
   ngOnInit() {
@@ -68,7 +65,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((user: any) => this.user = user);
 
-    const { xl } = this.breakpointService.getBreakpointsMap();
+    const {xl} = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()
       .pipe(
         map(([, currentBreakpoint]) => currentBreakpoint.width < xl),
@@ -90,7 +87,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       });
     this.themeService.onThemeChange()
       .pipe(
-        map(({ name }) => name),
+        map(({name}) => name),
         takeUntil(this.destroy$),
       )
       .subscribe(themeName => this.currentTheme = themeName);

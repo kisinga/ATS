@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Apollo, gql} from 'apollo-angular';
 
 @Component({
@@ -10,7 +10,8 @@ export class DashboardComponent implements OnInit {
   loading = true;
   error: any;
 
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo) {
+  }
 
   ngOnInit() {
     this.apollo
@@ -25,9 +26,9 @@ export class DashboardComponent implements OnInit {
         `,
       })
       .valueChanges.subscribe((result: any) => {
-        this.rates = result?.data?.rates;
-        this.loading = result.loading;
-        this.error = result.error;
-      });
+      this.rates = result?.data?.rates;
+      this.loading = result.loading;
+      this.error = result.error;
+    });
   }
 }
