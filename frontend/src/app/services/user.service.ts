@@ -23,4 +23,8 @@ export class UserService {
       }
     });
   }
+ private fetchCookie(){
+
+ }
+
 }

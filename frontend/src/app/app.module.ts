@@ -30,6 +30,7 @@ import { AngularFireModule } from '@angular/fire';
 import { LoginComponent } from './auth/login/login.component';
 import { UnauthorisedComponent } from './auth/unauthorised/unauthorised.component';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { GraphQLModule } from './graphql.module';
 
 @NgModule({
   declarations: [AppComponent, LoginComponent, UnauthorisedComponent],
@@ -52,6 +53,7 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     // CoreModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     ThemeModule.forRoot(),
+    GraphQLModule,
   ],
   providers: [
     // ...
