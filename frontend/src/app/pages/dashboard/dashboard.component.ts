@@ -17,9 +17,9 @@ export class DashboardComponent implements OnInit {
       .watchQuery({
         query: gql`
           {
-            rates(currency: "USD") {
-              currency
-              rate
+            users {
+              ID
+              email
             }
           }
         `,

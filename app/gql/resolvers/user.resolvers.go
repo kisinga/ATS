@@ -14,6 +14,6 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewMeter
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetUsers(ctx context.Context, limit *int64, after *string) ([]*models.User, error) {
+func (r *queryResolver) Users(ctx context.Context, limit *int64, after *string) ([]*models.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }

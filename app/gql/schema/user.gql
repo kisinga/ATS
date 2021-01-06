@@ -8,7 +8,7 @@ input NewUser {
 }
 
 extend type Query {
-  getUsers(limit: Int = 10, after: ID = null): [User]! @isLoggedIn
+  users(limit: Int = 10, after: ID = null): [User]!
 }
 
 extend type Mutation {

@@ -1,49 +1,27 @@
 package auth
 
 import (
-	"context"
 	"net/http"
 
-	firebase "firebase.google.com/go"
+	"github.com/go-chi/jwtauth"
+	"github.com/lestrrat-go/jwx/jwt"
 )
 
-// A private key for context that only this package can access. This is important
-// to prevent collisions between different context uses
-var userCtxKey = &contextKey{"user"}
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, _, err := jwtauth.FromContext(r.Context())
 
-type contextKey struct {
-	name string
-}
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
 
-// A stand-in for our database backed user object
-type User struct {
-	Name    string
-	IsAdmin bool
-}
+		if token == nil || jwt.Validate(token) != nil {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
 
-// Middleware decodes the share session cookie and packs the session into context
-func Middleware(firebase *firebase.App) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			c, err := r.Cookie("auth-cookie")
-
-			// reject unauthenticated requests
-			if err != nil || c == nil {
-				http.Error(w, "Invalid cookie", http.StatusForbidden)
-				return
-			}
-
-			// if !domain.User.ValidLogin(c) {
-			// 	http.Error(w, "Invalid cookie", http.StatusForbidden)
-			// 	return
-			// }
-			next.ServeHTTP(w, r)
-		})
-	}
-}
-
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *User {
-	raw, _ := ctx.Value(userCtxKey).(*User)
-	return raw
+		// Token is authenticated, pass it through
+		next.ServeHTTP(w, r)
+	})
 }

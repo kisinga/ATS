@@ -10,7 +10,7 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): [Meter]! @isLoggedIn
+  meters(limit: Int = 10, after: ID = null): [Meter]!
 }
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!

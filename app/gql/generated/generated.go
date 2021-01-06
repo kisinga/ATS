@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -41,7 +40,6 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	IsLoggedIn func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -58,9 +56,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Blank    func(childComplexity int) int
-		GetUsers func(childComplexity int, limit *int64, after *string) int
-		Meters   func(childComplexity int, limit *int64, after *string) int
+		Blank  func(childComplexity int) int
+		Meters func(childComplexity int, limit *int64, after *string) int
+		Users  func(childComplexity int, limit *int64, after *string) int
 	}
 
 	User struct {
@@ -77,7 +75,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Blank(ctx context.Context) (*string, error)
 	Meters(ctx context.Context, limit *int64, after *string) ([]*models.Meter, error)
-	GetUsers(ctx context.Context, limit *int64, after *string) ([]*models.User, error)
+	Users(ctx context.Context, limit *int64, after *string) ([]*models.User, error)
 }
 
 type executableSchema struct {
@@ -154,18 +152,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Blank(childComplexity), true
 
-	case "Query.getUsers":
-		if e.complexity.Query.GetUsers == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getUsers_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetUsers(childComplexity, args["limit"].(*int64), args["after"].(*string)), true
-
 	case "Query.meters":
 		if e.complexity.Query.Meters == nil {
 			break
@@ -177,6 +163,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Meters(childComplexity, args["limit"].(*int64), args["after"].(*string)), true
+
+	case "Query.users":
+		if e.complexity.Query.Users == nil {
+			break
+		}
+
+		args, err := ec.field_Query_users_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Users(childComplexity, args["limit"].(*int64), args["after"].(*string)), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -256,9 +254,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "app/gql/schema/main.gql", Input: `directive @isLoggedIn on FIELD_DEFINITION
-
-type Query {
+	{Name: "app/gql/schema/main.gql", Input: `type Query {
   # Just a placeholder as base model cannot be empty, for children to extend
   blank: String
 }
@@ -280,7 +276,7 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): [Meter]! @isLoggedIn
+  meters(limit: Int = 10, after: ID = null): [Meter]!
 }
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
@@ -296,7 +292,7 @@ input NewUser {
 }
 
 extend type Query {
-  getUsers(limit: Int = 10, after: ID = null): [User]! @isLoggedIn
+  users(limit: Int = 10, after: ID = null): [User]!
 }
 
 extend type Mutation {
@@ -365,7 +361,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getUsers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_meters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int64
@@ -389,7 +385,7 @@ func (ec *executionContext) field_Query_getUsers_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_meters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int64
@@ -725,28 +721,8 @@ func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.Col
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Meters(rctx, args["limit"].(*int64), args["after"].(*string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.IsLoggedIn == nil {
-				return nil, errors.New("directive isLoggedIn is not implemented")
-			}
-			return ec.directives.IsLoggedIn(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*models.Meter); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/kisinga/ATS/app/models.Meter`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Meters(rctx, args["limit"].(*int64), args["after"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -763,7 +739,7 @@ func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.Col
 	return ec.marshalNMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_getUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -780,35 +756,15 @@ func (ec *executionContext) _Query_getUsers(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_getUsers_args(ctx, rawArgs)
+	args, err := ec.field_Query_users_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().GetUsers(rctx, args["limit"].(*int64), args["after"].(*string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.IsLoggedIn == nil {
-				return nil, errors.New("directive isLoggedIn is not implemented")
-			}
-			return ec.directives.IsLoggedIn(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*models.User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/kisinga/ATS/app/models.User`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Users(rctx, args["limit"].(*int64), args["after"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2221,7 +2177,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "getUsers":
+		case "users":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -2229,7 +2185,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getUsers(ctx, field)
+				res = ec._Query_users(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

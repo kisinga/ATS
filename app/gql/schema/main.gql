@@ -1,5 +1,3 @@
-directive @isLoggedIn on FIELD_DEFINITION
-
 type Query {
   # Just a placeholder as base model cannot be empty, for children to extend
   blank: String

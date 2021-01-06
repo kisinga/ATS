@@ -9,24 +9,36 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/kisinga/ATS/app/auth"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/gql/resolvers"
 	"github.com/kisinga/ATS/app/registry"
 	"github.com/kisinga/ATS/app/storage"
-	"github.com/rs/cors"
+
+	"github.com/go-chi/jwtauth"
 )
 
+var tokenAuth *jwtauth.JWTAuth
+
 func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
+	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
 	router := chi.NewRouter()
-	router.Use(cors.New(cors.Options{
+	// Basic CORS
+	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
+	router.Use(cors.Handler(cors.Options{
+		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{
 			"http://localhost:4200",
 			"ats-ke.web.app/",
 		},
 		AllowCredentials: true,
-		Debug:            true,
-	}).Handler)
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders: []string{"Link"},
+		MaxAge:         300, // Maximum value not ignored by any of major browsers
+	}))
 
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
@@ -37,17 +49,25 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 	domain := registry.NewDomain(db)
 
 	r := resolvers.NewResolver(domain)
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: r}))
+	gqlHandler := generated.NewExecutableSchema(generated.Config{Resolvers: r})
+	srv := handler.NewDefaultServer(gqlHandler)
 	router.Handle("/playground", playground.Handler("GraphQL", "/api"))
-	router.Mount("/api", func() http.Handler {
-		r := chi.NewRouter()
-		r.Use(auth.Middleware(firebase))
-		r.Handle("/", srv)
-		return r
-	}(),
+	router.Group(func(rr chi.Router) {
+		// Seek, verify and validate JWT tokens
+		rr.Use(jwtauth.Verifier(tokenAuth))
+
+		// Handle valid / invalid tokens. In this example, we use
+		// the provided authenticator middleware, but you can write your
+		// own very easily, look at the Authenticator method in jwtauth.go
+		// and tweak it, its not scary.
+		rr.Use(auth.Middleware)
+		// _, claims, _ := jwtauth.FromContext(rr.)
+		// fmt.Println(claims)
+		// rr.Use(auth.Middleware(firebase))
+		rr.Handle("/api", srv)
+	},
 	)
-	router.Post("/sessionInit", auth.SessionInit(firebase))
+	router.Post("/sessionInit", auth.SessionInit(firebase, tokenAuth))
 	router.Get("/sessionTerm", auth.SessionTerm())
 
 	return http.ListenAndServe(port, router)
