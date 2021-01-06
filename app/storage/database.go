@@ -20,7 +20,7 @@ func New() (*Database, *firebase.App, error) {
 }
 
 func newFirebase() (*firebase.App, error) {
-	opt := option.WithCredentialsFile("../../firebase_admin.json")
+	opt := option.WithCredentialsFile("../firebase_admin.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing app: %v", err)

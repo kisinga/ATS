@@ -53,21 +53,15 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 	srv := handler.NewDefaultServer(gqlHandler)
 	router.Handle("/playground", playground.Handler("GraphQL", "/api"))
 	router.Group(func(rr chi.Router) {
-		// Seek, verify and validate JWT tokens
-		rr.Use(jwtauth.Verifier(tokenAuth))
 
-		// Handle valid / invalid tokens. In this example, we use
-		// the provided authenticator middleware, but you can write your
-		// own very easily, look at the Authenticator method in jwtauth.go
-		// and tweak it, its not scary.
-		rr.Use(auth.Middleware)
+		rr.Use(auth.Middleware(firebase))
 		// _, claims, _ := jwtauth.FromContext(rr.)
 		// fmt.Println(claims)
 		// rr.Use(auth.Middleware(firebase))
 		rr.Handle("/api", srv)
 	},
 	)
-	router.Post("/sessionInit", auth.SessionInit(firebase, tokenAuth))
+	router.Post("/sessionInit", auth.SessionInit(firebase))
 	router.Get("/sessionTerm", auth.SessionTerm())
 
 	return http.ListenAndServe(port, router)

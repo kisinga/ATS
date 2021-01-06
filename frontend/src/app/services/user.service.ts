@@ -33,23 +33,8 @@ export class UserService {
     });
   }
   fetchToken(id: string) {
-    this.http.post("http://localhost:4242/sessionInit", {id})
-    .pipe(take(1))
-    .subscribe(t=>{
-      let token = JSON.parse(JSON.stringify(t))
-      this.saveToken(token.Bearer)
-    })
-  }
-  getToken(): String {
-    return window.localStorage['jwtToken'];
+    this.http.post('http://localhost:4242/sessionInit', {id})
+    .toPromise().then(()=>{})
   }
 
-  saveToken(token: String) {
-    console.log(token)
-    window.localStorage['jwtToken'] = token;
-  }
-
-  destroyToken() {
-    window.localStorage.removeItem('jwtToken');
-  }
 }
