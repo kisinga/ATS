@@ -21,7 +21,7 @@ type data struct {
 }
 
 // SessionInit validates the provided userID using the firebase Admin API, then sets a cookie that is used to validate every request
-func SessionInit(firebase *firebase.App) http.HandlerFunc {
+func SessionInit(firebase *firebase.App, ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the ID token sent by the client
 		defer r.Body.Close()

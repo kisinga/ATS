@@ -36,7 +36,7 @@ export class UserService {
     });
   }
   fetchToken(email: string, id: string) {
-    this.http.post('http://localhost:4242/sessionInit', {id, email})
+    this.http.post('https://atske.herokuapp.com/sessionInit', {id, email})
     .pipe(
     catchError((e) => {
       console.log(e);
