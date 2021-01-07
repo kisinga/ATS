@@ -1,13 +1,13 @@
-import {NgModule} from '@angular/core';
-import {NbCardModule, NbMenuModule} from '@nebular/theme';
+import { NgModule } from "@angular/core";
+import { NbCardModule, NbMenuModule } from "@nebular/theme";
 
-import {ThemeModule} from '../@theme/theme.module';
-import {PagesComponent} from './pages.component';
-import {DashboardModule} from './dashboard/dashboard.module';
-import {PagesRoutingModule} from './pages-routing.module';
-import { UserManagementComponent } from './user-management/user-management.component';
-import { MeterManagementComponent } from './meter-management/meter-management.component';
-import { TransactionsComponent } from './transactions/transactions.component';
+import { ThemeModule } from "../@theme/theme.module";
+import { PagesComponent } from "./pages.component";
+import { DashboardModule } from "./dashboard/dashboard.module";
+import { PagesRoutingModule } from "./pages-routing.module";
+import { UserManagementComponent } from "./user-management/user-management.component";
+import { MeterManagementComponent } from "./meter-management/meter-management.component";
+import { TransactionsComponent } from "./transactions/transactions.component";
 
 @NgModule({
   imports: [
@@ -25,5 +25,4 @@ import { TransactionsComponent } from './transactions/transactions.component';
     TransactionsComponent,
   ],
 })
-export class PagesModule {
-}
+export class PagesModule {}

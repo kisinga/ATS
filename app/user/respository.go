@@ -6,12 +6,14 @@ import (
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Repository interface {
 	Create(context.Context, models.User) (*models.User, error)
 	Read(context.Context, string) (*models.User, error)
-	ReadMany(context.Context, string, int) ([]models.User, error)
+	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
 	Update(context.Context, models.User) (*models.User, error)
 	Delete(context.Context, string) (*models.User, error)
 }
@@ -31,8 +33,24 @@ func (r repository) Read(ctx context.Context, email string) (*models.User, error
 	user := models.User{}
 	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
 }
-func (r repository) ReadMany(ctx context.Context, after string, limit int) ([]models.User, error) {
-	return nil, nil
+func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error) {
+	users := []*models.User{}
+	DataCursor, dataErr := r.db.Client.Collection("users").Find(ctx,
+		bson.M{"_id": bson.M{"$lt": after}},
+		&options.FindOptions{Limit: limit, Sort: bson.M{"_id": -1}})
+
+	if dataErr != nil {
+		return nil, dataErr
+	}
+	for DataCursor.Next(ctx) {
+		elem := models.User{}
+		err := DataCursor.Decode(&elem)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, &elem)
+	}
+	return users, nil
 }
 func (r repository) Update(ctx context.Context, user models.User) (*models.User, error) {
 	return nil, nil

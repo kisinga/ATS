@@ -3,11 +3,14 @@ package user
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/kisinga/ATS/app/models"
 )
 
 type Interactor interface {
 	GetUser(context.Context, string) (*models.User, error)
+	GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
 	AddUser(context.Context, models.NewUser) (*models.User, error)
 }
 
@@ -30,4 +33,8 @@ func (i *interactor) AddUser(ctx context.Context, user models.NewUser) (*models.
 		Email: user.Email,
 	}
 	return i.repository.Create(ctx, newUser)
+}
+
+func (i *interactor) GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error) {
+	return i.repository.ReadMany(ctx, after, limit)
 }

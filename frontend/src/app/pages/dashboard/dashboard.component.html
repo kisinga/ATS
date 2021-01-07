@@ -1,7 +1,39 @@
-<div class="row">
-  <nb-card>
-    <nb-card-body>And God said, Let there be light</nb-card-body>
-  </nb-card>
+<div >
+  <nb-flip-card>
+    <nb-card-front>
+      <nb-card status="danger">
+        <nb-card-header>API KEY</nb-card-header>
+        <nb-card-body>
+          <div>
+          <p>
+            The API-Key is used to validate incoming top-up requests from KPLC Server.
+            <br>
+            <br>
+             <b>Only generate if you are sure you can effect the change the KPLC Requests as well.</b> 
+            <br>
+          </p>
+          </div>
+
+        </nb-card-body>
+      </nb-card>
+    </nb-card-front>
+    <nb-card-back>
+      <nb-card status="success">
+        <nb-card-header>KEY</nb-card-header>
+        <nb-card-body>
+         <div>
+           <p>
+             {{apiKey}}
+           </p>
+         </div>
+         <div>
+          <button nbButton status="danger" (click)="generateKey()"><nb-icon icon="alert-circle-outline"></nb-icon>GENERATE NEW KEY</button>
+         </div>
+        </nb-card-body>
+      </nb-card>
+    </nb-card-back>
+    
+  </nb-flip-card>
   <nb-card>
     <nb-card-body>And there was light</nb-card-body>
   </nb-card>
