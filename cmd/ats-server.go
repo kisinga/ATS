@@ -11,15 +11,20 @@ import (
 )
 
 var prod bool = false
+var live bool = false
 
 func main() {
 	if os.Getenv("prod") == "true" {
 		fmt.Println("We are in production!! Yeah")
 		prod = true
 	}
+	if os.Getenv("live") == "true" {
+		fmt.Println("Not local server")
+		live = true
+	}
 	// prod = true
 
-	db, firebase, err := storage.New(context.Background(), prod)
+	db, firebase, err := storage.New(context.Background(), prod, live)
 	if err != nil {
 		log.Fatalln("Error", err)
 	}

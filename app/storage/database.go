@@ -14,8 +14,8 @@ type Database struct {
 	Client *mongo.Database
 }
 
-func New(ctx context.Context, prod bool) (*Database, *firebase.App, error) {
-	firebase, err := newFirebase()
+func New(ctx context.Context, prod bool, live bool) (*Database, *firebase.App, error) {
+	firebase, err := newFirebase(live)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,8 +50,13 @@ func New(ctx context.Context, prod bool) (*Database, *firebase.App, error) {
 	}, firebase, nil
 }
 
-func newFirebase() (*firebase.App, error) {
-	opt := option.WithCredentialsFile("../firebase_admin.json")
+func newFirebase(live bool) (*firebase.App, error) {
+	var opt option.ClientOption
+	if live {
+		opt = option.WithCredentialsFile("./firebase_admin.json")
+	} else {
+		opt = option.WithCredentialsFile("../firebase_admin.json")
+	}
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing app: %v", err)

@@ -15,14 +15,9 @@ import (
 	"github.com/kisinga/ATS/app/gql/resolvers"
 	"github.com/kisinga/ATS/app/registry"
 	"github.com/kisinga/ATS/app/storage"
-
-	"github.com/go-chi/jwtauth"
 )
 
-var tokenAuth *jwtauth.JWTAuth
-
 func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
-	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
 	router := chi.NewRouter()
 	// Basic CORS
 	// for more ideas, see: https://developer.github.com/v3/#cross-origin-resource-sharing
