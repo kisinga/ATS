@@ -17,7 +17,9 @@ func main() {
 		fmt.Println("We are in production!! Yeah")
 		prod = true
 	}
-	db, firebase, err := storage.New(context.Background())
+	// prod = true
+
+	db, firebase, err := storage.New(context.Background(), prod)
 	if err != nil {
 		log.Fatalln("Error", err)
 	}

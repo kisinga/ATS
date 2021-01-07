@@ -22,7 +22,7 @@ type repository struct {
 }
 
 func (r repository) Create(models.User) (*models.User, error) {
-	return nil, nil
+	return r.db.Client.Database(env).Collection("posts")
 }
 func (r repository) Read(email string) (*models.User, error) {
 	return nil, nil

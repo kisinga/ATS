@@ -38,6 +38,7 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders: []string{"Link"},
 		MaxAge:         300, // Maximum value not ignored by any of major browsers
+		Debug:          !prod,
 	}))
 
 	router.Use(middleware.RequestID)

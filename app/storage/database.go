@@ -11,17 +11,22 @@ import (
 )
 
 type Database struct {
-	Client *mongo.Client
+	Client *mongo.Database
 }
 
-func New(ctx context.Context) (*Database, *firebase.App, error) {
+func New(ctx context.Context, prod bool) (*Database, *firebase.App, error) {
 	firebase, err := newFirebase()
 	if err != nil {
 		return nil, nil, err
 	}
 
 	fmt.Println("Connecting to Db........")
-
+	var env string
+	if prod {
+		env = "prod"
+	} else {
+		env = "test"
+	}
 	uri := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
 
 	clientOptions := options.Client().ApplyURI(uri)
@@ -41,7 +46,7 @@ func New(ctx context.Context) (*Database, *firebase.App, error) {
 	fmt.Println("Connected to MongoDB!")
 
 	return &Database{
-		Client: clientvar,
+		Client: clientvar.Database(env),
 	}, firebase, nil
 }
 
