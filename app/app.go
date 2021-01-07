@@ -30,7 +30,7 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{
 			"http://localhost:4200",
-			"ats-ke.web.app/",
+			"ats-ke.web.app",
 		},
 		AllowCredentials: true,
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
@@ -54,11 +54,7 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 	srv := handler.NewDefaultServer(gqlHandler)
 	router.Handle("/playground", playground.Handler("GraphQL", "/api"))
 	router.Group(func(rr chi.Router) {
-
 		rr.Use(auth.Middleware(firebase))
-		// _, claims, _ := jwtauth.FromContext(rr.)
-		// fmt.Println(claims)
-		// rr.Use(auth.Middleware(firebase))
 		rr.Handle("/api", srv)
 	},
 	)
