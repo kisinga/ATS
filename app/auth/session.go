@@ -45,7 +45,7 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) http.HandlerFu
 			http.Error(w, "Failed to create a session cookie", http.StatusInternalServerError)
 			return
 		}
-		_, err = domain.User.GetUser(claims.Email)
+		_, err = domain.User.GetUser(r.Context(), claims.Email)
 
 		if err != nil {
 			http.Error(w, "Not Authorised", http.StatusForbidden)
