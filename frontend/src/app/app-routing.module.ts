@@ -1,48 +1,35 @@
-import {ExtraOptions, RouterModule, Routes} from '@angular/router';
-import {NgModule} from '@angular/core';
-import {AngularFireAuthGuard, redirectLoggedInTo, redirectUnauthorizedTo} from '@angular/fire/auth-guard';
-import {LoginComponent} from './auth/login/login.component';
+import { ExtraOptions, RouterModule, Routes } from "@angular/router";
+import { NgModule } from "@angular/core";
+import {
+  AngularFireAuthGuard,
+  redirectLoggedInTo,
+  redirectUnauthorizedTo,
+} from "@angular/fire/auth-guard";
+import { LoginComponent } from "./auth/login/login.component";
 
-const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/login']);
-const redirectLoggedInToDashboard = () => redirectLoggedInTo(['']);
-
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(["/login"]);
+const redirectLoggedInToDashboard = () => redirectLoggedInTo([""]);
 
 export const routes: Routes = [
   {
-    path: '',
+    path: "",
     canActivate: [AngularFireAuthGuard], // here we tell Angular to check the access with our AuthGuard
-    data: {authGuardPipe: redirectUnauthorizedToLogin},
-    loadChildren: () => import('./pages/pages.module')
-      .then(m => m.PagesModule),
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
+    loadChildren: () =>
+      import("./pages/pages.module").then((m) => m.PagesModule),
   },
   {
-    path: 'login',
+    path: "login",
     component: LoginComponent,
-    canActivate: [AngularFireAuthGuard], data: {authGuardPipe: redirectLoggedInToDashboard},
-    //   children: [
-    //     {
-    //       path: '',
-    //       redirectTo: 'login',
-    //       pathMatch: 'full',
-    //     },
-    //     {
-    //       path: 'login',
-    //       component: NbLoginComponent,
-    //     },
-
-    //     {
-    //       path: 'logout',
-    //       component: NbLogoutComponent,
-    //     },
-    //     { path: '**', redirectTo: 'login' },
-    //   ],
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: redirectLoggedInToDashboard },
   },
   {
-    path: 'unauthorised',
+    path: "unauthorised",
     component: LoginComponent,
     canActivate: [AngularFireAuthGuard],
   },
-  {path: '**', redirectTo: ''},
+  { path: "**", redirectTo: "" },
 ];
 
 const config: ExtraOptions = {
@@ -53,5 +40,4 @@ const config: ExtraOptions = {
   imports: [RouterModule.forRoot(routes, config)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}

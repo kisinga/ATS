@@ -28,6 +28,7 @@ const routes: Routes = [
         path: "meters",
         component: MeterManagementComponent,
       },
+      { path: "", redirectTo: "dashboard" },
     ],
   },
 ];
