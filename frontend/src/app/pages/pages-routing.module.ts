@@ -3,6 +3,9 @@ import {NgModule} from '@angular/core';
 
 import {PagesComponent} from './pages.component';
 import {DashboardComponent} from './dashboard/dashboard.component';
+import { TransactionsComponent } from './transactions/transactions.component';
+import { MeterManagementComponent } from './meter-management/meter-management.component';
+import { UserManagementComponent } from './user-management/user-management.component';
 
 const routes: Routes = [{
   path: '',
@@ -12,11 +15,19 @@ const routes: Routes = [{
       path: '',
       component: DashboardComponent,
     },
-    // {
-    //   path: '',
-    //   redirectTo: 'dashboard',
-    //   pathMatch: 'full',
-    // },
+      {
+      path: 'transactions',
+      component: TransactionsComponent,
+    },
+      {
+      path: 'users',
+      component: UserManagementComponent,
+    },
+    {
+      path: 'meters',
+      component: MeterManagementComponent,
+    },
+  
   ],
 }];
 

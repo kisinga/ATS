@@ -62,7 +62,7 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 		rr.Handle("/api", srv)
 	},
 	)
-	router.Post("/sessionInit", auth.SessionInit(firebase))
+	router.Post("/sessionInit", auth.SessionInit(firebase, domain))
 	router.Get("/sessionTerm", auth.SessionTerm())
 
 	return http.ListenAndServe(port, router)

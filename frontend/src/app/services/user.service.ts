@@ -7,10 +7,21 @@ import {of, ReplaySubject} from 'rxjs';
 import {Apollo} from 'apollo-angular';
 import {catchError} from 'rxjs/operators';
 import dayjs from 'dayjs';
+import { useQuery, gql } from '@apollo/client';
 
 @Injectable({
   providedIn: 'root',
 })
+const GET_USERS = gql`
+  query GetRocketInventory($year: Int!) {
+    rocketInventory(year: $year) {
+      id
+      model
+      year
+      stock
+    }
+  }
+`;
 export class UserService {
   user = new ReplaySubject<firebase.UserInfo>(1);
 

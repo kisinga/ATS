@@ -11,19 +11,19 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: 'Meters',
     icon: 'flash-outline',
     link: 'meters',
-    home: true,
+    home: false,
   },
   {
     title: 'Users',
     icon: 'people-outline',
     link: 'users',
-    home: true,
+    home: false,
   },
   {
     title: 'Transactions',
     icon: 'activity-outline',
     link: 'transactions',
-    home: true,
+    home: false,
   },
   // {
   //   title: 'USERS',

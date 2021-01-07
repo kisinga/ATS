@@ -11,7 +11,7 @@ import (
 type Repository interface {
 	Create(context.Context, models.User) (*models.User, error)
 	Read(context.Context, string) (*models.User, error)
-	ReadMany(context.Context, string, string) ([]models.User, error)
+	ReadMany(context.Context, string, int) ([]models.User, error)
 	Update(context.Context, models.User) (*models.User, error)
 	Delete(context.Context, string) (*models.User, error)
 }
