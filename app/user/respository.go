@@ -31,7 +31,7 @@ func (r repository) Read(ctx context.Context, email string) (*models.User, error
 	user := models.User{}
 	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
 }
-func (r repository) ReadMany(ctx context.Context, start string, stop string) ([]models.User, error) {
+func (r repository) ReadMany(ctx context.Context, after string, limit int) ([]models.User, error) {
 	return nil, nil
 }
 func (r repository) Update(ctx context.Context, user models.User) (*models.User, error) {

@@ -31,7 +31,3 @@ func (i *interactor) AddUser(ctx context.Context, user models.NewUser) (*models.
 	}
 	return i.repository.Create(ctx, newUser)
 }
-
-// func (i *interactor) ValidLogin(email string, tokenID string) bool {
-// 	return true
-// }

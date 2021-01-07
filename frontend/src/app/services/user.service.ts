@@ -5,9 +5,8 @@ import {Router} from '@angular/router';
 import firebase from 'firebase/app';
 import {of, ReplaySubject} from 'rxjs';
 import {Apollo} from 'apollo-angular';
-import { take } from 'rxjs/operators';
+import {catchError} from 'rxjs/operators';
 import dayjs from 'dayjs';
-import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -35,20 +34,23 @@ export class UserService {
       }
     });
   }
+
   fetchToken(email: string, id: string) {
     this.http.post('https://atske.herokuapp.com/sessionInit', {id, email})
-    .pipe(
-    catchError((e) => {
-      console.log(e);
-      this.auth.signOut();
-      return of({});
-    }))
-    .toPromise()
-    .then(t => {
-      const token = JSON.parse(JSON.stringify(t));
-      this.saveToken(token.Bearer, token.expiry);
-      this.router.navigate(['/']);
-    });
+      .pipe(
+        catchError((e) => {
+          this.auth.signOut();
+          if (e === 'Not Authorised') {
+            this.router.navigate(['/unauthorised']);
+          }
+          return of({});
+        }))
+      .toPromise()
+      .then(t => {
+        const token = JSON.parse(JSON.stringify(t));
+        this.saveToken(token.Bearer, token.expiry);
+        this.router.navigate(['/']);
+      });
   }
 
   getToken(): String {
@@ -60,7 +62,7 @@ export class UserService {
   }
 
   tokenExpired(expiry) {
-     return (dayjs().isAfter(dayjs(expiry)));
+    return (dayjs().isAfter(dayjs(expiry)));
   }
 
   saveToken(token: String, expiry: string) {
