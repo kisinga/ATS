@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import {Apollo, gql} from 'apollo-angular';
+import { Component, OnInit } from "@angular/core";
+import { Apollo, gql } from "apollo-angular";
 
 @Component({
-  templateUrl: './user-management.component.html',
-  styleUrls: ['./user-management.component.scss']
+  templateUrl: "./user-management.component.html",
+  styleUrls: ["./user-management.component.scss"],
 })
 export class UserManagementComponent implements OnInit {
-
-  constructor(private apollo: Apollo) { }
+  constructor(private apollo: Apollo) {}
 
   ngOnInit(): void {
     this.apollo
@@ -21,9 +20,6 @@ export class UserManagementComponent implements OnInit {
           }
         `,
       })
-      .valueChanges.subscribe((result: any) => {
-   
-    });
+      .valueChanges.subscribe((result: any) => {});
   }
-
 }

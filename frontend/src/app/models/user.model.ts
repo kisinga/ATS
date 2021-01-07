@@ -1,3 +1,3 @@
-export type User = {
-    email: string
+export interface User {
+  email: string;
 }

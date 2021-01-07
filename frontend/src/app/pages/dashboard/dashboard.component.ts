@@ -1,16 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {Apollo, gql} from 'apollo-angular';
+import { Component, OnInit } from "@angular/core";
+import { Apollo, gql } from "apollo-angular";
 
 @Component({
-  selector: 'ngx-dashboard',
-  templateUrl: './dashboard.component.html',
+  selector: "ngx-dashboard",
+  templateUrl: "./dashboard.component.html",
 })
 export class DashboardComponent implements OnInit {
+  constructor(private apollo: Apollo) {}
 
-  constructor(private apollo: Apollo) {
-  }
-
-  ngOnInit() {
-    
-  }
+  ngOnInit() {}
 }
