@@ -7,6 +7,7 @@ import (
 	"time"
 
 	firebase "firebase.google.com/go"
+	"github.com/kisinga/ATS/app/registry"
 )
 
 // Token ...
@@ -21,7 +22,7 @@ type data struct {
 }
 
 // SessionInit validates the provided userID using the firebase Admin API, then sets a cookie that is used to validate every request
-func SessionInit(firebase *firebase.App, ) http.HandlerFunc {
+func SessionInit(firebase *firebase.App, domain *registry.Domain) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the ID token sent by the client
 		defer r.Body.Close()
@@ -44,8 +45,12 @@ func SessionInit(firebase *firebase.App, ) http.HandlerFunc {
 			http.Error(w, "Failed to create a session cookie", http.StatusInternalServerError)
 			return
 		}
-		// @TODO validate the email from mongodb
+		_, err = domain.User.GetUser(claims.Email)
 
+		if err != nil {
+			http.Error(w, "Not Authorised", http.StatusForbidden)
+			return
+		}
 		// Set cookie policy for session cookie.
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session",

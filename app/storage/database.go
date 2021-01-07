@@ -20,6 +20,8 @@ func New(ctx context.Context) (*Database, *firebase.App, error) {
 		return nil, nil, err
 	}
 
+	fmt.Println("Connecting to Db........")
+
 	uri := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
 
 	clientOptions := options.Client().ApplyURI(uri)
