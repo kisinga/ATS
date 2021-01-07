@@ -30,7 +30,7 @@ func NewApp(db *storage.Database, firebase *firebase.App, port string, prod bool
 		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{
 			"http://localhost:4200",
-			"https://ats-ke.web.app/",
+			"https://ats-ke.web.app",
 		},
 		AllowCredentials: true,
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
