@@ -5,18 +5,42 @@ import (
 	"fmt"
 
 	firebase "firebase.google.com/go"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/api/option"
 )
 
 type Database struct {
+	Client *mongo.Client
 }
 
-func New() (*Database, *firebase.App, error) {
+func New(ctx context.Context) (*Database, *firebase.App, error) {
 	firebase, err := newFirebase()
 	if err != nil {
 		return nil, nil, err
 	}
-	return &Database{}, firebase, nil
+
+	uri := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
+
+	clientOptions := options.Client().ApplyURI(uri)
+	clientvar, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = clientvar.Ping(ctx, nil)
+	go func() {
+		<-ctx.Done()
+		clientvar.Disconnect(ctx)
+	}()
+	if err != nil {
+		fmt.Println("Error connecting to Db........", err)
+		return nil, nil, err
+	}
+	fmt.Println("Connected to MongoDB!")
+
+	return &Database{
+		Client: clientvar,
+	}, firebase, nil
 }
 
 func newFirebase() (*firebase.App, error) {
