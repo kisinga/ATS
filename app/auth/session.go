@@ -11,7 +11,13 @@ import (
 
 // Token ...
 type Token struct {
-	Token string `json:"Bearer"`
+	Token  string    `json:"Bearer"`
+	Expiry time.Time `json:"expiry"`
+}
+
+type data struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
 }
 
 // SessionInit validates the provided userID using the firebase Admin API, then sets a cookie that is used to validate every request
@@ -19,7 +25,7 @@ func SessionInit(firebase *firebase.App) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the ID token sent by the client
 		defer r.Body.Close()
-		idToken, err := getIDTokenFromBody(r)
+		claims, err := getIDTokenFromBody(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -33,11 +39,12 @@ func SessionInit(firebase *firebase.App) http.HandlerFunc {
 		// To only allow session cookie setting on recent sign-in, auth_time in ID token
 		// can be checked to ensure user was recently signed in before creating a session cookie.
 		client, err := firebase.Auth(context.Background())
-		cookie, err := client.SessionCookie(r.Context(), idToken, expiresIn)
+		cookie, err := client.SessionCookie(r.Context(), claims.ID, expiresIn)
 		if err != nil {
 			http.Error(w, "Failed to create a session cookie", http.StatusInternalServerError)
 			return
 		}
+		// @TODO validate the email from mongodb
 
 		// Set cookie policy for session cookie.
 		http.SetCookie(w, &http.Cookie{
@@ -47,8 +54,23 @@ func SessionInit(firebase *firebase.App) http.HandlerFunc {
 			HttpOnly: true,
 			Secure:   true,
 		})
-		w.Write([]byte(`{"status": "success"}`))
+		response := Token{cookie, time.Now().Add(expiresIn).UTC()}
+		JSONResponse(response, w)
 	}
+}
+
+// JSONResponse ...
+func JSONResponse(response interface{}, w http.ResponseWriter) {
+
+	json, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
 }
 
 // SessionTerm deletes the set cookie
@@ -63,13 +85,11 @@ func SessionTerm() http.HandlerFunc {
 	}
 }
 
-func getIDTokenFromBody(r *http.Request) (string, error) {
-	cookie := struct {
-		ID string `json:"id,omitempty"`
-	}{}
+func getIDTokenFromBody(r *http.Request) (data, error) {
+	claims := data{}
 
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
-	err := json.NewDecoder(r.Body).Decode(&cookie)
-	return cookie.ID, err
+	err := json.NewDecoder(r.Body).Decode(&claims)
+	return claims, err
 }

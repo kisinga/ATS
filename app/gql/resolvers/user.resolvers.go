@@ -15,5 +15,5 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewMeter
 }
 
 func (r *queryResolver) Users(ctx context.Context, limit *int64, after *string) ([]*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return nil, nil
 }
