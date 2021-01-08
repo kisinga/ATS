@@ -64,12 +64,23 @@ type ComplexityRoot struct {
 		UpdatedBy   func(childComplexity int) int
 	}
 
+	MeterConnection struct {
+		Data     func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateMeter func(childComplexity int, input models.NewMeter) int
 		CreateUser  func(childComplexity int, input models.NewUser) int
 		DisableUser func(childComplexity int, email string) int
 		Generate    func(childComplexity int) int
 		UpdateUser  func(childComplexity int, input models.NewUser) int
+	}
+
+	PageInfo struct {
+		EndCursor   func(childComplexity int) int
+		HasNextPage func(childComplexity int) int
+		StartCursor func(childComplexity int) int
 	}
 
 	Query struct {
@@ -115,7 +126,7 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 }
 type QueryResolver interface {
-	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.Meter, error)
+	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
 	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.Meter, error)
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error)
 }
@@ -199,6 +210,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Meter.UpdatedBy(childComplexity), true
 
+	case "MeterConnection.data":
+		if e.complexity.MeterConnection.Data == nil {
+			break
+		}
+
+		return e.complexity.MeterConnection.Data(childComplexity), true
+
+	case "MeterConnection.pageInfo":
+		if e.complexity.MeterConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MeterConnection.PageInfo(childComplexity), true
+
 	case "Mutation.createMeter":
 		if e.complexity.Mutation.CreateMeter == nil {
 			break
@@ -253,6 +278,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(models.NewUser)), true
+
+	case "PageInfo.endCursor":
+		if e.complexity.PageInfo.EndCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.EndCursor(childComplexity), true
+
+	case "PageInfo.hasNextPage":
+		if e.complexity.PageInfo.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasNextPage(childComplexity), true
+
+	case "PageInfo.startCursor":
+		if e.complexity.PageInfo.StartCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.StartCursor(childComplexity), true
 
 	case "Query.meters":
 		if e.complexity.Query.Meters == nil {
@@ -482,11 +528,17 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): [Meter]!
+  meters(limit: Int = 10, after: ID = null): MeterConnection!
 }
 
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
+}
+type MeterConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [Meter!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
 
 extend type Subscription {
@@ -501,6 +553,13 @@ interface BaseObject {
   ID: ID!
   updatedBy: User
   createdBy: User
+}
+
+# Information for paginating this connection
+type PageInfo {
+  startCursor: ID!
+  endCursor: ID!
+  hasNextPage: Boolean!
 }
 `, BuiltIn: false},
 	{Name: "app/gql/schema/token.gql", Input: `type Token implements BaseObject {
@@ -1038,6 +1097,73 @@ func (ec *executionContext) _Meter_createdBy(ctx context.Context, field graphql.
 	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MeterConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.MeterConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MeterConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Meter)
+	fc.Result = res
+	return ec.marshalOMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MeterConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *models.MeterConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MeterConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐPageInfo(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_generate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1241,6 +1367,111 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	return ec.marshalNUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartCursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(primitive.ObjectID)
+	fc.Result = res
+	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndCursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(primitive.ObjectID)
+	fc.Result = res
+	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasNextPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1278,9 +1509,9 @@ func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Meter)
+	res := resTmp.(*models.MeterConnection)
 	fc.Result = res
-	return ec.marshalNMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res)
+	return ec.marshalNMeterConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_tokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3138,6 +3369,35 @@ func (ec *executionContext) _Meter(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var meterConnectionImplementors = []string{"MeterConnection"}
+
+func (ec *executionContext) _MeterConnection(ctx context.Context, sel ast.SelectionSet, obj *models.MeterConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, meterConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MeterConnection")
+		case "data":
+			out.Values[i] = ec._MeterConnection_data(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._MeterConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3175,6 +3435,43 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateUser":
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pageInfoImplementors = []string{"PageInfo"}
+
+func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *models.PageInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pageInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PageInfo")
+		case "startCursor":
+			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "endCursor":
+			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "hasNextPage":
+			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3718,6 +4015,20 @@ func (ec *executionContext) marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋapp�
 	return ec._Meter(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMeterConnection2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterConnection(ctx context.Context, sel ast.SelectionSet, v models.MeterConnection) graphql.Marshaler {
+	return ec._MeterConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMeterConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterConnection(ctx context.Context, sel ast.SelectionSet, v *models.MeterConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MeterConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNNewMeter2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐNewMeter(ctx context.Context, v interface{}) (models.NewMeter, error) {
 	res, err := ec.unmarshalInputNewMeter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3726,6 +4037,16 @@ func (ec *executionContext) unmarshalNNewMeter2githubᚗcomᚋkisingaᚋATSᚋap
 func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐNewUser(ctx context.Context, v interface{}) (models.NewUser, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *models.PageInfo) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PageInfo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4104,6 +4425,46 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return graphql.MarshalInt64(*v)
+}
+
+func (ec *executionContext) marshalOMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Meter) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx context.Context, sel ast.SelectionSet, v *models.Meter) graphql.Marshaler {

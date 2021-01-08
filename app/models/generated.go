@@ -20,6 +20,12 @@ type NewUser struct {
 	Email string `json:"email"`
 }
 
+type PageInfo struct {
+	StartCursor primitive.ObjectID `json:"startCursor"`
+	EndCursor   primitive.ObjectID `json:"endCursor"`
+	HasNextPage bool               `json:"hasNextPage"`
+}
+
 type Token struct {
 	MeterNumber string             `json:"meterNumber"`
 	TokenString string             `json:"tokenString"`

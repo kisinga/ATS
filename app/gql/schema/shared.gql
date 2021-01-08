@@ -7,3 +7,10 @@ interface BaseObject {
   updatedBy: User
   createdBy: User
 }
+
+# Information for paginating this connection
+type PageInfo {
+  startCursor: ID!
+  endCursor: ID!
+  hasNextPage: Boolean!
+}

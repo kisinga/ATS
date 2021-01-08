@@ -12,11 +12,17 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): [Meter]!
+  meters(limit: Int = 10, after: ID = null): MeterConnection!
 }
 
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
+}
+type MeterConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [Meter!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
 
 extend type Subscription {

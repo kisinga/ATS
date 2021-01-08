@@ -24,7 +24,7 @@ func (r *mutationResolver) CreateMeter(ctx context.Context, input models.NewMete
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.Meter, error) {
+func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
