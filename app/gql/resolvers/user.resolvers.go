@@ -11,11 +11,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewMeter) (*models.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
+	return r.domain.User.AddUser(ctx, input)
+}
+
+func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*models.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Users(ctx context.Context, limit *int64, after *string) ([]*models.User, error) {
+func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error) {
 	//Make sure that the provided limit doesnt exceed 50
 	if *limit > 50 {
 		*limit = int64(50)
@@ -24,10 +32,8 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *string) 
 	*limit = *limit + 1
 	afterID := primitive.NewObjectID()
 	if after != nil {
-		var err error
-		afterID, err = primitive.ObjectIDFromHex(*after)
-		if err != nil {
-			fmt.Println("Invalid users pagination id, ignoring")
+		if after != nil {
+			afterID = *after
 		}
 	}
 	k, l := r.domain.User.GetMany(ctx, afterID, limit)
