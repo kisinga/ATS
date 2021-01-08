@@ -1,9 +1,8 @@
-type Token implements BaseObject {
+type Token {
   meterNumber: String!
   tokenString: String!
   ID: ID!
-  updatedBy: User
-  createdBy: User
+  status: Int!
 }
 
 extend type Query {

@@ -46,6 +46,9 @@ models:
   ID:
     model:
       - "github.com/kisinga/ATS/app/models.ObjectID"
+  status:
+    model:
+      - "github.com/kisinga/ATS/app/models.TokenStatus"
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int64

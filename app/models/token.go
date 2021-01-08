@@ -1,16 +1,42 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"fmt"
+	"io"
+	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Token struct {
-	MeterNumber string             `json:"meterNumber"`
-	TokenString string             `json:"tokenString"`
-	ID          primitive.ObjectID `json:"ID"`
-	UpdatedBy   *User              `json:"updatedBy"`
-	CreatedBy   *User              `json:"createdBy"`
+	MeterNumber string             `json:"meterNumber,omitempty" bson:"meterNumber,omitempty"`
+	TokenString string             `json:"tokenString,omitempty" bson:"tokenString,omitempty"`
+	ID          primitive.ObjectID `json:"ID,omitempty" bson:"ID,omitempty"`
+	Status      *TokenStatus       `json:"status,omitempty" bson:"status,omitempty"`
 }
 
-func (Token) IsBaseObject() {}
+type TokenStatus int
+
+const (
+	StatusNew    TokenStatus = iota
+	StatusSent   TokenStatus = iota
+	StatusError  TokenStatus = iota
+	StatusLoaded TokenStatus = iota
+)
+
+func (y *TokenStatus) UnmarshalGQL(v interface{}) error {
+	status, ok := v.(int)
+	if !ok {
+		return fmt.Errorf("YesNo must be an int")
+	}
+	*y = TokenStatus(status)
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+func (y TokenStatus) MarshalGQL(w io.Writer) {
+	w.Write([]byte([]byte(strconv.Itoa(int(y)))))
+}
 
 type TokenConnection struct {
 	// A list of the meters, paginated by the provided values

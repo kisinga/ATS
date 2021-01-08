@@ -43,6 +43,7 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
+	Token() TokenResolver
 	User() UserResolver
 }
 
@@ -94,11 +95,10 @@ type ComplexityRoot struct {
 	}
 
 	Token struct {
-		CreatedBy   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		MeterNumber func(childComplexity int) int
+		Status      func(childComplexity int) int
 		TokenString func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
 	}
 
 	TokenConnection struct {
@@ -136,6 +136,9 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error)
+}
+type TokenResolver interface {
+	Status(ctx context.Context, obj *models.Token) (int64, error)
 }
 type UserResolver interface {
 	UpdatedBy(ctx context.Context, obj *models.User) (*models.User, error)
@@ -351,13 +354,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.TokenCreated(childComplexity, args["meterNumber"].(*string)), true
 
-	case "Token.createdBy":
-		if e.complexity.Token.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Token.CreatedBy(childComplexity), true
-
 	case "Token.ID":
 		if e.complexity.Token.ID == nil {
 			break
@@ -372,19 +368,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Token.MeterNumber(childComplexity), true
 
+	case "Token.status":
+		if e.complexity.Token.Status == nil {
+			break
+		}
+
+		return e.complexity.Token.Status(childComplexity), true
+
 	case "Token.tokenString":
 		if e.complexity.Token.TokenString == nil {
 			break
 		}
 
 		return e.complexity.Token.TokenString(childComplexity), true
-
-	case "Token.updatedBy":
-		if e.complexity.Token.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Token.UpdatedBy(childComplexity), true
 
 	case "TokenConnection.data":
 		if e.complexity.TokenConnection.Data == nil {
@@ -564,12 +560,11 @@ type PageInfo {
   hasNextPage: Boolean!
 }
 `, BuiltIn: false},
-	{Name: "app/gql/schema/token.gql", Input: `type Token implements BaseObject {
+	{Name: "app/gql/schema/token.gql", Input: `type Token {
   meterNumber: String!
   tokenString: String!
   ID: ID!
-  updatedBy: User
-  createdBy: User
+  status: Int!
 }
 
 extend type Query {
@@ -1820,7 +1815,7 @@ func (ec *executionContext) _Token_ID(ctx context.Context, field graphql.Collect
 	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Token_updatedBy(ctx context.Context, field graphql.CollectedField, obj *models.Token) (ret graphql.Marshaler) {
+func (ec *executionContext) _Token_status(ctx context.Context, field graphql.CollectedField, obj *models.Token) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1831,57 +1826,28 @@ func (ec *executionContext) _Token_updatedBy(ctx context.Context, field graphql.
 		Object:     "Token",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedBy, nil
+		return ec.resolvers.Token().Status(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*models.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Token_createdBy(ctx context.Context, field graphql.CollectedField, obj *models.Token) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
 		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Token",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
 		return graphql.Null
 	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*models.User)
+	res := resTmp.(int64)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TokenConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.TokenConnection) (ret graphql.Marshaler) {
@@ -3250,13 +3216,6 @@ func (ec *executionContext) _BaseObject(ctx context.Context, sel ast.SelectionSe
 			return graphql.Null
 		}
 		return ec._Meter(ctx, sel, obj)
-	case models.Token:
-		return ec._Token(ctx, sel, &obj)
-	case *models.Token:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Token(ctx, sel, obj)
 	case models.User:
 		return ec._User(ctx, sel, &obj)
 	case *models.User:
@@ -3587,7 +3546,7 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 }
 
-var tokenImplementors = []string{"Token", "BaseObject"}
+var tokenImplementors = []string{"Token"}
 
 func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, obj *models.Token) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, tokenImplementors)
@@ -3601,22 +3560,32 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 		case "meterNumber":
 			out.Values[i] = ec._Token_meterNumber(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "tokenString":
 			out.Values[i] = ec._Token_tokenString(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "ID":
 			out.Values[i] = ec._Token_ID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "updatedBy":
-			out.Values[i] = ec._Token_updatedBy(ctx, field, obj)
-		case "createdBy":
-			out.Values[i] = ec._Token_createdBy(ctx, field, obj)
+		case "status":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Token_status(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3992,6 +3961,21 @@ func (ec *executionContext) unmarshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋb
 
 func (ec *executionContext) marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx context.Context, sel ast.SelectionSet, v primitive.ObjectID) graphql.Marshaler {
 	res := models.MarshalObjectID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	res, err := graphql.UnmarshalInt64(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
