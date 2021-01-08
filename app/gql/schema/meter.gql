@@ -18,6 +18,7 @@ extend type Query {
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
 }
+
 type MeterConnection {
   "A list of the meters, paginated by the provided values"
   data: [Meter!]

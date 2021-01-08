@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r *queryResolver) Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.Meter, error) {
+func (r *queryResolver) Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

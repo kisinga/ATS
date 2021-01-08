@@ -102,6 +102,11 @@ type ComplexityRoot struct {
 		UpdatedBy   func(childComplexity int) int
 	}
 
+	TokenConnection struct {
+		Data     func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
 	User struct {
 		CreatedBy func(childComplexity int) int
 		Email     func(childComplexity int) int
@@ -127,7 +132,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
-	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.Meter, error)
+	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error)
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error)
 }
 type SubscriptionResolver interface {
@@ -395,6 +400,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Token.UpdatedBy(childComplexity), true
 
+	case "TokenConnection.data":
+		if e.complexity.TokenConnection.Data == nil {
+			break
+		}
+
+		return e.complexity.TokenConnection.Data(childComplexity), true
+
+	case "TokenConnection.pageInfo":
+		if e.complexity.TokenConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.TokenConnection.PageInfo(childComplexity), true
+
 	case "User.createdBy":
 		if e.complexity.User.CreatedBy == nil {
 			break
@@ -534,6 +553,7 @@ extend type Query {
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
 }
+
 type MeterConnection {
   "A list of the meters, paginated by the provided values"
   data: [Meter!]
@@ -571,11 +591,18 @@ type PageInfo {
 }
 
 extend type Query {
-  tokens(limit: Int = 10, after: ID = null): [Meter]!
+  tokens(limit: Int = 10, after: ID = null): TokenConnection!
 }
 
 extend type Subscription {
   tokenCreated(meterNumber: String): Token!
+}
+
+type TokenConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [Token!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
 `, BuiltIn: false},
 	{Name: "app/gql/schema/user.gql", Input: `type User implements BaseObject {
@@ -1551,9 +1578,9 @@ func (ec *executionContext) _Query_tokens(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Meter)
+	res := resTmp.(*models.TokenConnection)
 	fc.Result = res
-	return ec.marshalNMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res)
+	return ec.marshalNTokenConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐTokenConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1940,6 +1967,73 @@ func (ec *executionContext) _Token_createdBy(ctx context.Context, field graphql.
 	res := resTmp.(*models.User)
 	fc.Result = res
 	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TokenConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.TokenConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TokenConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Token)
+	fc.Result = res
+	return ec.marshalOToken2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐTokenᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TokenConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *models.TokenConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "TokenConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
@@ -3621,6 +3715,35 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var tokenConnectionImplementors = []string{"TokenConnection"}
+
+func (ec *executionContext) _TokenConnection(ctx context.Context, sel ast.SelectionSet, obj *models.TokenConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tokenConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TokenConnection")
+		case "data":
+			out.Values[i] = ec._TokenConnection_data(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._TokenConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var userImplementors = []string{"User", "BaseObject"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *models.User) graphql.Marshaler {
@@ -3968,43 +4091,6 @@ func (ec *executionContext) marshalNMeter2githubᚗcomᚋkisingaᚋATSᚋappᚋm
 	return ec._Meter(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx context.Context, sel ast.SelectionSet, v []*models.Meter) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx context.Context, sel ast.SelectionSet, v *models.Meter) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4076,6 +4162,20 @@ func (ec *executionContext) marshalNToken2ᚖgithubᚗcomᚋkisingaᚋATSᚋapp�
 		return graphql.Null
 	}
 	return ec._Token(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTokenConnection2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐTokenConnection(ctx context.Context, sel ast.SelectionSet, v models.TokenConnection) graphql.Marshaler {
+	return ec._TokenConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTokenConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐTokenConnection(ctx context.Context, sel ast.SelectionSet, v *models.TokenConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._TokenConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUser2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
@@ -4467,13 +4567,6 @@ func (ec *executionContext) marshalOMeter2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋa
 	return ret
 }
 
-func (ec *executionContext) marshalOMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx context.Context, sel ast.SelectionSet, v *models.Meter) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Meter(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4496,6 +4589,46 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) marshalOToken2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐTokenᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Token) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNToken2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐToken(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {

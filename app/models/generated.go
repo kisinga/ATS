@@ -26,12 +26,5 @@ type PageInfo struct {
 	HasNextPage bool               `json:"hasNextPage"`
 }
 
-type Token struct {
-	MeterNumber string             `json:"meterNumber"`
-	TokenString string             `json:"tokenString"`
-	ID          primitive.ObjectID `json:"ID"`
-	UpdatedBy   *User              `json:"updatedBy"`
-	CreatedBy   *User              `json:"createdBy"`
-}
 
 func (Token) IsBaseObject() {}

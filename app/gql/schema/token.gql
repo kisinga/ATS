@@ -7,9 +7,16 @@ type Token implements BaseObject {
 }
 
 extend type Query {
-  tokens(limit: Int = 10, after: ID = null): [Meter]!
+  tokens(limit: Int = 10, after: ID = null): TokenConnection!
 }
 
 extend type Subscription {
   tokenCreated(meterNumber: String): Token!
+}
+
+type TokenConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [Token!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
