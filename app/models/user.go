@@ -1,10 +1,10 @@
 package models
 
 type User struct {
-	Email string `json:"email,omitempty" bson:"email"`
-	Name  string `json:"name,omitempty" bson:"name"`
-	BaseModel
-	Disabled bool `json:"disabled,omitempty" bson:"disabled"`
+	Email string `json:"email,omitempty" bson:"email,omitempty"`
+	Name  string `json:"name,omitempty" bson:"name,omitempty"`
+	*BaseModel
+	Disabled bool `json:"disabled,omitempty" bson:"disabled,omitempty"`
 }
 
 func (User) IsBaseObject() {}

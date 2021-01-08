@@ -13,9 +13,9 @@ import (
 type Repository interface {
 	Create(context.Context, models.User) (*models.User, error)
 	Read(context.Context, string) (*models.User, error)
+	ReadByID(context.Context, primitive.ObjectID) (*models.User, error)
 	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
-	Update(context.Context, models.User) (*models.User, error)
-	Delete(context.Context, string) (*models.User, error)
+	Update(ctx context.Context, email string, newUser models.User) (*models.User, error)
 }
 
 func NewRepository(database *storage.Database) Repository {
@@ -27,12 +27,24 @@ type repository struct {
 }
 
 func (r repository) Create(ctx context.Context, user models.User) (*models.User, error) {
-	return nil, nil
+	res, err := r.db.Client.Collection("users").InsertOne(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	user.ID = res.InsertedID.(primitive.ObjectID)
+	return &user, nil
 }
+
 func (r repository) Read(ctx context.Context, email string) (*models.User, error) {
 	user := models.User{}
 	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
 }
+
+func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.User, error) {
+	user := models.User{}
+	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"_id": ID}).Decode(&user)
+}
+
 func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error) {
 	users := []*models.User{}
 	DataCursor, dataErr := r.db.Client.Collection("users").Find(ctx,
@@ -52,9 +64,11 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 	}
 	return users, nil
 }
-func (r repository) Update(ctx context.Context, user models.User) (*models.User, error) {
-	return nil, nil
-}
-func (r repository) Delete(ctx context.Context, email string) (*models.User, error) {
-	return nil, nil
+func (r repository) Update(ctx context.Context, email string, newUser models.User) (*models.User, error) {
+	user := models.User{}
+	err := r.db.Client.Collection("users").FindOneAndUpdate(ctx, bson.M{"email": email}, newUser).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

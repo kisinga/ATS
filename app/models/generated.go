@@ -2,11 +2,30 @@
 
 package models
 
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type BaseObject interface {
+	IsBaseObject()
+}
+
 type NewMeter struct {
 	MeterNumber string  `json:"meterNumber"`
 	Location    *string `json:"location"`
 }
 
 type NewUser struct {
+	Name  string `json:"name"`
 	Email string `json:"email"`
 }
+
+type Token struct {
+	MeterNumber string             `json:"meterNumber"`
+	TokenString string             `json:"tokenString"`
+	ID          primitive.ObjectID `json:"ID"`
+	UpdatedBy   *User              `json:"updatedBy"`
+	CreatedBy   *User              `json:"createdBy"`
+}
+
+func (Token) IsBaseObject() {}

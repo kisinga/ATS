@@ -1,9 +1,0 @@
-type Query {
-  # Just a placeholder as base model cannot be empty, for children to extend
-  blank: String
-}
-
-type Mutation {
-  # Just a placeholder as base model cannot be empty, for children to extend
-  blank: String
-}

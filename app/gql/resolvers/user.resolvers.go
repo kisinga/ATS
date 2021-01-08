@@ -5,18 +5,29 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	return r.domain.User.AddUser(ctx, input)
+	me := ForContext(ctx)
+	if me == nil {
+		return nil, errors.New("failed extracting user from context")
+	}
+	return r.domain.User.AddUser(ctx, input, me.Email)
 }
 
 func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	user, err := r.domain.User.GetUser(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	user.Disabled = true
+	return r.domain.User.UpdateUser(ctx, email, *user)
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
@@ -39,3 +50,16 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitiv
 	k, l := r.domain.User.GetMany(ctx, afterID, limit)
 	return k, l
 }
+
+func (r *userResolver) UpdatedBy(ctx context.Context, obj *models.User) (*models.User, error) {
+	return r.domain.User.GetUserByID(ctx, obj.UpdatedBy)
+}
+
+func (r *userResolver) CreatedBy(ctx context.Context, obj *models.User) (*models.User, error) {
+	return r.domain.User.GetUserByID(ctx, obj.CreatedBy)
+}
+
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
+type userResolver struct{ *Resolver }

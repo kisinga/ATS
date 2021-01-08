@@ -1,6 +1,6 @@
 module github.com/kisinga/ATS
 
-go 1.15
+go 1.16
 
 require (
 	firebase.google.com/go v3.13.0+incompatible

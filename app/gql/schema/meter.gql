@@ -1,7 +1,9 @@
-type Meter {
-  ID: ID!
+type Meter implements BaseObject {
   meterNumber: String!
   location: String
+  ID: ID!
+  updatedBy: User
+  createdBy: User
 }
 
 input NewMeter {
@@ -12,6 +14,11 @@ input NewMeter {
 extend type Query {
   meters(limit: Int = 10, after: ID = null): [Meter]!
 }
+
 extend type Mutation {
+  createMeter(input: NewMeter!): Meter!
+}
+
+extend type Subscription {
   createMeter(input: NewMeter!): Meter!
 }

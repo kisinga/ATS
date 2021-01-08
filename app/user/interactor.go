@@ -10,8 +10,10 @@ import (
 
 type Interactor interface {
 	GetUser(context.Context, string) (*models.User, error)
+	GetUserByID(context.Context, primitive.ObjectID) (*models.User, error)
 	GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
-	AddUser(context.Context, models.NewUser) (*models.User, error)
+	AddUser(ctx context.Context, user models.NewUser, creatorEmail string) (*models.User, error)
+	UpdateUser(ctx context.Context, email string, newUser models.User) (*models.User, error)
 }
 
 type interactor struct {
@@ -28,13 +30,30 @@ func (i *interactor) GetUser(ctx context.Context, email string) (*models.User, e
 	return i.repository.Read(ctx, email)
 }
 
-func (i *interactor) AddUser(ctx context.Context, user models.NewUser) (*models.User, error) {
+func (i *interactor) GetUserByID(ctx context.Context, ID primitive.ObjectID) (*models.User, error) {
+	return i.repository.ReadByID(ctx, ID)
+}
+
+func (i *interactor) AddUser(ctx context.Context, user models.NewUser, creatorEmail string) (*models.User, error) {
+	creator, err := i.GetUser(ctx, creatorEmail)
+	if err != nil {
+		return nil, err
+	}
 	newUser := models.User{
 		Email: user.Email,
+		BaseModel: &models.BaseModel{
+			CreatedBy: creator.ID,
+			ID:        primitive.NewObjectID(),
+		},
+		Name: user.Name,
 	}
 	return i.repository.Create(ctx, newUser)
 }
 
 func (i *interactor) GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error) {
 	return i.repository.ReadMany(ctx, after, limit)
+}
+
+func (i *interactor) UpdateUser(ctx context.Context, email string, newUser models.User) (*models.User, error) {
+	return i.repository.Update(ctx, email, newUser)
 }

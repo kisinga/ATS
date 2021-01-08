@@ -1,0 +1,15 @@
+type Token implements BaseObject {
+  meterNumber: String!
+  tokenString: String!
+  ID: ID!
+  updatedBy: User
+  createdBy: User
+}
+
+extend type Query {
+  tokens(limit: Int = 10, after: ID = null): [Meter]!
+}
+
+extend type Subscription {
+  tokenCreated(meterNumber: String): Token!
+}
