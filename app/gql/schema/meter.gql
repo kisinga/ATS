@@ -25,7 +25,3 @@ type MeterConnection {
   "Information for paginating this connection"
   pageInfo: PageInfo!
 }
-
-extend type Subscription {
-  createMeter(input: NewMeter!): Meter!
-}

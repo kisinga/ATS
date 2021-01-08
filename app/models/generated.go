@@ -25,6 +25,3 @@ type PageInfo struct {
 	EndCursor   primitive.ObjectID `json:"endCursor"`
 	HasNextPage bool               `json:"hasNextPage"`
 }
-
-
-func (Token) IsBaseObject() {}

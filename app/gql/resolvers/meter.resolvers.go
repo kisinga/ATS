@@ -5,7 +5,7 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
@@ -13,23 +13,45 @@ import (
 )
 
 func (r *meterResolver) UpdatedBy(ctx context.Context, obj *models.Meter) (*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.domain.User.GetUserByID(ctx, obj.UpdatedBy)
 }
 
 func (r *meterResolver) CreatedBy(ctx context.Context, obj *models.Meter) (*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.domain.User.GetUserByID(ctx, obj.CreatedBy)
 }
 
 func (r *mutationResolver) CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error) {
-	panic(fmt.Errorf("not implemented"))
+	me := ForContext(ctx)
+	if me == nil {
+		return nil, errors.New("failed extracting user from context")
+	}
+	// User in context doesnt have ID, as this is mongo only field
+	me, err := r.domain.User.GetUser(ctx, me.Email)
+	if err != nil {
+		return nil, err
+	}
+	return r.domain.Meter.AddMeter(ctx, input, me.ID)
 }
 
 func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *subscriptionResolver) CreateMeter(ctx context.Context, input models.NewMeter) (<-chan *models.Meter, error) {
-	panic(fmt.Errorf("not implemented"))
+	//Make sure that the provided limit doesnt exceed 50
+	if *limit > 50 {
+		*limit = int64(50)
+	}
+	//This step is very important, as fetching n+1 tuples always gives information about whether there is an element after the specified limit
+	*limit = *limit + 1
+	afterID := primitive.NewObjectID()
+	if after != nil {
+		if after != nil {
+			afterID = *after
+		}
+	}
+	k, l := r.domain.Meter.GetMany(ctx, afterID, limit)
+	connection := models.MeterConnection{
+		Data: k,
+	}
+	connection.CreateConection(*limit)
+	return &connection, l
 }
 
 // Meter returns generated.MeterResolver implementation.

@@ -10,6 +10,8 @@ type Token struct {
 	CreatedBy   *User              `json:"createdBy"`
 }
 
+func (Token) IsBaseObject() {}
+
 type TokenConnection struct {
 	// A list of the meters, paginated by the provided values
 	Data []*Token `json:"data"`

@@ -90,7 +90,6 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		CreateMeter  func(childComplexity int, input models.NewMeter) int
 		TokenCreated func(childComplexity int, meterNumber *string) int
 	}
 
@@ -136,7 +135,6 @@ type QueryResolver interface {
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error)
 }
 type SubscriptionResolver interface {
-	CreateMeter(ctx context.Context, input models.NewMeter) (<-chan *models.Meter, error)
 	TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error)
 }
 type UserResolver interface {
@@ -340,18 +338,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID)), true
-
-	case "Subscription.createMeter":
-		if e.complexity.Subscription.CreateMeter == nil {
-			break
-		}
-
-		args, err := ec.field_Subscription_createMeter_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Subscription.CreateMeter(childComplexity, args["input"].(models.NewMeter)), true
 
 	case "Subscription.tokenCreated":
 		if e.complexity.Subscription.TokenCreated == nil {
@@ -559,10 +545,6 @@ type MeterConnection {
   data: [Meter!]
   "Information for paginating this connection"
   pageInfo: PageInfo!
-}
-
-extend type Subscription {
-  createMeter(input: NewMeter!): Meter!
 }
 `, BuiltIn: false},
 	{Name: "app/gql/schema/shared.gql", Input: `type Query
@@ -788,21 +770,6 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["after"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Subscription_createMeter_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 models.NewMeter
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewMeter2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐNewMeter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
 	return args, nil
 }
 
@@ -1694,58 +1661,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Subscription_createMeter(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = nil
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Subscription",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Subscription_createMeter_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().CreateMeter(rctx, args["input"].(models.NewMeter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return nil
-	}
-	return func() graphql.Marshaler {
-		res, ok := <-resTmp.(<-chan *models.Meter)
-		if !ok {
-			return nil
-		}
-		return graphql.WriterFunc(func(w io.Writer) {
-			w.Write([]byte{'{'})
-			graphql.MarshalString(field.Alias).MarshalGQL(w)
-			w.Write([]byte{':'})
-			ec.marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res).MarshalGQL(w)
-			w.Write([]byte{'}'})
-		})
-	}
 }
 
 func (ec *executionContext) _Subscription_tokenCreated(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
@@ -3665,8 +3580,6 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 
 	switch fields[0].Name {
-	case "createMeter":
-		return ec._Subscription_createMeter(ctx, fields[0])
 	case "tokenCreated":
 		return ec._Subscription_tokenCreated(ctx, fields[0])
 	default:
