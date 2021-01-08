@@ -5,9 +5,11 @@ import (
 )
 
 type Meter struct {
-	MeterNumber string  `json:"meterNumber"`
-	Location    *string `json:"location"`
-	*BaseModel
+	MeterNumber string             `json:"meterNumber"`
+	Location    *string            `json:"location"`
+	ID          primitive.ObjectID `json:"ID"  bson:"_id,omitempty"`
+	CreatedBy   primitive.ObjectID `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
+	UpdatedBy   primitive.ObjectID `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
 }
 type MeterConnection struct {
 	// A list of the meters, paginated by the provided values

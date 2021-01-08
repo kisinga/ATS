@@ -1,6 +1,7 @@
 type User implements BaseObject {
   email: String!
   ID: ID!
+  name: String!
   updatedBy: User
   createdBy: User
 }
@@ -11,7 +12,14 @@ input NewUser {
 }
 
 extend type Query {
-  users(limit: Int = 10, after: ID = null): [User]!
+  users(limit: Int = 10, after: ID = null): UsersConnection!
+}
+
+type UsersConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [User!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
 
 extend type Mutation {

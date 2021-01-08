@@ -2,29 +2,20 @@ import { Injectable } from "@angular/core";
 import { User } from "app/models/user.model";
 import { ReplaySubject } from "rxjs";
 import { Apollo, gql } from "apollo-angular";
+import { UserService } from "./user.service";
+import { GetUsersQueryInput } from "app/models/gql/user.query";
 
 @Injectable({
   providedIn: "root",
 })
 export class StateService {
   userManagementPage = new ReplaySubject<Number>(1);
-  userManagementData = new ReplaySubject<Array<User>>(1);
+  userManagementData = new ReplaySubject<User[]>(1);
 
   dashboardApiKey = new ReplaySubject<string>(1);
-  constructor(private apollo: Apollo) {
-    this.apollo
-      .watchQuery<{ users: Array<User> }>({
-        query: gql`
-          {
-            users {
-              ID
-              email
-            }
-          }
-        `,
-      })
-      .valueChanges.subscribe((result) => {
-        this.userManagementData.next(result.data.users);
-      });
+  constructor(private users: UserService) {
+    this.users.getUsers({}).then((r) => {
+      this.userManagementData.next(r.data.users.data);
+    });
   }
 }

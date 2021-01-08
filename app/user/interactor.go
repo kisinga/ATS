@@ -40,12 +40,10 @@ func (i *interactor) AddUser(ctx context.Context, user models.NewUser, creatorEm
 		return nil, err
 	}
 	newUser := models.User{
-		Email: user.Email,
-		BaseModel: &models.BaseModel{
-			CreatedBy: creator.ID,
-			ID:        primitive.NewObjectID(),
-		},
-		Name: user.Name,
+		Email:     user.Email,
+		CreatedBy: creator.ID,
+		ID:        primitive.NewObjectID(),
+		Name:      user.Name,
 	}
 	return i.repository.Create(ctx, newUser)
 }

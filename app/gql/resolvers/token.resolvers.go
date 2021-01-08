@@ -13,7 +13,22 @@ import (
 )
 
 func (r *queryResolver) Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+	//Make sure that the provided limit doesnt exceed 50
+	if *limit > 50 {
+		*limit = int64(50)
+	}
+	//This step is very important, as fetching n+1 tuples always gives information about whether there is an element after the specified limit
+	*limit = *limit + 1
+	afterID := primitive.NewObjectID()
+	if after != nil {
+		afterID = *after
+	}
+	k, l := r.domain.Token.GetMany(ctx, afterID, limit)
+	connection := models.TokenConnection{
+		Data: k,
+	}
+	connection.CreateConection(*limit)
+	return &connection, l
 }
 
 func (r *subscriptionResolver) TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error) {
@@ -21,7 +36,7 @@ func (r *subscriptionResolver) TokenCreated(ctx context.Context, meterNumber *st
 }
 
 func (r *tokenResolver) Status(ctx context.Context, obj *models.Token) (int64, error) {
-	panic(fmt.Errorf("not implemented"))
+	return int64(int(obj.Status)), nil
 }
 
 // Token returns generated.TokenResolver implementation.

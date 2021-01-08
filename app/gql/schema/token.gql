@@ -3,6 +3,7 @@ type Token {
   tokenString: String!
   ID: ID!
   status: Int!
+  apiKey: ID!
 }
 
 extend type Query {

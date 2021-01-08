@@ -7,6 +7,12 @@ import { of, ReplaySubject } from "rxjs";
 import { Apollo } from "apollo-angular";
 import { catchError } from "rxjs/operators";
 import dayjs from "dayjs";
+import {
+  GetUsersQueryInput,
+  UsersQuery,
+  UsersQueryResult,
+} from "app/models/gql/user.query";
+import { ApolloQueryResult } from "@apollo/client/core";
 
 @Injectable({
   providedIn: "root",
@@ -80,5 +86,15 @@ export class UserService {
   destroyToken() {
     window.localStorage.removeItem("token");
     window.localStorage.removeItem("tokenExpiry");
+  }
+  getUsers(
+    inputs: GetUsersQueryInput
+  ): Promise<ApolloQueryResult<UsersQueryResult>> {
+    return this.apollo
+      .query<UsersQueryResult>({
+        query: UsersQuery,
+        variables: inputs,
+      })
+      .toPromise();
   }
 }

@@ -95,6 +95,7 @@ type ComplexityRoot struct {
 	}
 
 	Token struct {
+		APIKey      func(childComplexity int) int
 		ID          func(childComplexity int) int
 		MeterNumber func(childComplexity int) int
 		Status      func(childComplexity int) int
@@ -110,7 +111,13 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int) int
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
 		UpdatedBy func(childComplexity int) int
+	}
+
+	UsersConnection struct {
+		Data     func(childComplexity int) int
+		PageInfo func(childComplexity int) int
 	}
 }
 
@@ -132,7 +139,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
 	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error)
-	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error)
+	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error)
 }
 type SubscriptionResolver interface {
 	TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error)
@@ -354,6 +361,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.TokenCreated(childComplexity, args["meterNumber"].(*string)), true
 
+	case "Token.apiKey":
+		if e.complexity.Token.APIKey == nil {
+			break
+		}
+
+		return e.complexity.Token.APIKey(childComplexity), true
+
 	case "Token.ID":
 		if e.complexity.Token.ID == nil {
 			break
@@ -417,12 +431,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
+	case "User.name":
+		if e.complexity.User.Name == nil {
+			break
+		}
+
+		return e.complexity.User.Name(childComplexity), true
+
 	case "User.updatedBy":
 		if e.complexity.User.UpdatedBy == nil {
 			break
 		}
 
 		return e.complexity.User.UpdatedBy(childComplexity), true
+
+	case "UsersConnection.data":
+		if e.complexity.UsersConnection.Data == nil {
+			break
+		}
+
+		return e.complexity.UsersConnection.Data(childComplexity), true
+
+	case "UsersConnection.pageInfo":
+		if e.complexity.UsersConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.UsersConnection.PageInfo(childComplexity), true
 
 	}
 	return 0, false
@@ -565,6 +600,7 @@ type PageInfo {
   tokenString: String!
   ID: ID!
   status: Int!
+  apiKey: ID!
 }
 
 extend type Query {
@@ -585,6 +621,7 @@ type TokenConnection {
 	{Name: "app/gql/schema/user.gql", Input: `type User implements BaseObject {
   email: String!
   ID: ID!
+  name: String!
   updatedBy: User
   createdBy: User
 }
@@ -595,7 +632,14 @@ input NewUser {
 }
 
 extend type Query {
-  users(limit: Int = 10, after: ID = null): [User]!
+  users(limit: Int = 10, after: ID = null): UsersConnection!
+}
+
+type UsersConnection {
+  "A list of the meters, paginated by the provided values"
+  data: [User!]
+  "Information for paginating this connection"
+  pageInfo: PageInfo!
 }
 
 extend type Mutation {
@@ -1582,9 +1626,9 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.User)
+	res := resTmp.(*models.UsersConnection)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUsersConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUsersConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1850,6 +1894,41 @@ func (ec *executionContext) _Token_status(ctx context.Context, field graphql.Col
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Token_apiKey(ctx context.Context, field graphql.CollectedField, obj *models.Token) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Token",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(primitive.ObjectID)
+	fc.Result = res
+	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _TokenConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.TokenConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1987,6 +2066,41 @@ func (ec *executionContext) _User_ID(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_updatedBy(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2049,6 +2163,73 @@ func (ec *executionContext) _User_createdBy(ctx context.Context, field graphql.C
 	res := resTmp.(*models.User)
 	fc.Result = res
 	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UsersConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.UsersConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UsersConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUserᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UsersConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *models.UsersConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UsersConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3586,6 +3767,11 @@ func (ec *executionContext) _Token(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		case "apiKey":
+			out.Values[i] = ec._Token_apiKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3647,6 +3833,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "name":
+			out.Values[i] = ec._User_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "updatedBy":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3669,6 +3860,35 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				res = ec._User_createdBy(ctx, field, obj)
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var usersConnectionImplementors = []string{"UsersConnection"}
+
+func (ec *executionContext) _UsersConnection(ctx context.Context, sel ast.SelectionSet, obj *models.UsersConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, usersConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UsersConnection")
+		case "data":
+			out.Values[i] = ec._UsersConnection_data(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._UsersConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4079,43 +4299,6 @@ func (ec *executionContext) marshalNUser2githubᚗcomᚋkisingaᚋATSᚋappᚋmo
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v []*models.User) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4124,6 +4307,20 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋapp�
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUsersConnection2githubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUsersConnection(ctx context.Context, sel ast.SelectionSet, v models.UsersConnection) graphql.Marshaler {
+	return ec._UsersConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUsersConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUsersConnection(ctx context.Context, sel ast.SelectionSet, v *models.UsersConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UsersConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalN_FieldSet2string(ctx context.Context, v interface{}) (string, error) {
@@ -4516,6 +4713,46 @@ func (ec *executionContext) marshalOToken2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋa
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNToken2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐToken(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.User) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

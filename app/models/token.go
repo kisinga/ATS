@@ -12,9 +12,13 @@ type Token struct {
 	MeterNumber string             `json:"meterNumber,omitempty" bson:"meterNumber,omitempty"`
 	TokenString string             `json:"tokenString,omitempty" bson:"tokenString,omitempty"`
 	ID          primitive.ObjectID `json:"ID,omitempty" bson:"ID,omitempty"`
-	Status      *TokenStatus       `json:"status,omitempty" bson:"status,omitempty"`
+	Status      TokenStatus        `json:"status,omitempty" bson:"status,omitempty"`
+	APIKey      primitive.ObjectID `json:"apiKey,omitempty" bson:"apiKey,omitempty"`
 }
-
+type NewToken struct {
+	MeterNumber string
+	TokenString string
+}
 type TokenStatus int
 
 const (

@@ -42,9 +42,7 @@ func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primiti
 	*limit = *limit + 1
 	afterID := primitive.NewObjectID()
 	if after != nil {
-		if after != nil {
-			afterID = *after
-		}
+		afterID = *after
 	}
 	k, l := r.domain.Meter.GetMany(ctx, afterID, limit)
 	connection := models.MeterConnection{

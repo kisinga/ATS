@@ -6,7 +6,6 @@ package resolvers
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
@@ -22,19 +21,45 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser)
 }
 
 func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*models.User, error) {
-	user, err := r.domain.User.GetUser(ctx, email)
+	me := ForContext(ctx)
+	if me == nil {
+		return nil, errors.New("failed extracting user from context")
+	}
+	// user in context doesnt have ID field
+	me, err := r.domain.User.GetUser(ctx, me.Email)
 	if err != nil {
 		return nil, err
 	}
-	user.Disabled = true
-	return r.domain.User.UpdateUser(ctx, email, *user)
+	target, err := r.domain.User.GetUser(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	target.Disabled = true
+	target.UpdatedBy = me.ID
+	return r.domain.User.UpdateUser(ctx, email, *target)
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	me := ForContext(ctx)
+	if me == nil {
+		return nil, errors.New("failed extracting user from context")
+	}
+	// user in context doesnt have ID field
+	me, err := r.domain.User.GetUser(ctx, me.Email)
+	if err != nil {
+		return nil, err
+	}
+	target, err := r.domain.User.GetUser(ctx, input.Email)
+	if err != nil {
+		return nil, err
+	}
+	target.Email = input.Email
+	target.Name = input.Name
+	target.UpdatedBy = me.ID
+	return r.domain.User.UpdateUser(ctx, input.Email, *target)
 }
 
-func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitive.ObjectID) ([]*models.User, error) {
+func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error) {
 	//Make sure that the provided limit doesnt exceed 50
 	if *limit > 50 {
 		*limit = int64(50)
@@ -43,12 +68,14 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitiv
 	*limit = *limit + 1
 	afterID := primitive.NewObjectID()
 	if after != nil {
-		if after != nil {
-			afterID = *after
-		}
+		afterID = *after
 	}
 	k, l := r.domain.User.GetMany(ctx, afterID, limit)
-	return k, l
+	connection := models.UsersConnection{
+		Data: k,
+	}
+	connection.CreateConection(*limit)
+	return &connection, l
 }
 
 func (r *userResolver) UpdatedBy(ctx context.Context, obj *models.User) (*models.User, error) {
