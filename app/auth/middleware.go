@@ -16,6 +16,11 @@ import (
 
 func Middleware(firebase *firebase.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Passthrough websocket requests
+		if ws := c.Request.Header.Get("Upgrade"); ws == "websocket" {
+			c.Next()
+			return
+		}
 		// Get the ID token sent by the client
 		session, err := c.Cookie("session")
 		token := ""
@@ -33,24 +38,9 @@ func Middleware(firebase *firebase.App) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, json)
 			return
 		}
-		// Verify the session cookie. In this case an additional check is added to detect
-		// if the user's Firebase session was revoked, user deleted/disabled, etc.
-		client, err := firebase.Auth(context.Background())
-		firebaseToken, err := client.VerifySessionCookieAndCheckRevoked(c.Request.Context(), token)
+		user, err := GetUserFromToken(c.Request.Context(), firebase, token)
 		if err != nil {
-			// Session cookie is invalid. Force user to login.
-			json, _ := json.Marshal("Invalid token")
-			// Session is invalid. Force user to login.
-			c.AbortWithStatusJSON(http.StatusForbidden, json)
-			return
-		}
-		user := models.User{}
-		dbByte, err := json.Marshal(firebaseToken.Claims)
-		err = json.Unmarshal(dbByte, &user)
-		if err != nil {
-			// Session cookie is invalid. Force user to login.
-			json, _ := json.Marshal("Error Marshalling userdata into json")
-			// Session is invalid. Force user to login.
+			json, _ := json.Marshal(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, json)
 			return
 		}
@@ -65,6 +55,22 @@ func Middleware(firebase *firebase.App) gin.HandlerFunc {
 		// next.ServeHTTP(w, r)
 		c.Next()
 	}
+}
+func GetUserFromToken(ctx context.Context, firebase *firebase.App, token string) (*models.User, error) {
+	// Verify the session cookie. In this case an additional check is added to detect
+	// if the user's Firebase session was revoked, user deleted/disabled, etc.
+	client, err := firebase.Auth(context.Background())
+	firebaseToken, err := client.VerifySessionCookieAndCheckRevoked(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	user := models.User{}
+	dbByte, err := json.Marshal(firebaseToken.Claims)
+	err = json.Unmarshal(dbByte, &user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 // TokenFromHeader tries to retreive the token string from the
@@ -110,8 +116,8 @@ func GetUser(ctx *gin.Context) *models.User {
 	if !exists {
 		return nil
 	}
-	vv := v.(models.User)
-	return &vv
+	vv := v.(*models.User)
+	return vv
 }
 
 func GetUserFromContext(ctx context.Context, domain *registry.Domain) (*models.User, error) {

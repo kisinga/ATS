@@ -2,8 +2,9 @@ package app
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -36,7 +37,7 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 		MaxAge:           12 * time.Hour,
 	}))
 	gin.Use(auth.GinContextToContextMiddleware())
-	apiRoutes := gin.Group("/api", auth.Middleware(firebase), graphqlHandler(domain))
+	apiRoutes := gin.Group("/api", auth.Middleware(firebase), graphqlHandler(domain, firebase))
 	{
 		apiRoutes.POST("")
 		apiRoutes.GET("")
@@ -52,7 +53,7 @@ func playgroundHandler() gin.HandlerFunc {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
-func graphqlHandler(domain *registry.Domain) gin.HandlerFunc {
+func graphqlHandler(domain *registry.Domain, fb *firebase.App) gin.HandlerFunc {
 
 	r := resolvers.NewResolver(domain)
 
@@ -64,9 +65,25 @@ func graphqlHandler(domain *registry.Domain) gin.HandlerFunc {
 				return true
 			},
 		},
-		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
-			fmt.Println(initPayload)
-			return ctx, nil
+		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, error) {
+			if _, ok := payload["Authorization"].(string); !ok {
+				return ctx, errors.New("No auth in payload")
+			}
+			bearer := payload["Authorization"].(string)
+			token := ""
+			if len(bearer) > 7 && strings.ToUpper(bearer[0:6]) == "BEARER" {
+				token = bearer[7:]
+			}
+			user, err := auth.GetUserFromToken(ctx, fb, token)
+			if err != nil {
+				return ctx, err
+			}
+			ginContext, err := auth.GinContextFromContext(ctx)
+			if err != nil {
+				return ctx, err
+			}
+			ginContext.Set("user", user)
+			return auth.GinContextToContext(ginContext), nil
 		},
 	})
 
