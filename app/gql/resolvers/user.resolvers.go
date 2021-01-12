@@ -14,15 +14,15 @@ import (
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	me := auth.ForContext(ctx)
-	if me == nil {
+	me, err := auth.GetUserFromContext(ctx, r.domain)
+	if err != nil {
 		return nil, errors.New("failed extracting user from context")
 	}
 	return r.domain.User.AddUser(ctx, input, me.Email)
 }
 
 func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*models.User, error) {
-	me, err := auth.GetUserIDFromContext(ctx, r.domain)
+	me, err := auth.GetUserFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*mode
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	me, err := auth.GetUserIDFromContext(ctx, r.domain)
+	me, err := auth.GetUserFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}

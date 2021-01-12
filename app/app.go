@@ -35,13 +35,12 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	apiRoutes := gin.Group("/api", auth.Mid(firebase), graphqlHandler(domain))
+	gin.Use(auth.GinContextToContextMiddleware())
+	apiRoutes := gin.Group("/api", auth.Middleware(firebase), graphqlHandler(domain))
 	{
 		apiRoutes.POST("")
 		apiRoutes.GET("")
 	}
-	gin.Use(auth.GinContextToContextMiddleware())
-
 	gin.GET("/playground", playgroundHandler())
 
 	return gin.Run(port)

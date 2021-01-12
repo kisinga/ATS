@@ -9,53 +9,39 @@ import (
 	"strings"
 
 	firebase "firebase.google.com/go"
+	"github.com/gin-gonic/gin"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/registry"
 )
 
-// A private key for context that only this package can access. This is important
-// to prevent collisions between different context uses
-var userCtxKey = &contextKey{"user"}
-
-type contextKey struct {
-	name string
-}
-
-type Auth struct {
-	firebase *firebase.App
-}
-
-func NewAuth(firebase *firebase.App) *Auth {
-	return &Auth{
-		firebase,
-	}
-}
-
-func (a Auth) Middleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func Middleware(firebase *firebase.App) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// Get the ID token sent by the client
-		session, err := r.Cookie("session")
+		session, err := c.Cookie("session")
 		token := ""
 		if err != nil {
 			// Session cookie is unavailable. Force user to login.
 			// http.Redirect(w, r, "/login", http.StatusFound)
 			// return
-			token = tokenFromHeader(r)
+			token = tokenFromHeader(c.Request)
 		} else {
-			token = session.Value
+			token = session
 		}
 		if token == "" {
+			json, _ := json.Marshal("Invalid token")
 			// Session is invalid. Force user to login.
-			http.Error(w, "Invalid token", http.StatusForbidden)
+			c.AbortWithStatusJSON(http.StatusForbidden, json)
 			return
 		}
 		// Verify the session cookie. In this case an additional check is added to detect
 		// if the user's Firebase session was revoked, user deleted/disabled, etc.
-		client, err := a.firebase.Auth(context.Background())
-		firebaseToken, err := client.VerifySessionCookieAndCheckRevoked(r.Context(), token)
+		client, err := firebase.Auth(context.Background())
+		firebaseToken, err := client.VerifySessionCookieAndCheckRevoked(c.Request.Context(), token)
 		if err != nil {
 			// Session cookie is invalid. Force user to login.
-			http.Error(w, "Invalid token", http.StatusForbidden)
+			json, _ := json.Marshal("Invalid token")
+			// Session is invalid. Force user to login.
+			c.AbortWithStatusJSON(http.StatusForbidden, json)
 			return
 		}
 		user := models.User{}
@@ -63,18 +49,22 @@ func (a Auth) Middleware(next http.Handler) http.Handler {
 		err = json.Unmarshal(dbByte, &user)
 		if err != nil {
 			// Session cookie is invalid. Force user to login.
-			http.Error(w, "Error Marshalling userdata into json", http.StatusInternalServerError)
+			json, _ := json.Marshal("Error Marshalling userdata into json")
+			// Session is invalid. Force user to login.
+			c.AbortWithStatusJSON(http.StatusInternalServerError, json)
 			return
 		}
 		// Token is authenticated, pass it through
-		fmt.Println(user)
+		// fmt.Println(token)
+		// fmt.Println(user)
 		// put it in context
-		ctx := context.WithValue(r.Context(), userCtxKey, user)
-
-		// and call the next with our new context
-		r = r.WithContext(ctx)
-		next.ServeHTTP(w, r)
-	})
+		c.Set("user", user)
+		// ctx := context.WithValue(c.Request.Context(), userCtxKey, user)
+		// // // and call the next with our new context
+		// c.Request = c.Request.WithContext(ctx)
+		// next.ServeHTTP(w, r)
+		c.Next()
+	}
 }
 
 // TokenFromHeader tries to retreive the token string from the
@@ -88,24 +78,54 @@ func tokenFromHeader(r *http.Request) string {
 	return ""
 }
 
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-//Please note  User in context doesnt have ID, as this is mongo only field,
-// while this user is derived from firebase jwt
-func ForContext(ctx context.Context) *models.User {
-	raw, _ := ctx.Value(userCtxKey).(*models.User)
-	// raw = &models.User{
-	// 	Email: "kamana@kisinga.family",
-	// }
-	return raw
+func GinContextToContextMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), "GinContextKey", c)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+func GinContextToContext(c *gin.Context) context.Context {
+	ctx := context.WithValue(c.Request.Context(), "GinContextKey", c)
+	c.Request = c.Request.WithContext(ctx)
+	return ctx
+}
+func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
+	ginContext := ctx.Value("GinContextKey")
+	if ginContext == nil {
+		err := fmt.Errorf("could not retrieve gin.Context")
+		return nil, err
+	}
+
+	gc, ok := ginContext.(*gin.Context)
+	if !ok {
+		err := fmt.Errorf("gin.Context has wrong type")
+		return nil, err
+	}
+	return gc, nil
 }
 
-func GetUserIDFromContext(ctx context.Context, domain *registry.Domain) (*models.User, error) {
-	me := ForContext(ctx)
+func GetUser(ctx *gin.Context) *models.User {
+	v, exists := ctx.Get("user")
+	if !exists {
+		return nil
+	}
+	vv := v.(models.User)
+	return &vv
+}
+
+func GetUserFromContext(ctx context.Context, domain *registry.Domain) (*models.User, error) {
+	cc, err := GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// me := ForContext(ctx)
+	me := GetUser(cc)
 	if me == nil {
 		return nil, errors.New("failed extracting user from context")
 	}
 	// user in context doesnt have ID field
-	me, err := domain.User.GetUser(ctx, me.Email)
+	me, err = domain.User.GetUser(ctx, me.Email)
 	if err != nil {
 		return nil, err
 	}

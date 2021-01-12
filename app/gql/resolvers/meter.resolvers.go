@@ -21,7 +21,7 @@ func (r *meterResolver) CreatedBy(ctx context.Context, obj *models.Meter) (*mode
 }
 
 func (r *mutationResolver) CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error) {
-	me, err := auth.GetUserIDFromContext(ctx, r.domain)
+	me, err := auth.GetUserFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}
