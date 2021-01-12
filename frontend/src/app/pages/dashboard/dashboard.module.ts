@@ -1,6 +1,11 @@
 import { NgModule } from "@angular/core";
 import { NbEvaIconsModule } from "@nebular/eva-icons";
-import { NbButtonModule, NbCardModule, NbIconModule } from "@nebular/theme";
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbIconModule,
+  NbLayoutModule,
+} from "@nebular/theme";
 
 import { ThemeModule } from "../../@theme/theme.module";
 import { DashboardComponent } from "./dashboard.component";
@@ -12,6 +17,7 @@ import { DashboardComponent } from "./dashboard.component";
     NbEvaIconsModule,
     NbIconModule,
     ThemeModule,
+    NbLayoutModule,
   ],
   declarations: [DashboardComponent],
 })

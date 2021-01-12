@@ -25,10 +25,10 @@ import (
 
 func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
 	// ctx := context.Background()
-	gin := gin.Default()
+	router := gin.Default()
 
 	domain := registry.NewDomain(db)
-	gin.Use(cors.New(cors.Config{
+	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
 		AllowHeaders:     []string{"*"},
@@ -36,15 +36,16 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	gin.Use(auth.GinContextToContextMiddleware())
-	apiRoutes := gin.Group("/api", auth.Middleware(firebase), graphqlHandler(domain, firebase))
+	router.Use(gin.Recovery())
+	router.Use(auth.GinContextToContextMiddleware())
+	apiRoutes := router.Group("/api", auth.Middleware(firebase), graphqlHandler(domain, firebase))
 	{
 		apiRoutes.POST("")
 		apiRoutes.GET("")
 	}
-	gin.GET("/playground", playgroundHandler())
+	router.GET("/playground", playgroundHandler())
 
-	return gin.Run(port)
+	return router.Run(port)
 }
 func playgroundHandler() gin.HandlerFunc {
 	h := playground.Handler("GraphQL", "/api")

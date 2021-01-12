@@ -46,7 +46,9 @@ func (i *interactor) ListenForNew(ctx context.Context, consumer chan *models.API
 		for {
 			select {
 			case <-ctx.Done():
-				delete(i.listeners, id)
+				if _, ok := i.listeners[id]; ok {
+					delete(i.listeners, id)
+				}
 			}
 		}
 	}(id)
