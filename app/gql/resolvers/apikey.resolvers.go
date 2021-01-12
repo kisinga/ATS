@@ -26,6 +26,12 @@ func (r *mutationResolver) Generate(ctx context.Context) (*models.APIKey, error)
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
 	kk := make(chan *models.APIKey)
 	r.domain.APIKey.ListenForNew(ctx, kk)
+	go func() {
+		key, err := r.domain.APIKey.GetLatest(ctx)
+		if err == nil {
+			kk <- key
+		}
+	}()
 	return kk, nil
 }
 
