@@ -15,7 +15,7 @@ func (r *aPIKeyResolver) CreatedBy(ctx context.Context, obj *models.APIKey) (*mo
 	return r.domain.User.GetUserByID(ctx, obj.CreatedBy)
 }
 
-func (r *mutationResolver) Generate(ctx context.Context) (*models.APIKey, error) {
+func (r *mutationResolver) GenerateAPIKey(ctx context.Context) (*models.APIKey, error) {
 	me, err := auth.GetUserFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err

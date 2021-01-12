@@ -2,6 +2,8 @@ package apiKey
 
 import (
 	"context"
+	"errors"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -17,47 +19,59 @@ type Interactor interface {
 type interactor struct {
 	repository Repository
 	listeners  map[primitive.ObjectID]chan *models.APIKey
+	mu         sync.Mutex
 }
 
 func NewIterator(repo Repository) Interactor {
 	kk := make(map[primitive.ObjectID]chan *models.APIKey, 0)
-	go keyCreated(kk, repo.apiKeyChan())
-	return &interactor{repo, kk}
+	i := &interactor{repository: repo, listeners: kk}
+	go keyCreated(i, repo.apiKeyChan())
+	return i
 
 }
 
-func keyCreated(listeners map[primitive.ObjectID]chan *models.APIKey, channel chan *models.APIKey) {
+func keyCreated(i *interactor, channel chan *models.APIKey) {
 	for {
 		select {
 		case key := <-channel:
-			for _, listener := range listeners {
+			i.mu.Lock()
+			for _, listener := range i.listeners {
 				go func(l chan *models.APIKey) {
 					l <- key
 				}(listener)
 			}
+			i.mu.Unlock()
 		}
 	}
 }
 
 func (i *interactor) ListenForNew(ctx context.Context, consumer chan *models.APIKey) {
 	id := primitive.NewObjectID()
+	i.mu.Lock()
 	i.listeners[id] = consumer
-	go func(id primitive.ObjectID) {
-		for {
-			select {
-			case <-ctx.Done():
-				if _, ok := i.listeners[id]; ok {
-					delete(i.listeners, id)
-				}
-			}
-		}
-	}(id)
+	i.mu.Unlock()
+
+	// go func(id primitive.ObjectID) {
+	// 	for {
+	// 		select {
+	// 		// case <-ctx.Done():
+	// 		// 	if _, ok := i.listeners[id]; ok {
+	// 		// 		i.mu.Lock()
+	// 		// 		delete(i.listeners, id)
+	// 		// 		i.mu.Unlock()
+	// 		// 	}
+	// 		// }
+	// 	}
+	// }(id)
 }
 
 func (i *interactor) GetLatest(ctx context.Context) (*models.APIKey, error) {
 	// create a limit of 1, then use the readmany func to get the latest value
 	limit := int64(1)
 	res, err := i.repository.ReadMany(ctx, primitive.NewObjectID(), &limit)
+	if len(res) < 1 {
+		return nil, errors.New("Nothing found")
+	}
 	return res[0], err
 }
 

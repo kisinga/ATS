@@ -22,18 +22,15 @@
         <nb-card-header>KEY</nb-card-header>
         <nb-card-body>
          <div>
-          <nb-layout-column >
-            <h3>
-              {{apiKey?.ID}}
-            </h3>
-          </nb-layout-column>
-          <nb-layout-column >
-            <p>
-              {{apiKey?.createdBy.email}}
-             </p>
-          </nb-layout-column>
-          <button nbButton status="danger" (click)="generateKey()"><nb-icon icon="alert-circle-outline"></nb-icon>GENERATE NEW KEY</button>
+          <h3>
+            {{apiKey?.ID}}
+          </h3>
+          <p>
+            {{apiKey?.createdBy.email}}
+           </p>
          </div>
+         <button nbButton status="danger" (click)="generateKey()"><nb-icon icon="alert-circle-outline"></nb-icon>GENERATE NEW KEY</button>
+
         </nb-card-body>
       </nb-card>
     </nb-card-back>

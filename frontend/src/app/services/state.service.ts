@@ -15,6 +15,7 @@ export class StateService {
   userManagementData = new ReplaySubject<User[]>(1);
 
   dashboardApiKey = new ReplaySubject<APIKey>(1);
+  apikeyloading = new ReplaySubject<boolean>(1);
   constructor(
     private users: UserService,
     private apikeyService: ApiKeyService
@@ -23,6 +24,8 @@ export class StateService {
       this.userManagementData.next(r.data.users.data);
     });
     this.apikeyService.subscribeKey().subscribe((v) => {
+      this.apikeyloading.next(false);
+      console.log(v);
       this.dashboardApiKey.next(v.data.apiKeyChanged);
     });
   }

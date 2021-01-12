@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { APIKey } from "app/models/api-key.model";
+import { ApiKeyService } from "app/services/api-key.service";
 import { StateService } from "app/services/state.service";
 import { ReplaySubject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -11,8 +12,12 @@ import { takeUntil } from "rxjs/operators";
 export class DashboardComponent implements OnInit, OnDestroy {
   apiKey: APIKey;
   comopnentDestroyed: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+  loading: true;
 
-  constructor(private state: StateService) {
+  constructor(
+    private state: StateService,
+    private apikeyService: ApiKeyService
+  ) {
     this.state.dashboardApiKey
       .pipe(takeUntil(this.comopnentDestroyed))
       .subscribe((k) => {
@@ -24,5 +29,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.comopnentDestroyed.next(true);
   }
-  generateKey() {}
+  generateKey() {
+    this.apikeyService
+      .generate()
+      .toPromise()
+      .then((r) => {
+        console.log(r);
+      });
+  }
 }

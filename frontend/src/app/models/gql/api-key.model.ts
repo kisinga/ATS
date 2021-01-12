@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { APIKey } from "../api-key.model";
 
-export const APIKeSubscription = gql`
+export const APIKeySubscription = gql`
   subscription apiKeyChanged {
     apiKeyChanged {
       ID
@@ -12,7 +12,21 @@ export const APIKeSubscription = gql`
     }
   }
 `;
+export const APIKeyGenerate = gql`
+  mutation generateAPIKey {
+    generateAPIKey {
+      ID
+      createdBy {
+        email
+      }
+    }
+  }
+`;
 
 export interface APIKeySubscriptionResult {
   apiKeyChanged?: APIKey;
+}
+
+export interface APIKeyGenerateResult {
+  generateAPIKey?: APIKey;
 }

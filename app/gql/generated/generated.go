@@ -70,11 +70,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMeter func(childComplexity int, input models.NewMeter) int
-		CreateUser  func(childComplexity int, input models.NewUser) int
-		DisableUser func(childComplexity int, email string) int
-		Generate    func(childComplexity int) int
-		UpdateUser  func(childComplexity int, input models.NewUser) int
+		CreateMeter    func(childComplexity int, input models.NewMeter) int
+		CreateUser     func(childComplexity int, input models.NewUser) int
+		DisableUser    func(childComplexity int, email string) int
+		GenerateAPIKey func(childComplexity int) int
+		UpdateUser     func(childComplexity int, input models.NewUser) int
 	}
 
 	PageInfo struct {
@@ -129,7 +129,7 @@ type MeterResolver interface {
 	CreatedBy(ctx context.Context, obj *models.Meter) (*models.User, error)
 }
 type MutationResolver interface {
-	Generate(ctx context.Context) (*models.APIKey, error)
+	GenerateAPIKey(ctx context.Context) (*models.APIKey, error)
 	CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error)
 	CreateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 	DisableUser(ctx context.Context, email string) (*models.User, error)
@@ -266,12 +266,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DisableUser(childComplexity, args["email"].(string)), true
 
-	case "Mutation.generate":
-		if e.complexity.Mutation.Generate == nil {
+	case "Mutation.generateAPIKey":
+		if e.complexity.Mutation.GenerateAPIKey == nil {
 			break
 		}
 
-		return e.complexity.Mutation.Generate(childComplexity), true
+		return e.complexity.Mutation.GenerateAPIKey(childComplexity), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -546,7 +546,7 @@ var sources = []*ast.Source{
 }
 
 extend type Mutation {
-  generate: APIKey!
+  generateAPIKey: APIKey!
 }
 
 extend type Subscription {
@@ -1168,7 +1168,7 @@ func (ec *executionContext) _MeterConnection_pageInfo(ctx context.Context, field
 	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐPageInfo(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_generate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_generateAPIKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1186,7 +1186,7 @@ func (ec *executionContext) _Mutation_generate(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Generate(rctx)
+		return ec.resolvers.Mutation().GenerateAPIKey(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3560,8 +3560,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "generate":
-			out.Values[i] = ec._Mutation_generate(ctx, field)
+		case "generateAPIKey":
+			out.Values[i] = ec._Mutation_generateAPIKey(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
