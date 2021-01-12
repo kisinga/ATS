@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error", err)
 	}
-	err = app.NewApp(db, firebase, getPort(), prod)
+	err = app.Serve(db, firebase, getPort(), prod)
 	if err != nil {
 		log.Fatalln("Error", err)
 	}

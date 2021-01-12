@@ -62,6 +62,7 @@ export class UserService {
       .then((t) => {
         const token = JSON.parse(JSON.stringify(t));
         this.saveToken(token.Bearer, token.expiry);
+        // console.log(token);
         this.router.navigate(["/"]);
       });
   }

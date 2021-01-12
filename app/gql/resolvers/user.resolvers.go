@@ -7,13 +7,14 @@ import (
 	"context"
 	"errors"
 
+	"github.com/kisinga/ATS/app/auth"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	me := ForContext(ctx)
+	me := auth.ForContext(ctx)
 	if me == nil {
 		return nil, errors.New("failed extracting user from context")
 	}
@@ -21,12 +22,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input models.NewUser)
 }
 
 func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*models.User, error) {
-	me := ForContext(ctx)
-	if me == nil {
-		return nil, errors.New("failed extracting user from context")
-	}
-	// user in context doesnt have ID field
-	me, err := r.domain.User.GetUser(ctx, me.Email)
+	me, err := auth.GetUserIDFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}
@@ -40,12 +36,7 @@ func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*mode
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
-	me := ForContext(ctx)
-	if me == nil {
-		return nil, errors.New("failed extracting user from context")
-	}
-	// user in context doesnt have ID field
-	me, err := r.domain.User.GetUser(ctx, me.Email)
+	me, err := auth.GetUserIDFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}

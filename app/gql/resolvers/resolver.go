@@ -3,9 +3,6 @@
 package resolvers
 
 import (
-	"context"
-
-	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/registry"
 )
 
@@ -26,12 +23,4 @@ type Resolver struct {
 
 func NewResolver(domain *registry.Domain) *Resolver {
 	return &Resolver{domain}
-}
-
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-//Please note  User in context doesnt have ID, as this is mongo only field,
-// while this user is derived from firebase jwt
-func ForContext(ctx context.Context) *models.User {
-	raw, _ := ctx.Value(userCtxKey).(*models.User)
-	return raw
 }

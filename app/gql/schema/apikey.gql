@@ -1,9 +1,12 @@
-type APIKey implements BaseObject {
+type APIKey {
   ID: ID!
-  updatedBy: User
   createdBy: User
 }
 
 extend type Mutation {
   generate: APIKey!
+}
+
+extend type Subscription {
+  apiKeyChanged: APIKey!
 }

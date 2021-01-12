@@ -1,4 +1,5 @@
 # ATS ![logo](assets/logo/orange.png)
+
 This hosts code for Automated Token System
 
 Folder structure  
@@ -7,25 +8,24 @@ Folder structure
 /cmd is the entry point to the server  
 /config allows different configs to be loaded during initialization, the most important one being db urls  
 /frontend contains raw code for the client webapp  
-/frontend/public contains compiled code for the client webapp  
-  
+/frontend/public contains compiled code for the client webapp
 
 Infrastructure  
-Backend: GoLang (Hosted on Heroku)   
+Backend: GoLang (Hosted on Heroku)  
 FrontEnd: angular/javascript, SPA  
 API: GraphQL  
 WebHooks: (GraphQL, JSON, REST) either  
 Database: MongoDB (Hosted on Atlas)  
-Design Concept: (Domain Driven Design + Test Driven Design), Agile  
+Design Concept: (Domain Driven Design + Test Driven Design), Agile
 
 Golang DDD structure:
 The entry point  
 Main Types:  
 meter  
 token  
-user  
+user
 
-![structure](/assets/structure.png)
+![structure](assets/structure.png)
 
 Every type is isolated in it's own package  
 Every package associated with these types has 2 go files: interactor and repository  
@@ -35,17 +35,19 @@ Interactor contains all the higher-level abstractions of the possible operations
 This allows for inter-package communication as well as grouping several operations into one function. The same method might be visible from different packages  
 There is one shared database implementation that is shared across all the packages.
 
+# Authentication
 
-# Authentication   
-Factors we considered:  
-1. The user-base is small, but needs to be scalabble  
-2. We need to have some control over the user signup  
-3. Simplicity is the ultimate sophistication (~Einstein)  
-  
+Factors we considered:
+
+1. The user-base is small, but needs to be scalabble
+2. We need to have some control over the user signup
+3. Simplicity is the ultimate sophistication (~Einstein)
+
 The original plan was to have contol over the entire stack, but since **efficient and secure** auth by itself is a very broad and complex, we decided to combine firebase auth and mongo.  
-Merits:  
-1. Secure auth on-the-fly  
-2. Rich API  
-3. Generous free tier  
-4. We can leverage on the free hosting as well (Hence leave backend to host API ONLY)  
-5. The backend retains full control  
+Merits:
+
+1. Secure auth on-the-fly
+2. Rich API
+3. Generous free tier
+4. We can leverage on the free hosting as well (Hence leave backend to host API ONLY)
+5. The backend retains full control

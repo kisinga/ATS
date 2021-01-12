@@ -5,8 +5,8 @@ package resolvers
 
 import (
 	"context"
-	"errors"
 
+	"github.com/kisinga/ATS/app/auth"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,12 +21,7 @@ func (r *meterResolver) CreatedBy(ctx context.Context, obj *models.Meter) (*mode
 }
 
 func (r *mutationResolver) CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error) {
-	me := ForContext(ctx)
-	if me == nil {
-		return nil, errors.New("failed extracting user from context")
-	}
-	// User in context doesnt have ID, as this is mongo only field
-	me, err := r.domain.User.GetUser(ctx, me.Email)
+	me, err := auth.GetUserIDFromContext(ctx, r.domain)
 	if err != nil {
 		return nil, err
 	}

@@ -54,7 +54,6 @@ type ComplexityRoot struct {
 	APIKey struct {
 		CreatedBy func(childComplexity int) int
 		ID        func(childComplexity int) int
-		UpdatedBy func(childComplexity int) int
 	}
 
 	Meter struct {
@@ -91,7 +90,8 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		TokenCreated func(childComplexity int, meterNumber *string) int
+		APIKeyChanged func(childComplexity int) int
+		TokenCreated  func(childComplexity int, meterNumber *string) int
 	}
 
 	Token struct {
@@ -122,7 +122,6 @@ type ComplexityRoot struct {
 }
 
 type APIKeyResolver interface {
-	UpdatedBy(ctx context.Context, obj *models.APIKey) (*models.User, error)
 	CreatedBy(ctx context.Context, obj *models.APIKey) (*models.User, error)
 }
 type MeterResolver interface {
@@ -142,6 +141,7 @@ type QueryResolver interface {
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error)
 }
 type SubscriptionResolver interface {
+	APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error)
 	TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error)
 }
 type TokenResolver interface {
@@ -180,13 +180,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.APIKey.ID(childComplexity), true
-
-	case "APIKey.updatedBy":
-		if e.complexity.APIKey.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.APIKey.UpdatedBy(childComplexity), true
 
 	case "Meter.createdBy":
 		if e.complexity.Meter.CreatedBy == nil {
@@ -348,6 +341,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Users(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID)), true
+
+	case "Subscription.apiKeyChanged":
+		if e.complexity.Subscription.APIKeyChanged == nil {
+			break
+		}
+
+		return e.complexity.Subscription.APIKeyChanged(childComplexity), true
 
 	case "Subscription.tokenCreated":
 		if e.complexity.Subscription.TokenCreated == nil {
@@ -540,14 +540,17 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "app/gql/schema/apikey.gql", Input: `type APIKey implements BaseObject {
+	{Name: "app/gql/schema/apikey.gql", Input: `type APIKey {
   ID: ID!
-  updatedBy: User
   createdBy: User
 }
 
 extend type Mutation {
   generate: APIKey!
+}
+
+extend type Subscription {
+  apiKeyChanged: APIKey!
 }
 `, BuiltIn: false},
 	{Name: "app/gql/schema/meter.gql", Input: `type Meter implements BaseObject {
@@ -898,38 +901,6 @@ func (ec *executionContext) _APIKey_ID(ctx context.Context, field graphql.Collec
 	res := resTmp.(primitive.ObjectID)
 	fc.Result = res
 	return ec.marshalNID2goᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _APIKey_updatedBy(ctx context.Context, field graphql.CollectedField, obj *models.APIKey) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "APIKey",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.APIKey().UpdatedBy(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*models.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _APIKey_createdBy(ctx context.Context, field graphql.CollectedField, obj *models.APIKey) (ret graphql.Marshaler) {
@@ -1700,6 +1671,51 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Subscription_apiKeyChanged(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Subscription",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Subscription().APIKeyChanged(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-resTmp.(<-chan *models.APIKey)
+		if !ok {
+			return nil
+		}
+		return graphql.WriterFunc(func(w io.Writer) {
+			w.Write([]byte{'{'})
+			graphql.MarshalString(field.Alias).MarshalGQL(w)
+			w.Write([]byte{':'})
+			ec.marshalNAPIKey2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐAPIKey(ctx, field.Selections, res).MarshalGQL(w)
+			w.Write([]byte{'}'})
+		})
+	}
 }
 
 func (ec *executionContext) _Subscription_tokenCreated(ctx context.Context, field graphql.CollectedField) (ret func() graphql.Marshaler) {
@@ -3383,13 +3399,6 @@ func (ec *executionContext) _BaseObject(ctx context.Context, sel ast.SelectionSe
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case models.APIKey:
-		return ec._APIKey(ctx, sel, &obj)
-	case *models.APIKey:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._APIKey(ctx, sel, obj)
 	case models.Meter:
 		return ec._Meter(ctx, sel, &obj)
 	case *models.Meter:
@@ -3413,7 +3422,7 @@ func (ec *executionContext) _BaseObject(ctx context.Context, sel ast.SelectionSe
 
 // region    **************************** object.gotpl ****************************
 
-var aPIKeyImplementors = []string{"APIKey", "BaseObject"}
+var aPIKeyImplementors = []string{"APIKey"}
 
 func (ec *executionContext) _APIKey(ctx context.Context, sel ast.SelectionSet, obj *models.APIKey) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, aPIKeyImplementors)
@@ -3429,17 +3438,6 @@ func (ec *executionContext) _APIKey(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "updatedBy":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._APIKey_updatedBy(ctx, field, obj)
-				return res
-			})
 		case "createdBy":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3720,6 +3718,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 
 	switch fields[0].Name {
+	case "apiKeyChanged":
+		return ec._Subscription_apiKeyChanged(ctx, fields[0])
 	case "tokenCreated":
 		return ec._Subscription_tokenCreated(ctx, fields[0])
 	default:

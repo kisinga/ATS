@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"github.com/kisinga/ATS/app/apiKey"
 	"github.com/kisinga/ATS/app/meter"
 	"github.com/kisinga/ATS/app/storage"
 	"github.com/kisinga/ATS/app/token"
@@ -8,19 +9,21 @@ import (
 )
 
 type Domain struct {
-	Meter meter.Interactor
-	User  user.Interactor
-	Token token.Interactor
+	Meter  meter.Interactor
+	User   user.Interactor
+	Token  token.Interactor
+	APIKey apiKey.Interactor
 }
 
 func NewDomain(db *storage.Database) *Domain {
 	meterRepo := meter.NewRepository(db)
 	userRepo := user.NewRepository(db)
-
+	apikeyRepo := apiKey.NewRepository(db)
 	tokenRepo := token.NewRepository(db)
 	return &Domain{
-		Meter: meter.NewIterator(meterRepo),
-		User:  user.NewIterator(userRepo),
-		Token: token.NewIterator(tokenRepo),
+		Meter:  meter.NewIterator(meterRepo),
+		User:   user.NewIterator(userRepo),
+		Token:  token.NewIterator(tokenRepo),
+		APIKey: apiKey.NewIterator(apikeyRepo),
 	}
 }

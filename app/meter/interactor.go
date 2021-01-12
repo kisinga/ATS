@@ -20,7 +20,7 @@ type interactor struct {
 }
 
 func NewIterator(repo Repository) Interactor {
-	return &interactor{}
+	return &interactor{repo}
 }
 
 func (i *interactor) GetMeter(ctx context.Context, meterNumber string) (*models.Meter, error) {

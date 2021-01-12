@@ -19,7 +19,7 @@ type interactor struct {
 }
 
 func NewIterator(repo Repository) Interactor {
-	return &interactor{}
+	return &interactor{repo}
 }
 
 func (i *interactor) GetToken(ctx context.Context, ID primitive.ObjectID) (*models.Token, error) {
