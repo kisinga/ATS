@@ -5,6 +5,7 @@ import {
   NbIconModule,
   NbLayoutModule,
   NbMenuModule,
+  NbSpinnerModule,
 } from "@nebular/theme";
 
 import { ThemeModule } from "../@theme/theme.module";
@@ -29,6 +30,7 @@ import { NbEvaIconsModule } from "@nebular/eva-icons";
     NbIconModule,
     ThemeModule,
     NbLayoutModule,
+    NbSpinnerModule,
   ],
   declarations: [
     DashboardComponent,

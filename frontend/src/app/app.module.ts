@@ -31,6 +31,7 @@ import { UnauthorisedComponent } from "./auth/unauthorised/unauthorised.componen
 import { NbEvaIconsModule } from "@nebular/eva-icons";
 import { GraphQLModule } from "./graphql.module";
 import { StateService } from "./services/state.service";
+import { APIKeySubscription } from "./models/gql/api-key.model";
 
 @NgModule({
   declarations: [AppComponent, LoginComponent, UnauthorisedComponent],
@@ -57,6 +58,7 @@ import { StateService } from "./services/state.service";
   ],
   providers: [
     // ...
+    // APIKeySubscription,
     AngularFireAuthGuard,
   ],
   bootstrap: [AppComponent],

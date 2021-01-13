@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ApolloQueryResult, FetchResult } from "@apollo/client/core";
-import { Apollo } from "apollo-angular";
+import { Apollo, QueryRef } from "apollo-angular";
 import { APIKey } from "app/models/api-key.model";
 import {
   APIKeyGenerate,
@@ -14,11 +14,9 @@ import { Observable } from "rxjs";
   providedIn: "root",
 })
 export class ApiKeyService {
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo, private apiKeySub: APIKeySubscription) {}
   subscribeKey(): Observable<FetchResult<APIKeySubscriptionResult>> {
-    return this.apollo.subscribe<APIKeySubscriptionResult>({
-      query: APIKeySubscription,
-    });
+    return this.apiKeySub.subscribe();
   }
 
   generate(): Observable<FetchResult<APIKeyGenerateResult>> {

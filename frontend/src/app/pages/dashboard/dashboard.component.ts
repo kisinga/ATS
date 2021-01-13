@@ -12,7 +12,7 @@ import { takeUntil } from "rxjs/operators";
 export class DashboardComponent implements OnInit, OnDestroy {
   apiKey: APIKey;
   comopnentDestroyed: ReplaySubject<boolean> = new ReplaySubject<boolean>();
-  loading: true;
+  loading: boolean;
 
   constructor(
     private state: StateService,
@@ -23,6 +23,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe((k) => {
         this.apiKey = k;
       });
+    this.state.apikeyloading
+      .pipe(takeUntil(this.comopnentDestroyed))
+      .subscribe((k) => {
+        this.loading = k;
+      });
   }
 
   ngOnInit() {}
@@ -30,11 +35,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.comopnentDestroyed.next(true);
   }
   generateKey() {
+    this.state.setAPIKeyLoading(true);
     this.apikeyService
       .generate()
       .toPromise()
       .then((r) => {
-        console.log(r);
+        this.state.setAPIKeyLoading(false);
+        // console.log(r);
       });
   }
 }

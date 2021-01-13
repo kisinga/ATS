@@ -1,25 +1,50 @@
-import { NgModule } from "@angular/core";
 import { APOLLO_OPTIONS } from "apollo-angular";
+import { HttpLink } from "apollo-angular/http";
 import {
+  split,
   ApolloClientOptions,
   ApolloLink,
+  DefaultOptions,
   InMemoryCache,
 } from "@apollo/client/core";
-import { HttpLink } from "apollo-angular/http";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { NgModule } from "@angular/core";
 import { setContext } from "@apollo/client/link/context";
 
-// const uri = "https://atske.herokuapp.com/api"; // <-- add the URL of the GraphQL server here
-const uri = "http://localhost:4242/api"; // <-- add the URL of the GraphQL server here
+let local: boolean;
+let uri = "atske.herokuapp.com/api"; // <-- add the URL of the GraphQL server here
+let wsSchema = "wss://";
+let httpSchema = "https://";
+
+const defaultOptions: DefaultOptions = {
+  watchQuery: {
+    fetchPolicy: "no-cache",
+    errorPolicy: "ignore",
+  },
+  query: {
+    fetchPolicy: "no-cache",
+    errorPolicy: "all",
+  },
+};
+
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    local = true;
+  }
+  if (local) {
+    wsSchema = "ws://";
+    uri = "localhost:4242/api";
+    httpSchema = "http://";
+  }
   const basic = setContext((operation, context) => ({
     headers: {
       Accept: "charset=utf-8",
     },
   }));
+  const token = window.localStorage.getItem("token");
 
   const auth = setContext((operation, context) => {
-    const token = window.localStorage.getItem("token");
-
     if (token === null) {
       return {};
     } else {
@@ -30,11 +55,40 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
       };
     }
   });
-  const link = ApolloLink.from([basic, auth, httpLink.create({ uri })]);
+  const httpUrlLInk = httpLink.create({ uri: httpSchema + uri });
+
+  const webSocketLink = new WebSocketLink({
+    uri: wsSchema + uri,
+    options: {
+      reconnect: true,
+      lazy: true,
+      connectionParams: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+
+  const enhanced_link = split(
+    // split based on operation type
+    ({ query }) => {
+      const dif = getMainDefinition(query);
+      return (
+        dif.kind === "OperationDefinition" && dif.operation === "subscription"
+      );
+    },
+    webSocketLink,
+    httpUrlLInk
+  );
+
+  // const link = ApolloLink.from([basic, auth, httpUrlLInk]);
+  const link = ApolloLink.from([basic, auth, enhanced_link]);
+
   const cache = new InMemoryCache();
+
   return {
     link,
     cache,
+    defaultOptions,
   };
 }
 

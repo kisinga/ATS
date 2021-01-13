@@ -18,7 +18,10 @@
       </nb-card>
     </nb-card-front>
     <nb-card-back>
-      <nb-card status="success">
+      <nb-card status="success" [nbSpinner]="loading"
+      nbSpinnerStatus="danger"
+      nbSpinnerSize="large"
+      nbSpinnerMessage="">
         <nb-card-header>KEY</nb-card-header>
         <nb-card-body>
          <div>
@@ -29,7 +32,10 @@
             {{apiKey?.createdBy.email}}
            </p>
          </div>
-         <button nbButton status="danger" (click)="generateKey()"><nb-icon icon="alert-circle-outline"></nb-icon>GENERATE NEW KEY</button>
+         <button nbButton status="danger" (click)="generateKey()">
+           <nb-icon icon="alert-circle-outline"> 
+
+           </nb-icon>GENERATE NEW KEY</button>
 
         </nb-card-body>
       </nb-card>

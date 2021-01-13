@@ -1,17 +1,24 @@
 import gql from "graphql-tag";
 import { APIKey } from "../api-key.model";
+import { Subscription } from "apollo-angular";
+import { Injectable } from "@angular/core";
 
-export const APIKeySubscription = gql`
-  subscription apiKeyChanged {
-    apiKeyChanged {
-      ID
-      createdBy {
-        email
-        name
+@Injectable({
+  providedIn: "root",
+})
+export class APIKeySubscription extends Subscription {
+  document = gql`
+    subscription apiKeyChanged {
+      apiKeyChanged {
+        ID
+        createdBy {
+          email
+          name
+        }
       }
     }
-  }
-`;
+  `;
+}
 export const APIKeyGenerate = gql`
   mutation generateAPIKey {
     generateAPIKey {

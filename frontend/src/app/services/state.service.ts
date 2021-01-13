@@ -20,13 +20,17 @@ export class StateService {
     private users: UserService,
     private apikeyService: ApiKeyService
   ) {
+    this.setAPIKeyLoading(true);
     this.users.getUsers({}).then((r) => {
       this.userManagementData.next(r.data.users.data);
     });
-    this.apikeyService.subscribeKey().subscribe((v) => {
+
+    this.apikeyService.subscribeKey().subscribe((val) => {
       this.apikeyloading.next(false);
-      console.log(v);
-      this.dashboardApiKey.next(v.data.apiKeyChanged);
+      this.dashboardApiKey.next(val.data.apiKeyChanged);
     });
+  }
+  setAPIKeyLoading(status: boolean) {
+    this.apikeyloading.next(status);
   }
 }
