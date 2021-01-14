@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { Apollo, gql } from "apollo-angular";
 import { APIKey } from "../api-key.model";
 import { Subscription } from "apollo-angular";
 import { Injectable } from "@angular/core";

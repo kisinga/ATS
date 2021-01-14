@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { Apollo, gql } from "apollo-angular";
 import { User } from "../user.model";
 import { pageInfoFragment } from "./page-info.fragment";
 import { PageInfoModel } from "./page-info.model";

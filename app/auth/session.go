@@ -7,6 +7,7 @@ import (
 	"time"
 
 	firebase "firebase.google.com/go"
+	"github.com/gin-gonic/gin"
 	"github.com/kisinga/ATS/app/registry"
 )
 
@@ -22,13 +23,14 @@ type data struct {
 }
 
 // SessionInit validates the provided userID using the firebase Admin API, then sets a cookie that is used to validate every request
-func SessionInit(firebase *firebase.App, domain *registry.Domain) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func SessionInit(firebase *firebase.App, domain *registry.Domain) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// Get the ID token sent by the client
-		defer r.Body.Close()
-		claims, err := getIDTokenFromBody(r)
+		defer c.Request.Body.Close()
+		claims, err := getIDTokenFromBody(c.Request)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			json, _ := json.Marshal(err.Error())
+			c.AbortWithStatusJSON(http.StatusBadRequest, json)
 			return
 		}
 
@@ -40,19 +42,21 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) http.HandlerFu
 		// To only allow session cookie setting on recent sign-in, auth_time in ID token
 		// can be checked to ensure user was recently signed in before creating a session cookie.
 		client, err := firebase.Auth(context.Background())
-		cookie, err := client.SessionCookie(r.Context(), claims.ID, expiresIn)
+		cookie, err := client.SessionCookie(c.Request.Context(), claims.ID, expiresIn)
 		if err != nil {
-			http.Error(w, "Failed to create a session cookie", http.StatusInternalServerError)
+			json, _ := json.Marshal("Failed to create a session cookie")
+			c.AbortWithStatusJSON(http.StatusInternalServerError, json)
 			return
 		}
-		user, err := domain.User.GetUser(r.Context(), claims.Email)
+		user, err := domain.User.GetUser(c.Request.Context(), claims.Email)
 
 		if err != nil || user.Disabled {
-			http.Error(w, "Not Authorised", http.StatusForbidden)
+			json, _ := json.Marshal("Not authorised")
+			c.AbortWithStatusJSON(http.StatusForbidden, json)
 			return
 		}
 		// Set cookie policy for session cookie.
-		http.SetCookie(w, &http.Cookie{
+		http.SetCookie(c.Writer, &http.Cookie{
 			Name:     "session",
 			Value:    cookie,
 			MaxAge:   int(expiresIn.Seconds()),
@@ -60,8 +64,9 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) http.HandlerFu
 			Secure:   true,
 		})
 		response := Token{cookie, time.Now().Add(expiresIn).UTC()}
-		JSONResponse(response, w)
+		JSONResponse(response, c.Writer)
 	}
+
 }
 
 // JSONResponse ...
@@ -79,14 +84,14 @@ func JSONResponse(response interface{}, w http.ResponseWriter) {
 }
 
 // SessionTerm deletes the set cookie
-func SessionTerm() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
+func SessionTerm() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		http.SetCookie(c.Writer, &http.Cookie{
 			Name:   "session",
 			Value:  "",
 			MaxAge: 0,
 		})
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(c.Writer, c.Request, "/login", http.StatusFound)
 	}
 }
 

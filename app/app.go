@@ -40,10 +40,11 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	router.Use(gin.Recovery()) // add Recovery middleware
 	apiRoutes := router.Group("/api", auth.Middleware(firebase), graphqlHandler(domain, firebase))
 	{
-		apiRoutes.POST("")
-		apiRoutes.GET("")
+		apiRoutes.Any("")
 	}
 	router.GET("/playground", playgroundHandler())
+	router.POST("/sessionInit", auth.SessionInit(firebase, domain))
+	router.GET("/sessionTerm", auth.SessionTerm())
 
 	return router.Run(port)
 }
