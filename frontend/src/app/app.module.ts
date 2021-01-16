@@ -64,5 +64,5 @@ import { APIKeySubscription } from "./models/gql/api-key.model";
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(state: StateService) {}
+  constructor() {}
 }

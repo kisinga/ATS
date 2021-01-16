@@ -26,8 +26,9 @@ export class StateService {
     });
 
     this.apikeyService.subscribeKey().subscribe((val) => {
+      // console.log(val);
       this.apikeyloading.next(false);
-      this.dashboardApiKey.next(val.data.apiKeyChanged);
+      this.dashboardApiKey.next(val.data.generateAPIKey);
     });
   }
   setAPIKeyLoading(status: boolean) {

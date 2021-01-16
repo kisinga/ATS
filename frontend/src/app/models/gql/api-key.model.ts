@@ -7,17 +7,7 @@ import { Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class APIKeySubscription extends Subscription {
-  document = gql`
-    subscription apiKeyChanged {
-      apiKeyChanged {
-        ID
-        createdBy {
-          email
-          name
-        }
-      }
-    }
-  `;
+  document = APIKeySubscriptionQuery;
 }
 export const APIKeyGenerate = gql`
   mutation generateAPIKey {
@@ -30,8 +20,19 @@ export const APIKeyGenerate = gql`
   }
 `;
 
+export const APIKeySubscriptionQuery = gql`
+  subscription apiKeyChanged {
+    apiKeyChanged {
+      ID
+      createdBy {
+        email
+      }
+    }
+  }
+`;
+
 export interface APIKeySubscriptionResult {
-  apiKeyChanged?: APIKey;
+  generateAPIKey?: APIKey;
 }
 
 export interface APIKeyGenerateResult {

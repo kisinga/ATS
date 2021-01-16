@@ -43,7 +43,7 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
     },
   }));
   const token = window.localStorage.getItem("token");
-
+  // console.log(token);
   const auth = setContext((operation, context) => {
     if (token === null) {
       return {};
@@ -65,6 +65,8 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
       connectionParams: {
         Authorization: `Bearer ${token}`,
       },
+      minTimeout: 30000,
+      timeout: 60000,
     },
   });
 

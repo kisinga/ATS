@@ -38,7 +38,9 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	}))
 	router.Use(auth.GinContextToContextMiddleware())
 	router.Use(gin.Recovery()) // add Recovery middleware
-	apiRoutes := router.Group("/api", auth.Middleware(firebase), graphqlHandler(domain, firebase))
+	apiRoutes := router.Group("/api",
+		auth.Middleware(firebase),
+		graphqlHandler(domain, firebase))
 	{
 		apiRoutes.Any("")
 	}
