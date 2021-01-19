@@ -23,6 +23,10 @@ func (r *mutationResolver) GenerateAPIKey(ctx context.Context) (*models.APIKey, 
 	return r.domain.APIKey.Generate(ctx, *me)
 }
 
+func (r *queryResolver) CurrentAPIKey(ctx context.Context) (*models.APIKey, error) {
+	return r.domain.APIKey.GetLatest(ctx)
+}
+
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
 	kk := make(chan *models.APIKey)
 	r.domain.APIKey.ListenForNew(ctx, kk)

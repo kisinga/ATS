@@ -84,9 +84,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Meters func(childComplexity int, limit *int64, after *primitive.ObjectID) int
-		Tokens func(childComplexity int, limit *int64, after *primitive.ObjectID) int
-		Users  func(childComplexity int, limit *int64, after *primitive.ObjectID) int
+		CurrentAPIKey func(childComplexity int) int
+		Meters        func(childComplexity int, limit *int64, after *primitive.ObjectID) int
+		Tokens        func(childComplexity int, limit *int64, after *primitive.ObjectID) int
+		Users         func(childComplexity int, limit *int64, after *primitive.ObjectID) int
 	}
 
 	Subscription struct {
@@ -136,6 +137,7 @@ type MutationResolver interface {
 	UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 }
 type QueryResolver interface {
+	CurrentAPIKey(ctx context.Context) (*models.APIKey, error)
 	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
 	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error)
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error)
@@ -305,6 +307,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.currentAPIKey":
+		if e.complexity.Query.CurrentAPIKey == nil {
+			break
+		}
+
+		return e.complexity.Query.CurrentAPIKey(childComplexity), true
 
 	case "Query.meters":
 		if e.complexity.Query.Meters == nil {
@@ -543,6 +552,10 @@ var sources = []*ast.Source{
 	{Name: "app/gql/schema/apikey.gql", Input: `type APIKey {
   ID: ID!
   createdBy: User
+}
+
+extend type Query {
+  currentAPIKey: APIKey!
 }
 
 extend type Mutation {
@@ -1474,6 +1487,41 @@ func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field gra
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_currentAPIKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CurrentAPIKey(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.APIKey)
+	fc.Result = res
+	return ec.marshalNAPIKey2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐAPIKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3648,6 +3696,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "currentAPIKey":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_currentAPIKey(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "meters":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {

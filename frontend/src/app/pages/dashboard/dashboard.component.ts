@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { APIKey } from "app/models/api-key.model";
-import { ApiKeyService } from "app/services/api-key.service";
-import { StateService } from "app/services/state.service";
+import { ApiKeyService } from "app/pages/shared/services/api-key.service";
+import { StateService } from "app/pages/shared/services/state.service";
 import { ReplaySubject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
@@ -17,7 +17,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private state: StateService,
     private apikeyService: ApiKeyService
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.state.dashboardApiKey
       .pipe(takeUntil(this.comopnentDestroyed))
       .subscribe((k) => {
@@ -29,8 +31,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loading = k;
       });
   }
-
-  ngOnInit() {}
   ngOnDestroy(): void {
     this.comopnentDestroyed.next(true);
   }
@@ -40,8 +40,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .generate()
       .toPromise()
       .then((r) => {
-        this.state.setAPIKeyLoading(false);
-        // console.log(r);
+        this.apikeyService.refetch();
       });
   }
 }

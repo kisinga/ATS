@@ -10,6 +10,30 @@ export const UsersQuery = gql`
         ID
         name
         email
+        createdBy {
+          name
+          email
+        }
+      }
+      pageInfo {
+        ...pageInfoFragment
+      }
+    }
+  }
+  ${pageInfoFragment}
+`;
+
+export const NewUserMutation = gql`
+  query getUsers($limit: Int, $afterID: ID) {
+    users(limit: $limit, after: $afterID) {
+      data {
+        ID
+        name
+        email
+        createdBy {
+          name
+          email
+        }
       }
       pageInfo {
         ...pageInfoFragment
@@ -22,6 +46,10 @@ export const UsersQuery = gql`
 export interface GetUsersQueryInput {
   limit?: number;
   after?: string;
+}
+export interface NewUserInput {
+  name: string;
+  email: string;
 }
 
 export interface UsersQueryModel {

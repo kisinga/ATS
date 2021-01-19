@@ -3,6 +3,7 @@ import {
   NbButtonModule,
   NbCardModule,
   NbIconModule,
+  NbInputModule,
   NbLayoutModule,
   NbMenuModule,
   NbSpinnerModule,
@@ -16,6 +17,9 @@ import { MeterManagementComponent } from "./meter-management/meter-management.co
 import { TransactionsComponent } from "./transactions/transactions.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { NbEvaIconsModule } from "@nebular/eva-icons";
+import { MatTableModule } from "@angular/material/table";
+import { DateFromObjectIdPipe } from "app/pages/shared/pipes/date-from-object-id.pipe";
+import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.component";
 
 @NgModule({
   imports: [
@@ -31,13 +35,19 @@ import { NbEvaIconsModule } from "@nebular/eva-icons";
     ThemeModule,
     NbLayoutModule,
     NbSpinnerModule,
+    MatTableModule,
+    NbInputModule,
   ],
+  exports: [DateFromObjectIdPipe],
   declarations: [
     DashboardComponent,
     PagesComponent,
     UserManagementComponent,
     MeterManagementComponent,
     TransactionsComponent,
+    DateFromObjectIdPipe,
+    NewUserComponent,
   ],
+  providers: [],
 })
 export class PagesModule {}

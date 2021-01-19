@@ -1,16 +1,42 @@
-<div >
-  <table class="table table-hover">
-    <thead>
-        <tr>
-            <td>Name</td>
-            <td>Email</td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let user of users">
-            <td>{{user.name}}</td>
-            <td>{{user.email}}</td>
-        </tr>
-    </tbody>
-</table> 
-</div>
+<button nbButton hero status="primary" (click)="openNewUserModal()">ADD NEW</button>
+
+<table mat-table [dataSource]="users" class="mat-elevation-z8">
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+  
+    <!-- Position Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef> Email </th>
+      <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+    </ng-container>
+  
+    <!-- Weight Column -->
+    <ng-container matColumnDef="createdby">
+      <th mat-header-cell *matHeaderCellDef> Created By </th>
+      <td mat-cell *matCellDef="let element"> {{element.createdBy?.name}} </td>
+    </ng-container>
+  
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef> Date </th>
+      <td mat-cell *matCellDef="let element"> {{element.ID | dateFromObjectId}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef> Date </th>
+      <td mat-cell *matCellDef="let element"> 
+        <button nbButton ghost status="danger"><nb-icon icon="trash-2-outline"></nb-icon></button>
+    </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>

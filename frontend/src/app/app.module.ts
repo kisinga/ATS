@@ -30,7 +30,6 @@ import { LoginComponent } from "./auth/login/login.component";
 import { UnauthorisedComponent } from "./auth/unauthorised/unauthorised.component";
 import { NbEvaIconsModule } from "@nebular/eva-icons";
 import { GraphQLModule } from "./graphql.module";
-import { StateService } from "./services/state.service";
 import { APIKeySubscription } from "./models/gql/api-key.model";
 
 @NgModule({
@@ -38,6 +37,7 @@ import { APIKeySubscription } from "./models/gql/api-key.model";
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    GraphQLModule,
     HttpClientModule,
     AppRoutingModule,
     NbSidebarModule.forRoot(),
@@ -51,14 +51,13 @@ import { APIKeySubscription } from "./models/gql/api-key.model";
     NbButtonModule,
     NbEvaIconsModule,
     NbIconModule,
-    // CoreModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     ThemeModule.forRoot(),
-    GraphQLModule,
+    NbIconModule,
   ],
+  exports: [GraphQLModule],
   providers: [
     // ...
-    // APIKeySubscription,
     AngularFireAuthGuard,
   ],
   bootstrap: [AppComponent],

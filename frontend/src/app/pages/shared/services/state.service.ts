@@ -25,10 +25,9 @@ export class StateService {
       this.userManagementData.next(r.data.users.data);
     });
 
-    this.apikeyService.subscribeKey().subscribe((val) => {
-      // console.log(val);
-      this.apikeyloading.next(false);
-      this.dashboardApiKey.next(val.data.generateAPIKey);
+    this.apikeyService.current().subscribe(({ data, loading }) => {
+      this.setAPIKeyLoading(loading);
+      this.dashboardApiKey.next(data.currentAPIKey);
     });
   }
   setAPIKeyLoading(status: boolean) {

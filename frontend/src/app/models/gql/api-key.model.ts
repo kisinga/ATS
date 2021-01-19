@@ -30,6 +30,16 @@ export const APIKeySubscriptionQuery = gql`
     }
   }
 `;
+export const APIKeyQuery = gql`
+  query currentAPIKey {
+    currentAPIKey {
+      ID
+      createdBy {
+        email
+      }
+    }
+  }
+`;
 
 export interface APIKeySubscriptionResult {
   generateAPIKey?: APIKey;
@@ -37,4 +47,7 @@ export interface APIKeySubscriptionResult {
 
 export interface APIKeyGenerateResult {
   generateAPIKey?: APIKey;
+}
+export interface APIKeyQueryResult {
+  currentAPIKey?: APIKey;
 }

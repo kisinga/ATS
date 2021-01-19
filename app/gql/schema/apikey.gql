@@ -3,6 +3,10 @@ type APIKey {
   createdBy: User
 }
 
+extend type Query {
+  currentAPIKey: APIKey!
+}
+
 extend type Mutation {
   generateAPIKey: APIKey!
 }
