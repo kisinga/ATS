@@ -66,7 +66,12 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 }
 func (r repository) Update(ctx context.Context, email string, newUser models.User) (*models.User, error) {
 	user := models.User{}
-	err := r.db.Client.Collection("users").FindOneAndUpdate(ctx, bson.M{"email": email}, bson.M{"$set": newUser}).Decode(&user)
+	after := options.After
+	updateOptions := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+	}
+	err := r.db.Client.Collection("users").FindOneAndUpdate(ctx, bson.M{"email": email}, bson.M{"$set": newUser},
+		&updateOptions).Decode(&user)
 	if err != nil {
 		return nil, err
 	}

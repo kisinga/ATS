@@ -7,6 +7,7 @@ import {
   NbLayoutModule,
   NbMenuModule,
   NbSpinnerModule,
+  NbTooltipModule,
 } from "@nebular/theme";
 
 import { ThemeModule } from "../@theme/theme.module";
@@ -37,6 +38,7 @@ import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.co
     NbSpinnerModule,
     MatTableModule,
     NbInputModule,
+    NbTooltipModule,
   ],
   exports: [DateFromObjectIdPipe],
   declarations: [

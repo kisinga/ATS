@@ -55,7 +55,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       .enableUser(email)
       .toPromise()
       .then((t) => {
-        console.log(t);
+        // console.log(t);
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
