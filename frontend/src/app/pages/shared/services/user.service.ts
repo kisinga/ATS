@@ -8,6 +8,8 @@ import { Apollo } from "apollo-angular";
 import { catchError } from "rxjs/operators";
 import dayjs from "dayjs";
 import {
+  DisableUserMutation,
+  EnableUserMutation,
   GetUsersQueryInput,
   UsersQuery,
   UsersQueryResult,
@@ -43,6 +45,18 @@ export class UserService {
           router.navigate(["/login"]);
         }
       }
+    });
+  }
+  disableUser(email: string) {
+    return this.apollo.mutate({
+      mutation: DisableUserMutation,
+      variables: { email },
+    });
+  }
+  enableUser(email: string) {
+    return this.apollo.mutate({
+      mutation: EnableUserMutation,
+      variables: { email },
     });
   }
 

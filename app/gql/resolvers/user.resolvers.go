@@ -35,6 +35,20 @@ func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*mode
 	return r.domain.User.UpdateUser(ctx, email, *target)
 }
 
+func (r *mutationResolver) EnableUser(ctx context.Context, email string) (*models.User, error) {
+	me, err := auth.GetUserFromContext(ctx, r.domain)
+	if err != nil {
+		return nil, err
+	}
+	target, err := r.domain.User.GetUser(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	target.Disabled = false
+	target.UpdatedBy = me.ID
+	return r.domain.User.UpdateUser(ctx, email, *target)
+}
+
 func (r *mutationResolver) UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error) {
 	me, err := auth.GetUserFromContext(ctx, r.domain)
 	if err != nil {

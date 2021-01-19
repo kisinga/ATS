@@ -4,6 +4,7 @@ type User implements BaseObject {
   name: String!
   updatedBy: User
   createdBy: User
+  disabled: Boolean
 }
 
 input NewUser {
@@ -25,5 +26,6 @@ type UsersConnection {
 extend type Mutation {
   createUser(input: NewUser!): User!
   disableUser(email: String!): User!
+  enableUser(email: String!): User!
   updateUser(input: NewUser!): User!
 }

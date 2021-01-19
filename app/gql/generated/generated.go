@@ -73,6 +73,7 @@ type ComplexityRoot struct {
 		CreateMeter    func(childComplexity int, input models.NewMeter) int
 		CreateUser     func(childComplexity int, input models.NewUser) int
 		DisableUser    func(childComplexity int, email string) int
+		EnableUser     func(childComplexity int, email string) int
 		GenerateAPIKey func(childComplexity int) int
 		UpdateUser     func(childComplexity int, input models.NewUser) int
 	}
@@ -110,6 +111,7 @@ type ComplexityRoot struct {
 
 	User struct {
 		CreatedBy func(childComplexity int) int
+		Disabled  func(childComplexity int) int
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
@@ -134,6 +136,7 @@ type MutationResolver interface {
 	CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error)
 	CreateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 	DisableUser(ctx context.Context, email string) (*models.User, error)
+	EnableUser(ctx context.Context, email string) (*models.User, error)
 	UpdateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 }
 type QueryResolver interface {
@@ -267,6 +270,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DisableUser(childComplexity, args["email"].(string)), true
+
+	case "Mutation.enableUser":
+		if e.complexity.Mutation.EnableUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_enableUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EnableUser(childComplexity, args["email"].(string)), true
 
 	case "Mutation.generateAPIKey":
 		if e.complexity.Mutation.GenerateAPIKey == nil {
@@ -425,6 +440,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.CreatedBy(childComplexity), true
+
+	case "User.disabled":
+		if e.complexity.User.Disabled == nil {
+			break
+		}
+
+		return e.complexity.User.Disabled(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -640,6 +662,7 @@ type TokenConnection {
   name: String!
   updatedBy: User
   createdBy: User
+  disabled: Boolean
 }
 
 input NewUser {
@@ -661,6 +684,7 @@ type UsersConnection {
 extend type Mutation {
   createUser(input: NewUser!): User!
   disableUser(email: String!): User!
+  enableUser(email: String!): User!
   updateUser(input: NewUser!): User!
 }
 `, BuiltIn: false},
@@ -712,6 +736,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 }
 
 func (ec *executionContext) field_Mutation_disableUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_enableUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1326,6 +1365,48 @@ func (ec *executionContext) _Mutation_disableUser(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DisableUser(rctx, args["email"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_enableUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_enableUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EnableUser(rctx, args["email"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2227,6 +2308,38 @@ func (ec *executionContext) _User_createdBy(ctx context.Context, field graphql.C
 	res := resTmp.(*models.User)
 	fc.Result = res
 	return ec.marshalOUser2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_disabled(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Disabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UsersConnection_data(ctx context.Context, field graphql.CollectedField, obj *models.UsersConnection) (ret graphql.Marshaler) {
@@ -3628,6 +3741,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "enableUser":
+			out.Values[i] = ec._Mutation_enableUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateUser":
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -3922,6 +4040,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				res = ec._User_createdBy(ctx, field, obj)
 				return res
 			})
+		case "disabled":
+			out.Values[i] = ec._User_disabled(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

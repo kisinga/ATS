@@ -10,6 +10,7 @@ export const UsersQuery = gql`
         ID
         name
         email
+        disabled
         createdBy {
           name
           email
@@ -30,6 +31,7 @@ export const NewUserMutation = gql`
         ID
         name
         email
+        disabled
         createdBy {
           name
           email
@@ -41,6 +43,39 @@ export const NewUserMutation = gql`
     }
   }
   ${pageInfoFragment}
+`;
+
+// export const userDataFragment = gql`
+
+// `;
+export const DisableUserMutation = gql`
+  mutation disableUser($email: String!) {
+    disableUser(email: $email) {
+      ID
+      name
+      email
+      disabled
+      createdBy {
+        name
+        email
+      }
+    }
+  }
+`;
+
+export const EnableUserMutation = gql`
+  mutation enableUser($email: String!) {
+    enableUser(email: $email) {
+      ID
+      name
+      email
+      disabled
+      createdBy {
+        name
+        email
+      }
+    }
+  }
 `;
 
 export interface GetUsersQueryInput {
