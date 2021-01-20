@@ -12,6 +12,7 @@ export class NewUserComponent implements OnInit {
     protected ref: NbDialogRef<NewUserComponent>,
     private userService: UserService
   ) {}
+  creationError = null;
   newUserForm = new FormGroup({
     name: new FormControl(
       "",
@@ -29,11 +30,18 @@ export class NewUserComponent implements OnInit {
     this.ref.close();
   }
   submit() {
+    this.creationError = null;
     if (this.newUserForm.valid) {
-      this.userService.createUser(this.newUserForm.value).then((r) => {
-        console.log(r);
-        this.ref.close();
-      });
+      this.userService
+        .createUser(this.newUserForm.value)
+        .then((r) => {
+          // console.log(r);
+          this.ref.close(true);
+        })
+        .catch((e) => {
+          this.creationError =
+            "Error creating user. Please ensure that the email doesnt already exist";
+        });
     } else {
     }
   }

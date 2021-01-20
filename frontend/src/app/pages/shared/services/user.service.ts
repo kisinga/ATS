@@ -116,7 +116,6 @@ export class UserService {
       .toPromise();
   }
   createUser(input: NewUserInput) {
-    console.log(input);
     return this.apollo
       .mutate<User>({
         mutation: NewUserMutation,

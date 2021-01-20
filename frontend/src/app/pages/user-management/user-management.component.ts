@@ -32,7 +32,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.comopnentDestroyed.next(true);
   }
   openNewUserModal() {
-    this.dialogService.open(NewUserComponent);
+    this.dialogService
+      .open(NewUserComponent)
+      .onClose.subscribe((refresh: boolean) => {
+        if (refresh) {
+          this.getUsers({});
+        }
+      });
   }
   disableUser(email: string) {
     this.loadingUser = email;

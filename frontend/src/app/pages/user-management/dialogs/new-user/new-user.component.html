@@ -19,10 +19,13 @@
                 Invalid Email
             </span>
         </nb-alert>
+        <nb-alert *ngIf="creationError" status="danger">
+            {{creationError}}
+        </nb-alert>
 
     </nb-card-body>
     <nb-card-footer>
-        <button class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
-        <button nbButton status="success" (click)="submit()">Submit</button>
+        <button type="button" class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
+        <button type="submit" nbButton status="success" (click)="submit()">Submit</button>
     </nb-card-footer>
 </nb-card>

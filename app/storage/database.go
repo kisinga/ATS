@@ -27,6 +27,7 @@ func New(ctx context.Context, prod bool, live bool) (*Database, *firebase.App, e
 	} else {
 		env = "test"
 	}
+	// I know that this should be in a config somewhere, but I'll put it here for now
 	uri := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
 
 	clientOptions := options.Client().ApplyURI(uri)
