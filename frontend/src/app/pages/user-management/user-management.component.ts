@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { NbDialogService } from "@nebular/theme";
 import { Apollo, gql } from "apollo-angular";
+import { GetUsersQueryInput } from "app/models/gql/user.query";
 import { User } from "app/models/user.model";
 import { StateService } from "app/pages/shared/services/state.service";
 import { ReplaySubject } from "rxjs";
@@ -24,11 +25,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private dialogService: NbDialogService,
     private userService: UserService
   ) {
-    this.state.userManagementData
-      .pipe(takeUntil(this.comopnentDestroyed))
-      .subscribe((k) => {
-        this.users = k;
-      });
+    this.getUsers({});
   }
 
   ngOnInit() {}
@@ -47,7 +44,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
+        this.getUsers({});
       });
+  }
+  getUsers(params: GetUsersQueryInput) {
+    this.userService.getUsers(params).then((r) => {
+      this.users = r.data.users.data;
+    });
   }
   enableUser(email: string) {
     this.loadingUser = email;
@@ -59,6 +62,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
+        this.getUsers({});
       });
   }
   generateKey() {}

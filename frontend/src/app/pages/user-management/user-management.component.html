@@ -27,8 +27,8 @@
         <td mat-cell *matCellDef="let element">
 
             <div *ngIf="element.email === loadingUser;else other_content">
-                <button nbSpinner nbSpinnerStatus="success" nbButton>
-                    Saving
+                <button [nbSpinner]="true" ghost nbSpinnerStatus="primary" nbButton>
+                    <!-- Saving -->
                 </button>
             </div>
 
