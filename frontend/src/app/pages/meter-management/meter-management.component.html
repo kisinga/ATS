@@ -1,1 +1,54 @@
-<p>meter-management works!</p>
+<button nbButton hero status="primary" (click)="openNewMeterModal()">ADD NEW</button>
+
+<table [nbSpinner]="loading" nbSpinnerStatus="primary" mat-table [dataSource]="meters" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="meter_number">
+        <th mat-header-cell *matHeaderCellDef>Meter Number </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="owner">
+        <th mat-header-cell *matHeaderCellDef> Owner </th>
+        <td mat-cell *matCellDef="let element"> {{element.email}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef> Phone </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdBy?.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.ID | dateFromObjectId | date: "short"}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> Action </th>
+        <td mat-cell *matCellDef="let element">
+
+            <div *ngIf="element.email === loadingMeter;else other_content">
+                <button [nbSpinner]="true" ghost nbSpinnerStatus="primary" nbButton>
+                    <!-- Saving -->
+                </button>
+            </div>
+
+            <ng-template #other_content>
+                <div *ngIf="element.disabled;else other_content">
+                    <button nbButton ghost status="primary" nbTooltip="Enable User"  (click)="enableMeter(element.ID)">
+                        <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                    </button>
+                </div>
+
+                <ng-template #other_content>
+                    <button nbButton ghost status="danger"  nbTooltip="Disable User"  (click)="disableMeter(element.ID)">
+                        <nb-icon icon="slash-outline"></nb-icon>
+                    </button>
+                </ng-template>
+            </ng-template>
+        </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

@@ -112,6 +112,7 @@ export class UserService {
       .query<UsersQueryResult>({
         query: UsersQuery,
         variables: { inputs },
+        fetchPolicy: "cache-first",
       })
       .toPromise();
   }

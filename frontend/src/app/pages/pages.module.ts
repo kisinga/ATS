@@ -23,6 +23,7 @@ import { MatTableModule } from "@angular/material/table";
 import { DateFromObjectIdPipe } from "app/pages/shared/pipes/date-from-object-id.pipe";
 import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NewMeterComponent } from './meter-management/dialogs/new-meter/new-meter.component';
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
     TransactionsComponent,
     DateFromObjectIdPipe,
     NewUserComponent,
+    NewMeterComponent,
   ],
   providers: [],
 })
