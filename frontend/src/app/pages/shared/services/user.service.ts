@@ -11,10 +11,13 @@ import {
   DisableUserMutation,
   EnableUserMutation,
   GetUsersQueryInput,
+  NewUserInput,
+  NewUserMutation,
   UsersQuery,
   UsersQueryResult,
 } from "app/models/gql/user.query";
 import { ApolloQueryResult } from "@apollo/client/core";
+import { User } from "app/models/user.model";
 
 @Injectable({
   providedIn: "root",
@@ -108,7 +111,16 @@ export class UserService {
     return this.apollo
       .query<UsersQueryResult>({
         query: UsersQuery,
-        variables: inputs,
+        variables: { inputs },
+      })
+      .toPromise();
+  }
+  createUser(input: NewUserInput) {
+    console.log(input);
+    return this.apollo
+      .mutate<User>({
+        mutation: NewUserMutation,
+        variables: { input },
       })
       .toPromise();
   }

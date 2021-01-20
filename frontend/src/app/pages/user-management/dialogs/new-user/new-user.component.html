@@ -2,15 +2,27 @@
     <nb-card-header>Add new user</nb-card-header>
     <nb-card-body>
         <div>
-            <form action="">
-                <input type="text" nbInput fullWidth status="basic" placeholder="Name">
-                <input type="text" nbInput fullWidth status="basic" placeholder="Email">        
+            <form [formGroup]="newUserForm">
+                <input type="text" nbInput name="name" fullWidth status="basic" placeholder="Name" required
+                    minlength="4" appForbiddenName="bob" formControlName="name">
+                <input type="text" nbInput name="email" fullWidth status="basic" formControlName="email" required
+                    placeholder="Email">
             </form>
         </div>
-        </nb-card-body>
+        <nb-alert *ngIf="!newUserForm.valid && newUserForm.touched" status="danger">
+            <span *ngIf="!newUserForm.controls['name'].valid">
+                <p></p>
+                Name must be more than 4 characters
+            </span>
+            <br>
+            <span *ngIf="!newUserForm.controls['email'].valid">
+                Invalid Email
+            </span>
+        </nb-alert>
+
+    </nb-card-body>
     <nb-card-footer>
-      <button class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
-      <button nbButton status="success" (click)="submit()">Submit</button>
+        <button class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
+        <button nbButton status="success" (click)="submit()">Submit</button>
     </nb-card-footer>
-  </nb-card>
-  
+</nb-card>

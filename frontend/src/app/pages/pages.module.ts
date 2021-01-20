@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import {
+  NbAlertModule,
   NbButtonModule,
   NbCardModule,
   NbIconModule,
@@ -21,6 +22,7 @@ import { NbEvaIconsModule } from "@nebular/eva-icons";
 import { MatTableModule } from "@angular/material/table";
 import { DateFromObjectIdPipe } from "app/pages/shared/pipes/date-from-object-id.pipe";
 import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.component";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
   imports: [
@@ -39,6 +41,9 @@ import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.co
     MatTableModule,
     NbInputModule,
     NbTooltipModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NbAlertModule,
   ],
   exports: [DateFromObjectIdPipe],
   declarations: [

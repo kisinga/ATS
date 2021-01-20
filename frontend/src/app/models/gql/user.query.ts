@@ -25,24 +25,18 @@ export const UsersQuery = gql`
 `;
 
 export const NewUserMutation = gql`
-  query getUsers($limit: Int, $afterID: ID) {
-    users(limit: $limit, after: $afterID) {
-      data {
-        ID
+  mutation createUser($input: NewUser!) {
+    createUser(input: $input) {
+      ID
+      name
+      email
+      disabled
+      createdBy {
         name
         email
-        disabled
-        createdBy {
-          name
-          email
-        }
-      }
-      pageInfo {
-        ...pageInfoFragment
       }
     }
   }
-  ${pageInfoFragment}
 `;
 
 // export const userDataFragment = gql`

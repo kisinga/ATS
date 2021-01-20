@@ -1,6 +1,6 @@
 <button nbButton hero status="primary" (click)="openNewUserModal()">ADD NEW</button>
 
-<table mat-table [dataSource]="users" class="mat-elevation-z8">
+<table [nbSpinner]="loading" nbSpinnerStatus="primary" mat-table [dataSource]="users" class="mat-elevation-z8">
 
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Name </th>

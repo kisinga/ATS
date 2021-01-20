@@ -5,9 +5,7 @@ import { GetUsersQueryInput } from "app/models/gql/user.query";
 import { User } from "app/models/user.model";
 import { StateService } from "app/pages/shared/services/state.service";
 import { ReplaySubject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { DateFromObjectIdPipe } from "../shared/pipes/date-from-object-id.pipe";
-import { ApiKeyService } from "../shared/services/api-key.service";
+import { NewUserInput } from "app/models/gql/user.query";
 import { UserService } from "../shared/services/user.service";
 import { NewUserComponent } from "./dialogs/new-user/new-user.component";
 
@@ -20,6 +18,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   comopnentDestroyed: ReplaySubject<boolean> = new ReplaySubject<boolean>();
   displayedColumns: string[] = ["email", "name", "createdby", "date", "delete"];
   loadingUser = "";
+  loading: Boolean = false;
   constructor(
     private state: StateService,
     private dialogService: NbDialogService,
@@ -33,7 +32,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.comopnentDestroyed.next(true);
   }
   openNewUserModal() {
-    this.dialogService.open(NewUserComponent).onClose.subscribe((user) => {});
+    this.dialogService.open(NewUserComponent);
   }
   disableUser(email: string) {
     this.loadingUser = email;
@@ -48,8 +47,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       });
   }
   getUsers(params: GetUsersQueryInput) {
+    this.loading = true;
     this.userService.getUsers(params).then((r) => {
       this.users = r.data.users.data;
+      this.loading = false;
     });
   }
   enableUser(email: string) {
@@ -58,7 +59,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       .enableUser(email)
       .toPromise()
       .then((t) => {
-        // console.log(t);
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
