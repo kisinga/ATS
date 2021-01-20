@@ -8,7 +8,7 @@ type User struct {
 	ID        primitive.ObjectID `json:"ID"  bson:"_id,omitempty"`
 	CreatedBy primitive.ObjectID `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	UpdatedBy primitive.ObjectID `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
-	Disabled  bool               `json:"disabled,omitempty" bson:"disabled,omitempty"`
+	Disabled  bool               `json:"disabled" bson:"disabled"`
 }
 
 func (User) IsBaseObject() {}
