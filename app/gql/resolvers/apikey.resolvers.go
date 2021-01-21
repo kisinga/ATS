@@ -24,17 +24,14 @@ func (r *mutationResolver) GenerateAPIKey(ctx context.Context) (*models.APIKey, 
 }
 
 func (r *queryResolver) CurrentAPIKey(ctx context.Context) (*models.APIKey, error) {
-	return r.domain.APIKey.GetLatest(ctx)
+	return r.domain.APIKey.GetLatest(), nil
 }
 
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
 	kk := make(chan *models.APIKey)
 	r.domain.APIKey.ListenForNew(ctx, kk)
 	go func() {
-		key, err := r.domain.APIKey.GetLatest(ctx)
-		if err == nil {
-			kk <- key
-		}
+		kk <- r.domain.APIKey.GetLatest()
 	}()
 	return kk, nil
 }
