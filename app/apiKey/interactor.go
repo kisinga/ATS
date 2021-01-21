@@ -13,17 +13,17 @@ import (
 type Interactor interface {
 	GetLatest(ctx context.Context) (*models.APIKey, error)
 	Generate(ctx context.Context, user models.User) (*models.APIKey, error)
-	ListenForNew(ctx context.Context, consumer chan *models.APIKey)
+	ListenForNew(ctx context.Context, consumer chan<- *models.APIKey)
 }
 
 type interactor struct {
 	repository Repository
-	listeners  map[primitive.ObjectID]chan *models.APIKey
+	listeners  map[primitive.ObjectID]chan<- *models.APIKey
 	mu         sync.Mutex
 }
 
 func NewIterator(repo Repository) Interactor {
-	kk := make(map[primitive.ObjectID]chan *models.APIKey, 0)
+	kk := make(map[primitive.ObjectID]chan<- *models.APIKey, 0)
 	i := &interactor{repository: repo, listeners: kk}
 	go keyCreated(i, repo.apiKeyChan())
 	return i
@@ -36,7 +36,7 @@ func keyCreated(i *interactor, channel chan *models.APIKey) {
 		case key := <-channel:
 			i.mu.Lock()
 			for _, listener := range i.listeners {
-				go func(l chan *models.APIKey) {
+				go func(l chan<- *models.APIKey) {
 					l <- key
 				}(listener)
 			}
@@ -45,24 +45,19 @@ func keyCreated(i *interactor, channel chan *models.APIKey) {
 	}
 }
 
-func (i *interactor) ListenForNew(ctx context.Context, consumer chan *models.APIKey) {
+func (i *interactor) ListenForNew(ctx context.Context, consumer chan<- *models.APIKey) {
 	id := primitive.NewObjectID()
 	i.mu.Lock()
 	i.listeners[id] = consumer
 	i.mu.Unlock()
-
-	// go func(id primitive.ObjectID) {
-	// 	for {
-	// 		select {
-	// 		// case <-ctx.Done():
-	// 		// 	if _, ok := i.listeners[id]; ok {
-	// 		// 		i.mu.Lock()
-	// 		// 		delete(i.listeners, id)
-	// 		// 		i.mu.Unlock()
-	// 		// 	}
-	// 		// }
-	// 	}
-	// }(id)
+	go func() {
+		<-ctx.Done()
+		i.mu.Lock()
+		if _, ok := i.listeners[id]; ok {
+			delete(i.listeners, id)
+			i.mu.Unlock()
+		}
+	}()
 }
 
 func (i *interactor) GetLatest(ctx context.Context) (*models.APIKey, error) {
