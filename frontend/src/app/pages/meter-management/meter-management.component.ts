@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { FetchPolicy } from "@apollo/client/core";
 import { NbDialogService } from "@nebular/theme";
 import { GetMetersQueryInput } from "app/models/gql/meter.model";
 import { Meter } from "app/models/meter.model";
@@ -14,7 +15,7 @@ export class MeterManagementComponent implements OnInit {
     private dialogService: NbDialogService,
     private meterService: MeterService
   ) {
-    this.getMeters({});
+    this.getMeters({}, "cache-first");
   }
   loading: Boolean = false;
   loadingMeter = "";
@@ -27,13 +28,13 @@ export class MeterManagementComponent implements OnInit {
       .open(NewMeterComponent)
       .onClose.subscribe((refresh: boolean) => {
         if (refresh) {
-          this.getMeters({});
+          this.getMeters({}, "network-only");
         }
       });
   }
-  getMeters(params: GetMetersQueryInput) {
+  getMeters(params: GetMetersQueryInput, fetchPolicy: FetchPolicy) {
     this.loading = true;
-    this.meterService.getMeters(params).then((r) => {
+    this.meterService.getMeters(params, fetchPolicy).then((r) => {
       this.meters = r.data.meters.data;
       this.loading = false;
     });
@@ -47,7 +48,7 @@ export class MeterManagementComponent implements OnInit {
         if (this.loadingMeter === meterNumber) {
           this.loadingMeter = "";
         }
-        this.getMeters({});
+        this.getMeters({}, "network-only");
       });
   }
   disableMeter(meterNumber: string) {
@@ -59,7 +60,7 @@ export class MeterManagementComponent implements OnInit {
         if (this.loadingMeter === meterNumber) {
           this.loadingMeter = "";
         }
-        this.getMeters({});
+        this.getMeters({}, "network-only");
       });
   }
 }

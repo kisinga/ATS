@@ -8,6 +8,7 @@ import { ReplaySubject } from "rxjs";
 import { NewUserInput } from "app/models/gql/user.query";
 import { UserService } from "../shared/services/user.service";
 import { NewUserComponent } from "./dialogs/new-user/new-user.component";
+import { FetchPolicy } from "@apollo/client/core";
 
 @Component({
   templateUrl: "./user-management.component.html",
@@ -24,7 +25,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private dialogService: NbDialogService,
     private userService: UserService
   ) {
-    this.getUsers({});
+    this.getUsers({}, "cache-first");
   }
 
   ngOnInit() {}
@@ -36,14 +37,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       .open(NewUserComponent)
       .onClose.subscribe((refresh: boolean) => {
         if (refresh) {
-          this.getUsers({});
+          this.getUsers({}, "network-only");
         }
       });
   }
 
-  getUsers(params: GetUsersQueryInput) {
+  getUsers(params: GetUsersQueryInput, fetchPolicy: FetchPolicy) {
     this.loading = true;
-    this.userService.getUsers(params).then((r) => {
+    this.userService.getUsers(params, fetchPolicy).then((r) => {
       this.users = r.data.users.data;
       this.loading = false;
     });
@@ -57,7 +58,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
-        this.getUsers({});
+        this.getUsers({}, "network-only");
       });
   }
   disableUser(email: string) {
@@ -69,7 +70,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         if (this.loadingUser === email) {
           this.loadingUser = "";
         }
-        this.getUsers({});
+        this.getUsers({}, "network-only");
       });
   }
   generateKey() {}

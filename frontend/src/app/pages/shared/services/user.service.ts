@@ -16,7 +16,7 @@ import {
   UsersQuery,
   UsersQueryResult,
 } from "app/models/gql/user.query";
-import { ApolloQueryResult } from "@apollo/client/core";
+import { ApolloQueryResult, FetchPolicy } from "@apollo/client/core";
 import { User } from "app/models/user.model";
 
 @Injectable({
@@ -106,12 +106,14 @@ export class UserService {
     window.localStorage.removeItem("tokenExpiry");
   }
   getUsers(
-    inputs: GetUsersQueryInput
+    inputs: GetUsersQueryInput,
+    fetchPolicy: FetchPolicy
   ): Promise<ApolloQueryResult<UsersQueryResult>> {
     return this.apollo
       .query<UsersQueryResult>({
         query: UsersQuery,
         variables: { inputs },
+        fetchPolicy,
       })
       .toPromise();
   }

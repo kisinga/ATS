@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ApolloQueryResult } from "@apollo/client/core";
+import { ApolloQueryResult, FetchPolicy } from "@apollo/client/core";
 import { Apollo } from "apollo-angular";
 import {
   DisableMeterMutation,
@@ -18,12 +18,14 @@ import { Meter } from "app/models/meter.model";
 export class MeterService {
   constructor(private apollo: Apollo) {}
   getMeters(
-    inputs: GetMetersQueryInput
+    inputs: GetMetersQueryInput,
+    fetchPolicy: FetchPolicy
   ): Promise<ApolloQueryResult<MetersQueryResult>> {
     return this.apollo
       .query<MetersQueryResult>({
         query: MetersQuery,
         variables: { inputs },
+        fetchPolicy,
       })
       .toPromise();
   }
