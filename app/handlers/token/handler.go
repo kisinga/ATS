@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gin-gonic/gin"
@@ -26,12 +28,20 @@ func TokenHandler(domain *registry.Domain) gin.HandlerFunc {
 		}
 		var token models.NewToken
 		if err := c.ShouldBind(&token); err != nil {
-			c.AbortWithStatusJSON(401, "Invalid request")
+			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid request")
 			return
+		}
+		meter, err := domain.Meter.GetMeter(c.Request.Context(), token.MeterNumber)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, "Invalid meter number")
+		}
+		if !meter.Active {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, "Meter not active")
 		}
 		_, err = domain.Token.AddToken(c.Request.Context(), token, key)
 		if err != nil {
-			c.AbortWithStatusJSON(500, "Error Adding token to DB")
+
+			c.AbortWithStatusJSON(500, err)
 			return
 		}
 

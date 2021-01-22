@@ -2,6 +2,7 @@ package token
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kisinga/ATS/app/meter"
 
@@ -37,7 +38,9 @@ func (i *interactor) AddToken(ctx context.Context, input models.NewToken, apiKey
 		Status:      models.StatusNew,
 		TokenString: input.TokenString,
 	}
-	//@TODO Validate that the meter number exists
+	if _, err := i.meterRepository.Read(ctx, input.MeterNumber); err != nil {
+		return nil, errors.New("Invalid Meter number")
+	}
 	return i.repository.Create(ctx, newToken)
 }
 
