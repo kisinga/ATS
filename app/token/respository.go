@@ -16,19 +16,24 @@ type Repository interface {
 	ReadByID(context.Context, primitive.ObjectID) (*models.Token, error)
 	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Token, error)
 	Update(ctx context.Context, newMeter models.Token) (*models.Token, error)
+	tokenCreatedChan() chan *models.Token
 }
 
 func NewRepository(database *storage.Database) Repository {
-	return &repository{database}
+	return &repository{database, make(chan *models.Token, 0)}
 }
 
 type repository struct {
-	db *storage.Database
+	db           *storage.Database
+	tokenCreated chan *models.Token
 }
 
 func (r repository) Create(ctx context.Context, token models.Token) (*models.Token, error) {
 	_, err := r.db.Client.Collection("tokens").InsertOne(ctx, token)
 	return &token, err
+}
+func (r repository) tokenCreatedChan() chan *models.Token {
+	return r.tokenCreated
 }
 
 // func (r repository) Read(ctx context.Context, meterNumber string) (*models.Token, error) {
