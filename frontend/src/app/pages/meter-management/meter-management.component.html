@@ -23,21 +23,21 @@
         <th mat-header-cell *matHeaderCellDef> Action </th>
         <td mat-cell *matCellDef="let element">
 
-            <div *ngIf="element.email === loadingMeter;else other_content">
+            <div *ngIf="element.meterNumber === loadingMeter;else other_content">
                 <button [nbSpinner]="true" ghost nbSpinnerStatus="primary" nbButton>
                     <!-- Saving -->
                 </button>
             </div>
 
             <ng-template #other_content>
-                <div *ngIf="element.disabled;else other_content">
-                    <button nbButton ghost status="primary" nbTooltip="Enable User"  (click)="enableMeter(element.ID)">
+                <div *ngIf="!element.active;else other_content">
+                    <button nbButton ghost status="primary" nbTooltip="Enable Meter"  (click)="enableMeter(element.meterNumber)">
                         <nb-icon icon="checkmark-circle-outline"></nb-icon>
                     </button>
                 </div>
 
                 <ng-template #other_content>
-                    <button nbButton ghost status="danger"  nbTooltip="Disable User"  (click)="disableMeter(element.ID)">
+                    <button nbButton ghost status="danger"  nbTooltip="Disable Meter"  (click)="disableMeter(element.meterNumber)">
                         <nb-icon icon="slash-outline"></nb-icon>
                     </button>
                 </ng-template>

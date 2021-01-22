@@ -38,6 +38,28 @@ export class MeterManagementComponent implements OnInit {
       this.loading = false;
     });
   }
-  enableMeter() {}
-  disableMeter() {}
+  enableMeter(meterNumber: string) {
+    this.loadingMeter = meterNumber;
+    this.meterService
+      .enableMeter(meterNumber)
+      .toPromise()
+      .then((t) => {
+        if (this.loadingMeter === meterNumber) {
+          this.loadingMeter = "";
+        }
+        this.getMeters({});
+      });
+  }
+  disableMeter(meterNumber: string) {
+    this.loadingMeter = meterNumber;
+    this.meterService
+      .disableMeter(meterNumber)
+      .toPromise()
+      .then((t) => {
+        if (this.loadingMeter === meterNumber) {
+          this.loadingMeter = "";
+        }
+        this.getMeters({});
+      });
+  }
 }

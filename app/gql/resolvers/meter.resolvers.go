@@ -28,6 +28,34 @@ func (r *mutationResolver) CreateMeter(ctx context.Context, input models.NewMete
 	return r.domain.Meter.AddMeter(ctx, input, me.ID)
 }
 
+func (r *mutationResolver) DisableMeter(ctx context.Context, meterNumber string) (*models.Meter, error) {
+	me, err := auth.GetUserFromContext(ctx, r.domain)
+	if err != nil {
+		return nil, err
+	}
+	target, err := r.domain.Meter.GetMeter(ctx, meterNumber)
+	if err != nil {
+		return nil, err
+	}
+	target.Active = false
+	target.UpdatedBy = me.ID
+	return r.domain.Meter.UpdateMeter(ctx, meterNumber, *target)
+}
+
+func (r *mutationResolver) EnableMeter(ctx context.Context, meterNumber string) (*models.Meter, error) {
+	me, err := auth.GetUserFromContext(ctx, r.domain)
+	if err != nil {
+		return nil, err
+	}
+	target, err := r.domain.Meter.GetMeter(ctx, meterNumber)
+	if err != nil {
+		return nil, err
+	}
+	target.Active = true
+	target.UpdatedBy = me.ID
+	return r.domain.Meter.UpdateMeter(ctx, meterNumber, *target)
+}
+
 func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error) {
 	//Make sure that the provided limit doesnt exceed 50
 	if *limit > 50 {

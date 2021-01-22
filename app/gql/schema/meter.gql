@@ -17,6 +17,9 @@ extend type Query {
 
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
+  disableMeter(meterNumber: String!): Meter!
+  enableMeter(meterNumber: String!): Meter!
+  # updateMeter(input: NewMeter!): Meter!
 }
 
 type MeterConnection {

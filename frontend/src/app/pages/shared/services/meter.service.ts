@@ -2,6 +2,8 @@ import { Injectable } from "@angular/core";
 import { ApolloQueryResult } from "@apollo/client/core";
 import { Apollo } from "apollo-angular";
 import {
+  DisableMeterMutation,
+  EnableMeterMutation,
   GetMetersQueryInput,
   MetersQuery,
   MetersQueryResult,
@@ -22,7 +24,6 @@ export class MeterService {
       .query<MetersQueryResult>({
         query: MetersQuery,
         variables: { inputs },
-        fetchPolicy: "cache-first",
       })
       .toPromise();
   }
@@ -33,5 +34,19 @@ export class MeterService {
         variables: { input },
       })
       .toPromise();
+  }
+
+  disableMeter(meterNumber: string) {
+    return this.apollo.mutate({
+      mutation: DisableMeterMutation,
+      variables: { meterNumber },
+    });
+  }
+
+  enableMeter(meterNumber: string) {
+    return this.apollo.mutate({
+      mutation: EnableMeterMutation,
+      variables: { meterNumber },
+    });
   }
 }

@@ -66,7 +66,7 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 }
 func (r repository) Update(ctx context.Context, meterNumber string, newMeter models.Meter) (*models.Meter, error) {
 	user := models.Meter{}
-	err := r.db.Client.Collection("meters").FindOneAndUpdate(ctx, bson.M{"meterNumber": meterNumber}, newMeter).Decode(&user)
+	err := r.db.Client.Collection("meters").FindOneAndUpdate(ctx, bson.M{"meterNumber": meterNumber}, bson.M{"$set": newMeter}).Decode(&user)
 	if err != nil {
 		return nil, err
 	}

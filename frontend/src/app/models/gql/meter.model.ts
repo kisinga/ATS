@@ -49,8 +49,8 @@ export const NewMeterMutation = gql`
 
 // `;
 export const DisableMeterMutation = gql`
-  mutation disableMeter($email: String!) {
-    disableMeter(email: $email) {
+  mutation disableMeter($meterNumber: String!) {
+    disableMeter(meterNumber: $meterNumber) {
       meterNumber
       ID
       updatedBy {

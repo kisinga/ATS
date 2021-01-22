@@ -40,18 +40,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
       });
   }
-  disableUser(email: string) {
-    this.loadingUser = email;
-    this.userService
-      .disableUser(email)
-      .toPromise()
-      .then((t) => {
-        if (this.loadingUser === email) {
-          this.loadingUser = "";
-        }
-        this.getUsers({});
-      });
-  }
+
   getUsers(params: GetUsersQueryInput) {
     this.loading = true;
     this.userService.getUsers(params).then((r) => {
@@ -63,6 +52,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.loadingUser = email;
     this.userService
       .enableUser(email)
+      .toPromise()
+      .then((t) => {
+        if (this.loadingUser === email) {
+          this.loadingUser = "";
+        }
+        this.getUsers({});
+      });
+  }
+  disableUser(email: string) {
+    this.loadingUser = email;
+    this.userService
+      .disableUser(email)
       .toPromise()
       .then((t) => {
         if (this.loadingUser === email) {

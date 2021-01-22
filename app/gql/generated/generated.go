@@ -72,7 +72,9 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateMeter    func(childComplexity int, input models.NewMeter) int
 		CreateUser     func(childComplexity int, input models.NewUser) int
+		DisableMeter   func(childComplexity int, meterNumber string) int
 		DisableUser    func(childComplexity int, email string) int
+		EnableMeter    func(childComplexity int, meterNumber string) int
 		EnableUser     func(childComplexity int, email string) int
 		GenerateAPIKey func(childComplexity int) int
 		UpdateUser     func(childComplexity int, input models.NewUser) int
@@ -134,6 +136,8 @@ type MeterResolver interface {
 type MutationResolver interface {
 	GenerateAPIKey(ctx context.Context) (*models.APIKey, error)
 	CreateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error)
+	DisableMeter(ctx context.Context, meterNumber string) (*models.Meter, error)
+	EnableMeter(ctx context.Context, meterNumber string) (*models.Meter, error)
 	CreateUser(ctx context.Context, input models.NewUser) (*models.User, error)
 	DisableUser(ctx context.Context, email string) (*models.User, error)
 	EnableUser(ctx context.Context, email string) (*models.User, error)
@@ -259,6 +263,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(models.NewUser)), true
 
+	case "Mutation.disableMeter":
+		if e.complexity.Mutation.DisableMeter == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMeter_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMeter(childComplexity, args["meterNumber"].(string)), true
+
 	case "Mutation.disableUser":
 		if e.complexity.Mutation.DisableUser == nil {
 			break
@@ -270,6 +286,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DisableUser(childComplexity, args["email"].(string)), true
+
+	case "Mutation.enableMeter":
+		if e.complexity.Mutation.EnableMeter == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_enableMeter_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EnableMeter(childComplexity, args["meterNumber"].(string)), true
 
 	case "Mutation.enableUser":
 		if e.complexity.Mutation.EnableUser == nil {
@@ -607,6 +635,9 @@ extend type Query {
 
 extend type Mutation {
   createMeter(input: NewMeter!): Meter!
+  disableMeter(meterNumber: String!): Meter!
+  enableMeter(meterNumber: String!): Meter!
+  # updateMeter(input: NewMeter!): Meter!
 }
 
 type MeterConnection {
@@ -735,6 +766,21 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_disableMeter_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["meterNumber"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("meterNumber"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["meterNumber"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_disableUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -747,6 +793,21 @@ func (ec *executionContext) field_Mutation_disableUser_args(ctx context.Context,
 		}
 	}
 	args["email"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_enableMeter_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["meterNumber"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("meterNumber"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["meterNumber"] = arg0
 	return args, nil
 }
 
@@ -1284,6 +1345,90 @@ func (ec *executionContext) _Mutation_createMeter(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMeter(rctx, args["input"].(models.NewMeter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Meter)
+	fc.Result = res
+	return ec.marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_disableMeter(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_disableMeter_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DisableMeter(rctx, args["meterNumber"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Meter)
+	fc.Result = res
+	return ec.marshalNMeter2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_enableMeter(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_enableMeter_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EnableMeter(rctx, args["meterNumber"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3737,6 +3882,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createMeter":
 			out.Values[i] = ec._Mutation_createMeter(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "disableMeter":
+			out.Values[i] = ec._Mutation_disableMeter(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "enableMeter":
+			out.Values[i] = ec._Mutation_enableMeter(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
