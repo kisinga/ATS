@@ -51,3 +51,7 @@ Merits:
 3. Generous free tier
 4. We can leverage on the free hosting as well (Hence leave backend to host API ONLY)
 5. The backend retains full control
+
+# Logic
+
+![structure](assets/logic.png)
