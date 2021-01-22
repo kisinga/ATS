@@ -4,4 +4,5 @@ export interface User {
   createdBy: User;
   updatedBy: User;
   ID: string;
+  active: Boolean;
 }

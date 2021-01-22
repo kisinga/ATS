@@ -4,7 +4,7 @@ type User implements BaseObject {
   name: String!
   updatedBy: User
   createdBy: User
-  disabled: Boolean
+  active: Boolean!
 }
 
 input NewUser {

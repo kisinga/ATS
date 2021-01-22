@@ -1,9 +1,9 @@
 type Meter implements BaseObject {
   meterNumber: String!
-  location: String
   ID: ID!
   updatedBy: User
   createdBy: User
+  active: Boolean!
 }
 
 input NewMeter {

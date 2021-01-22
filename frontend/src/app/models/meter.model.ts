@@ -1,4 +1,8 @@
+import { User } from "./user.model";
+
 export interface Meter {
   meterNumber: String;
-  location: String;
+  ID: String;
+  createdBy: User;
+  updatedBy: User;
 }

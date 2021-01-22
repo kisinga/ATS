@@ -33,7 +33,7 @@
             </div>
 
             <ng-template #other_content>
-                <div *ngIf="element.disabled;else other_content">
+                <div *ngIf="!element.active;else other_content">
                     <button nbButton ghost status="primary" nbTooltip="Enable User"  (click)="enableUser(element.email)">
                         <nb-icon icon="checkmark-circle-outline"></nb-icon>
                     </button>

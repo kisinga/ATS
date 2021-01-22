@@ -5,8 +5,7 @@ import (
 )
 
 type Meter struct {
-	MeterNumber string             `json:"meterNumber,omitempty"`
-	Location    *string            `json:"location,omitempty"`
+	MeterNumber string             `json:"meterNumber,omitempty" bson:"meterNumber,omitempty"`
 	ID          primitive.ObjectID `json:"ID,omitempty" bson:"_id,omitempty"`
 	CreatedBy   primitive.ObjectID `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	UpdatedBy   primitive.ObjectID `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`

@@ -26,13 +26,13 @@ type repository struct {
 	db *storage.Database
 }
 
-func (r repository) Create(ctx context.Context, user models.Meter) (*models.Meter, error) {
-	res, err := r.db.Client.Collection("meters").InsertOne(ctx, user)
+func (r repository) Create(ctx context.Context, meter models.Meter) (*models.Meter, error) {
+	res, err := r.db.Client.Collection("meters").InsertOne(ctx, meter)
 	if err != nil {
 		return nil, err
 	}
-	user.ID = res.InsertedID.(primitive.ObjectID)
-	return &user, nil
+	meter.ID = res.InsertedID.(primitive.ObjectID)
+	return &meter, nil
 }
 
 func (r repository) Read(ctx context.Context, meterNumber string) (*models.Meter, error) {

@@ -10,7 +10,7 @@ export const UsersQuery = gql`
         ID
         name
         email
-        disabled
+        active
         createdBy {
           name
           email
@@ -30,7 +30,7 @@ export const NewUserMutation = gql`
       ID
       name
       email
-      disabled
+      active
       createdBy {
         name
         email
@@ -48,7 +48,7 @@ export const DisableUserMutation = gql`
       ID
       name
       email
-      disabled
+      active
       createdBy {
         name
         email
@@ -63,7 +63,7 @@ export const EnableUserMutation = gql`
       ID
       name
       email
-      disabled
+      active
       createdBy {
         name
         email

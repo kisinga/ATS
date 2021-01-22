@@ -48,7 +48,7 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) gin.HandlerFun
 		}
 		user, err := domain.User.GetUser(c.Request.Context(), claims.Email)
 
-		if err != nil || user.Disabled {
+		if err != nil || !user.Active {
 			c.AbortWithStatusJSON(http.StatusForbidden, "Not authorised")
 			return
 		}

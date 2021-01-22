@@ -1,1 +1,27 @@
-<p>new-meter works!</p>
+<nb-card>
+    <nb-card-header>Add new Meter</nb-card-header>
+    <nb-card-body>
+        <div>
+            <form [formGroup]="newMeterForm">
+                <input type="text" nbInput name="meterNumber" fullWidth status="basic" placeholder="Meter Number" required
+                    minlength="4" formControlName="meterNumber">
+            </form>
+        </div>
+        <nb-alert *ngIf="!newMeterForm.valid && newMeterForm.touched" status="danger">
+            <span *ngIf="!newMeterForm.controls['meterNumber'].valid">
+                <p></p>
+                Invalid Meter Number
+            </span>
+            <br>
+          
+        </nb-alert>
+        <nb-alert *ngIf="creationError" status="danger">
+            {{creationError}}
+        </nb-alert>
+
+    </nb-card-body>
+    <nb-card-footer>
+        <button type="button" class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
+        <button type="submit" nbButton status="success" (click)="submit()">Submit</button>
+    </nb-card-footer>
+</nb-card>

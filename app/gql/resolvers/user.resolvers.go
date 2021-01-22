@@ -30,7 +30,7 @@ func (r *mutationResolver) DisableUser(ctx context.Context, email string) (*mode
 	if err != nil {
 		return nil, err
 	}
-	target.Disabled = true
+	target.Active = false
 	target.UpdatedBy = me.ID
 	return r.domain.User.UpdateUser(ctx, email, *target)
 }
@@ -44,7 +44,7 @@ func (r *mutationResolver) EnableUser(ctx context.Context, email string) (*model
 	if err != nil {
 		return nil, err
 	}
-	target.Disabled = false
+	target.Active = true
 	target.UpdatedBy = me.ID
 	return r.domain.User.UpdateUser(ctx, email, *target)
 }
