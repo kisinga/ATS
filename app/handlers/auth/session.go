@@ -29,8 +29,7 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) gin.HandlerFun
 		defer c.Request.Body.Close()
 		claims, err := getIDTokenFromBody(c.Request)
 		if err != nil {
-			json, _ := json.Marshal(err.Error())
-			c.AbortWithStatusJSON(http.StatusBadRequest, json)
+			c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -44,15 +43,13 @@ func SessionInit(firebase *firebase.App, domain *registry.Domain) gin.HandlerFun
 		client, err := firebase.Auth(context.Background())
 		cookie, err := client.SessionCookie(c.Request.Context(), claims.ID, expiresIn)
 		if err != nil {
-			json, _ := json.Marshal("Failed to create a session cookie")
-			c.AbortWithStatusJSON(http.StatusInternalServerError, json)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, "Failed to create a session cookie")
 			return
 		}
 		user, err := domain.User.GetUser(c.Request.Context(), claims.Email)
 
 		if err != nil || user.Disabled {
-			json, _ := json.Marshal("Not authorised")
-			c.AbortWithStatusJSON(http.StatusForbidden, json)
+			c.AbortWithStatusJSON(http.StatusForbidden, "Not authorised")
 			return
 		}
 		// Set cookie policy for session cookie.

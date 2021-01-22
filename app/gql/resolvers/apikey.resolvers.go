@@ -6,8 +6,8 @@ package resolvers
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/auth"
 	"github.com/kisinga/ATS/app/gql/generated"
+	"github.com/kisinga/ATS/app/handlers/auth"
 	"github.com/kisinga/ATS/app/models"
 )
 

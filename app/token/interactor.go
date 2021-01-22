@@ -3,6 +3,8 @@ package token
 import (
 	"context"
 
+	"github.com/kisinga/ATS/app/meter"
+
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -15,11 +17,12 @@ type Interactor interface {
 }
 
 type interactor struct {
-	repository Repository
+	repository      Repository
+	meterRepository meter.Repository
 }
 
-func NewIterator(repo Repository) Interactor {
-	return &interactor{repo}
+func NewIterator(repo Repository, meterRepo meter.Repository) Interactor {
+	return &interactor{repo, meterRepo}
 }
 
 func (i *interactor) GetToken(ctx context.Context, ID primitive.ObjectID) (*models.Token, error) {
@@ -34,6 +37,7 @@ func (i *interactor) AddToken(ctx context.Context, input models.NewToken, apiKey
 		Status:      models.StatusNew,
 		TokenString: input.TokenString,
 	}
+	//@TODO Validate that the meter number exists
 	return i.repository.Create(ctx, newToken)
 }
 

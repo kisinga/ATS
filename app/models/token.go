@@ -16,8 +16,8 @@ type Token struct {
 	APIKey      primitive.ObjectID `json:"apiKey,omitempty" bson:"apiKey,omitempty"`
 }
 type NewToken struct {
-	MeterNumber string
-	TokenString string
+	MeterNumber string `json:"meterNumber,omitempty" binding:"required"`
+	TokenString string `json:"tokenString,omitempty" binding:"required"`
 }
 type TokenStatus int
 

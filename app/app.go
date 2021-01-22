@@ -16,9 +16,10 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/kisinga/ATS/app/auth"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/gql/resolvers"
+	"github.com/kisinga/ATS/app/handlers/auth"
+	handlers "github.com/kisinga/ATS/app/handlers/token"
 	"github.com/kisinga/ATS/app/registry"
 	"github.com/kisinga/ATS/app/storage"
 )
@@ -46,10 +47,12 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	}
 	router.GET("/playground", playgroundHandler())
 	router.POST("/sessionInit", auth.SessionInit(firebase, domain))
+	router.POST("/token", handlers.TokenHandler(domain))
 	router.GET("/sessionTerm", auth.SessionTerm())
 
 	return router.Run(port)
 }
+
 func playgroundHandler() gin.HandlerFunc {
 	h := playground.Handler("GraphQL", "/api")
 

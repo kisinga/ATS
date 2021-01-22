@@ -33,15 +33,13 @@ func Middleware(firebase *firebase.App) gin.HandlerFunc {
 			token = session
 		}
 		if token == "" {
-			json, _ := json.Marshal("Invalid token")
 			// Session is invalid. Force user to login.
-			c.AbortWithStatusJSON(http.StatusForbidden, json)
+			c.AbortWithStatusJSON(http.StatusForbidden, "Invalid token")
 			return
 		}
 		user, err := GetUserFromToken(c.Request.Context(), firebase, token)
 		if err != nil {
-			json, _ := json.Marshal(err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, json)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 		// Token is authenticated, pass it through
