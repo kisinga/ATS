@@ -2,7 +2,6 @@ package token
 
 import (
 	"context"
-	"errors"
 	"sync"
 
 	"github.com/kisinga/ATS/app/meter"
@@ -53,6 +52,7 @@ func tokenCreated(i *interactor, channel chan *models.Token) {
 	for {
 		select {
 		case key := <-channel:
+			i.mu.Lock()
 			for _, listener := range i.listeners {
 				go func(l chan<- *models.Token) {
 					l <- key
@@ -74,10 +74,7 @@ func (i *interactor) AddToken(ctx context.Context, input models.NewToken, apiKey
 		Status:      models.StatusNew,
 		TokenString: input.TokenString,
 	}
-	if _, err := i.meterRepository.Read(ctx, input.MeterNumber); err != nil {
-		return nil, errors.New("Invalid Meter number")
-	}
-	
+
 	return i.repository.Create(ctx, newToken)
 }
 

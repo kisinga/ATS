@@ -34,13 +34,14 @@ func TokenHandler(domain *registry.Domain) gin.HandlerFunc {
 		meter, err := domain.Meter.GetMeter(c.Request.Context(), token.MeterNumber)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, "Invalid meter number")
+			return
 		}
 		if !meter.Active {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, "Meter not active")
+			return
 		}
 		_, err = domain.Token.AddToken(c.Request.Context(), token, key)
 		if err != nil {
-
 			c.AbortWithStatusJSON(500, err)
 			return
 		}

@@ -49,7 +49,7 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	router.POST("/sessionInit", auth.SessionInit(firebase, domain))
 	router.POST("/token", handlers.TokenHandler(domain))
 	router.GET("/sessionTerm", auth.SessionTerm())
-
+	listenForNewTokens(domain)
 	return router.Run(port)
 }
 

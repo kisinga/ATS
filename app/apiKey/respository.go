@@ -31,9 +31,11 @@ type repository struct {
 func (r repository) Create(ctx context.Context, token models.APIKey) (*models.APIKey, error) {
 	_, err := r.db.Client.Collection("apikeys").InsertOne(ctx, token)
 	// send to chanel via a goroutine so it doesnt block
-	go func() {
-		r.apiKeyCreated <- &token
-	}()
+	if err == nil {
+		go func() {
+			r.apiKeyCreated <- &token
+		}()
+	}
 	return &token, err
 }
 
