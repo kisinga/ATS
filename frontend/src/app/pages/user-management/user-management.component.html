@@ -50,6 +50,6 @@
 
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-user': row.disabled}"
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-user': !row.active}"
     ></tr>
 </table>
