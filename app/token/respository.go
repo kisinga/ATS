@@ -71,5 +71,8 @@ func (r repository) Update(ctx context.Context, newToken models.Token) (*models.
 	if err != nil {
 		return nil, err
 	}
+	go func() {
+		r.tokenCreated <- &token
+	}()
 	return &token, nil
 }
