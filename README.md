@@ -58,8 +58,8 @@ Merits:
 
 # Creating A Sample Token
 
-Obtain the Active API-Key from the dashboad
-Run the terminal
+Obtain the Active API-Key from the dashboad  
+Run on the terminal  
 `curl --request POST \ --url https://atske.herokuapp.com/token \ --header 'Authorization: [API KEY]' \ --header 'Content-Type: application/json' \ --data '{ "meterNumber": "[TARGET METER NUMBER]", "tokenString": "[TOKEN]" }'`
 
 Replace [API KEY] With the value obtained from the dashboard  

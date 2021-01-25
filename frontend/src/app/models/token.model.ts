@@ -6,7 +6,7 @@ export interface Token {
   apiKey: string;
 }
 
-enum TokenStatus {
+export enum TokenStatus {
   New,
   Sent,
   Error,

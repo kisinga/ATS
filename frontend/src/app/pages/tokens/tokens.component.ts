@@ -10,6 +10,7 @@ import {
   GetTokensQueryInput,
   TokensQueryModel,
 } from "app/models/gql/token.model";
+import { TokenStatus } from "app/models/token.model";
 import { FetchPolicy } from "@apollo/client/core";
 import { TokenService } from "../shared/services/token.service";
 import { ReplaySubject } from "rxjs";
@@ -32,7 +33,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
     "status",
   ];
   @ViewChild(MatPaginator) paginator: MatPaginator;
-
+  tokenStatus = TokenStatus;
   constructor(private tokenService: TokenService) {
     this.getTokens({ limit: 10 }, "cache-first");
   }
