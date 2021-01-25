@@ -11,7 +11,7 @@ import (
 type Token struct {
 	MeterNumber string             `json:"meterNumber,omitempty" bson:"meterNumber,omitempty"`
 	TokenString string             `json:"tokenString,omitempty" bson:"tokenString,omitempty"`
-	ID          primitive.ObjectID `json:"ID,omitempty" bson:"ID,omitempty"`
+	ID          primitive.ObjectID `json:"ID,omitempty" bson:"_id,omitempty"`
 	Status      TokenStatus        `json:"status,omitempty" bson:"status,omitempty"`
 	APIKey      primitive.ObjectID `json:"apiKey,omitempty" bson:"apiKey,omitempty"`
 }
@@ -50,7 +50,7 @@ type TokenConnection struct {
 	PageInfo *PageInfo `json:"pageInfo"`
 }
 
-func (c *TokenConnection) CreateConection(limit int64) *TokenConnection {
+func (c *TokenConnection) CreateConection(limit int64, count int64) *TokenConnection {
 	if len(c.Data) > 0 {
 		EndCursor := primitive.ObjectID{}
 		if int64(len(c.Data)) > limit-1 {
@@ -67,6 +67,7 @@ func (c *TokenConnection) CreateConection(limit int64) *TokenConnection {
 				}
 				return false
 			}(),
+			Count:       count,
 			StartCursor: c.Data[0].ID,
 		}
 		// Make sure to return the specified number of elements only

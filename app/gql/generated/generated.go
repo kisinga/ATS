@@ -81,6 +81,7 @@ type ComplexityRoot struct {
 	}
 
 	PageInfo struct {
+		Count       func(childComplexity int) int
 		EndCursor   func(childComplexity int) int
 		HasNextPage func(childComplexity int) int
 		StartCursor func(childComplexity int) int
@@ -88,8 +89,8 @@ type ComplexityRoot struct {
 
 	Query struct {
 		CurrentAPIKey func(childComplexity int) int
+		GetTokens     func(childComplexity int, limit *int64, after *primitive.ObjectID, meterNumber *string) int
 		Meters        func(childComplexity int, limit *int64, after *primitive.ObjectID) int
-		Tokens        func(childComplexity int, limit *int64, after *primitive.ObjectID) int
 		Users         func(childComplexity int, limit *int64, after *primitive.ObjectID) int
 	}
 
@@ -146,7 +147,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	CurrentAPIKey(ctx context.Context) (*models.APIKey, error)
 	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
-	Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error)
+	GetTokens(ctx context.Context, limit *int64, after *primitive.ObjectID, meterNumber *string) (*models.TokenConnection, error)
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error)
 }
 type SubscriptionResolver interface {
@@ -330,6 +331,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(models.NewUser)), true
 
+	case "PageInfo.count":
+		if e.complexity.PageInfo.Count == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.Count(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -358,6 +366,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.CurrentAPIKey(childComplexity), true
 
+	case "Query.getTokens":
+		if e.complexity.Query.GetTokens == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTokens_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTokens(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID), args["meterNumber"].(*string)), true
+
 	case "Query.meters":
 		if e.complexity.Query.Meters == nil {
 			break
@@ -369,18 +389,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Meters(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID)), true
-
-	case "Query.tokens":
-		if e.complexity.Query.Tokens == nil {
-			break
-		}
-
-		args, err := ec.field_Query_tokens_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Tokens(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -630,7 +638,7 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): MeterConnection!
+  meters(limit: Int = 30, after: ID = null): MeterConnection!
 }
 
 extend type Mutation {
@@ -662,6 +670,7 @@ type PageInfo {
   startCursor: ID!
   endCursor: ID!
   hasNextPage: Boolean!
+  count: Int!
 }
 `, BuiltIn: false},
 	{Name: "app/gql/schema/token.gql", Input: `type Token {
@@ -673,7 +682,11 @@ type PageInfo {
 }
 
 extend type Query {
-  tokens(limit: Int = 10, after: ID = null): TokenConnection!
+  getTokens(
+    limit: Int = 30
+    after: ID = null
+    meterNumber: String
+  ): TokenConnection!
 }
 
 extend type Subscription {
@@ -702,7 +715,7 @@ input NewUser {
 }
 
 extend type Query {
-  users(limit: Int = 10, after: ID = null): UsersConnection!
+  users(limit: Int = 30, after: ID = null): UsersConnection!
 }
 
 type UsersConnection {
@@ -856,7 +869,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_meters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getTokens_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int64
@@ -877,10 +890,19 @@ func (ec *executionContext) field_Query_meters_args(ctx context.Context, rawArgs
 		}
 	}
 	args["after"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["meterNumber"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("meterNumber"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["meterNumber"] = arg2
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_tokens_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_meters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int64
@@ -1718,6 +1740,41 @@ func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PageInfo_count(ctx context.Context, field graphql.CollectedField, obj *models.PageInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_currentAPIKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1795,7 +1852,7 @@ func (ec *executionContext) _Query_meters(ctx context.Context, field graphql.Col
 	return ec.marshalNMeterConnection2ᚖgithubᚗcomᚋkisingaᚋATSᚋappᚋmodelsᚐMeterConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_tokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_getTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1812,7 +1869,7 @@ func (ec *executionContext) _Query_tokens(ctx context.Context, field graphql.Col
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_tokens_args(ctx, rawArgs)
+	args, err := ec.field_Query_getTokens_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1820,7 +1877,7 @@ func (ec *executionContext) _Query_tokens(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Tokens(rctx, args["limit"].(*int64), args["after"].(*primitive.ObjectID))
+		return ec.resolvers.Query().GetTokens(rctx, args["limit"].(*int64), args["after"].(*primitive.ObjectID), args["meterNumber"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3952,6 +4009,11 @@ func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "count":
+			out.Values[i] = ec._PageInfo_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4006,7 +4068,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "tokens":
+		case "getTokens":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -4014,7 +4076,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_tokens(ctx, field)
+				res = ec._Query_getTokens(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

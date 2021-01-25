@@ -13,7 +13,7 @@ input NewUser {
 }
 
 extend type Query {
-  users(limit: Int = 10, after: ID = null): UsersConnection!
+  users(limit: Int = 30, after: ID = null): UsersConnection!
 }
 
 type UsersConnection {

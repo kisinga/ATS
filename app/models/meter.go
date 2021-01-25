@@ -18,7 +18,7 @@ type MeterConnection struct {
 	PageInfo *PageInfo `json:"pageInfo"`
 }
 
-func (c *MeterConnection) CreateConection(limit int64) *MeterConnection {
+func (c *MeterConnection) CreateConection(limit int64, count int64) *MeterConnection {
 	if len(c.Data) > 0 {
 		EndCursor := primitive.ObjectID{}
 		if int64(len(c.Data)) > limit-1 {
@@ -35,6 +35,7 @@ func (c *MeterConnection) CreateConection(limit int64) *MeterConnection {
 				}
 				return false
 			}(),
+			Count:       count,
 			StartCursor: c.Data[0].ID,
 		}
 		// Make sure to return the specified number of elements only

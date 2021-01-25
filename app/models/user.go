@@ -24,7 +24,7 @@ type UsersConnection struct {
 	PageInfo *PageInfo `json:"pageInfo"`
 }
 
-func (c *UsersConnection) CreateConection(limit int64) *UsersConnection {
+func (c *UsersConnection) CreateConection(limit int64, count int64) *UsersConnection {
 	if len(c.Data) > 0 {
 		EndCursor := primitive.ObjectID{}
 		if int64(len(c.Data)) > limit-1 {
@@ -41,6 +41,7 @@ func (c *UsersConnection) CreateConection(limit int64) *UsersConnection {
 				}
 				return false
 			}(),
+			Count:       count,
 			StartCursor: c.Data[0].ID,
 		}
 		// Make sure to return the specified number of elements only

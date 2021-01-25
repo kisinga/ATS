@@ -3,9 +3,9 @@ import { NgModule } from "@angular/core";
 
 import { PagesComponent } from "./pages.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
-import { TransactionsComponent } from "./transactions/transactions.component";
 import { MeterManagementComponent } from "./meter-management/meter-management.component";
 import { UserManagementComponent } from "./user-management/user-management.component";
+import { TokensComponent } from "./tokens/tokens.component";
 
 const routes: Routes = [
   {
@@ -17,8 +17,8 @@ const routes: Routes = [
         component: DashboardComponent,
       },
       {
-        path: "transactions",
-        component: TransactionsComponent,
+        path: "tokens",
+        component: TokensComponent,
       },
       {
         path: "users",

@@ -20,9 +20,9 @@ export const MENU_ITEMS: NbMenuItem[] = [
     home: false,
   },
   {
-    title: "Transactions",
+    title: "Tokens",
     icon: "activity-outline",
-    link: "/transactions",
+    link: "/tokens",
     home: false,
   },
 ];

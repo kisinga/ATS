@@ -7,7 +7,11 @@ type Token {
 }
 
 extend type Query {
-  tokens(limit: Int = 10, after: ID = null): TokenConnection!
+  getTokens(
+    limit: Int = 30
+    after: ID = null
+    meterNumber: String
+  ): TokenConnection!
 }
 
 extend type Subscription {

@@ -5,5 +5,6 @@ export const pageInfoFragment = gql`
     startCursor
     endCursor
     hasNextPage
+    count
   }
 `;

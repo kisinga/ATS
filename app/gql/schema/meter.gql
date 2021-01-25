@@ -12,7 +12,7 @@ input NewMeter {
 }
 
 extend type Query {
-  meters(limit: Int = 10, after: ID = null): MeterConnection!
+  meters(limit: Int = 30, after: ID = null): MeterConnection!
 }
 
 extend type Mutation {

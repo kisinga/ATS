@@ -38,7 +38,7 @@ export class NewMeterComponent implements OnInit {
         .catch((e) => {
           // console.log(e);
           this.creationError =
-            "Error creating Meter. Please ensure that the email doesnt already exist";
+            "Error creating Meter. Please ensure that the Meter-Number doesnt already exist";
         });
     } else {
     }

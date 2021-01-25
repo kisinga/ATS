@@ -24,4 +24,5 @@ type PageInfo struct {
 	StartCursor primitive.ObjectID `json:"startCursor"`
 	EndCursor   primitive.ObjectID `json:"endCursor"`
 	HasNextPage bool               `json:"hasNextPage"`
+	Count       int64              `json:"count"`
 }
