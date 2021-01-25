@@ -58,12 +58,14 @@ func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*model
 func (r repository) ReadMany(ctx context.Context, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
 	tokens := []*models.Token{}
 	direcction := bson.M{"$lt": beforeOrAfter}
+	sort := bson.M{"_id": -1}
 	if reversed {
-		direcction = bson.M{"$gt": beforeOrAfter}
+		direcction = bson.M{"$gte": beforeOrAfter}
+		sort = bson.M{"_id": 1}
 	}
 	DataCursor, dataErr := r.db.Client.Collection("tokens").Find(ctx,
 		bson.M{"_id": direcction},
-		&options.FindOptions{Limit: limit, Sort: bson.M{"_id": -1}})
+		&options.FindOptions{Limit: limit, Sort: sort})
 
 	if dataErr != nil {
 		return nil, dataErr
@@ -76,6 +78,13 @@ func (r repository) ReadMany(ctx context.Context, beforeOrAfter primitive.Object
 		}
 		tokens = append(tokens, &elem)
 	}
+	// reverse the order so that pagination info is correct
+	if reversed {
+		for i, j := 0, len(tokens)-1; i < j; i, j = i+1, j-1 {
+			tokens[i], tokens[j] = tokens[j], tokens[i]
+		}
+	}
+
 	return tokens, nil
 }
 func (r repository) Update(ctx context.Context, newToken models.Token) (*models.Token, error) {

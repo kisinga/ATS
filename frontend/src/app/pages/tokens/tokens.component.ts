@@ -40,7 +40,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginator.page
       .pipe(takeUntil(this.comopnentDestroyed))
       .subscribe((page) => {
-        if (page.pageIndex == 0 && page.pageIndex > this.currentPage) {
+        if (page.pageIndex === 0 && page.pageIndex > this.currentPage) {
           //  The user had scrolled forwad and is now back to page 1, hence no pagination data
           this.getTokens({ limit: 10 }, "cache-first");
         } else {
