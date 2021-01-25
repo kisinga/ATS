@@ -54,4 +54,4 @@ Merits:
 
 # Logic
 
-![structure](assets/logic.png)
+![structure](assets/logicv2.png)
