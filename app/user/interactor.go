@@ -44,6 +44,7 @@ func (i *interactor) AddUser(ctx context.Context, user models.NewUser, creatorEm
 		CreatedBy: creator.ID,
 		ID:        primitive.NewObjectID(),
 		Name:      user.Name,
+		Active:    true,
 	}
 	return i.repository.Create(ctx, newUser)
 }

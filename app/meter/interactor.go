@@ -40,6 +40,7 @@ func (i *interactor) AddMeter(ctx context.Context, meter models.NewMeter, creato
 		CreatedBy:   creatorID,
 		ID:          primitive.NewObjectID(),
 		MeterNumber: meter.MeterNumber,
+		Active:      true,
 	}
 	return i.repository.Create(ctx, newMeter)
 }
