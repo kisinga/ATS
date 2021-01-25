@@ -4,8 +4,18 @@ import { pageInfoFragment } from "./page-info.fragment";
 import { PageInfoModel } from "./page-info.model";
 
 export const TokensQuery = gql`
-  query getTokens($limit: Int, $afterID: ID, $meterNumber: String) {
-    getTokens(limit: $limit, after: $afterID, meterNumber: $meterNumber) {
+  query getTokens(
+    $limit: Int = 10
+    $beforeOrAfter: ID
+    $reversed: Boolean
+    $meterNumber: String
+  ) {
+    getTokens(
+      limit: $limit
+      beforeOrAfter: $beforeOrAfter
+      reversed: $reversed
+      meterNumber: $meterNumber
+    ) {
       data {
         meterNumber
         tokenString
@@ -23,7 +33,9 @@ export const TokensQuery = gql`
 
 export interface GetTokensQueryInput {
   limit?: number;
-  after?: string;
+  beforeOrAfter?: string;
+  reversed?: boolean;
+  meterNumber?: string;
 }
 
 export interface TokensQueryModel {

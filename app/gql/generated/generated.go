@@ -89,7 +89,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		CurrentAPIKey func(childComplexity int) int
-		GetTokens     func(childComplexity int, limit *int64, after *primitive.ObjectID, meterNumber *string) int
+		GetTokens     func(childComplexity int, limit *int64, beforeOrAfter *primitive.ObjectID, reversed *bool, meterNumber *string) int
 		Meters        func(childComplexity int, limit *int64, after *primitive.ObjectID) int
 		Users         func(childComplexity int, limit *int64, after *primitive.ObjectID) int
 	}
@@ -147,7 +147,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	CurrentAPIKey(ctx context.Context) (*models.APIKey, error)
 	Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error)
-	GetTokens(ctx context.Context, limit *int64, after *primitive.ObjectID, meterNumber *string) (*models.TokenConnection, error)
+	GetTokens(ctx context.Context, limit *int64, beforeOrAfter *primitive.ObjectID, reversed *bool, meterNumber *string) (*models.TokenConnection, error)
 	Users(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.UsersConnection, error)
 }
 type SubscriptionResolver interface {
@@ -376,7 +376,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetTokens(childComplexity, args["limit"].(*int64), args["after"].(*primitive.ObjectID), args["meterNumber"].(*string)), true
+		return e.complexity.Query.GetTokens(childComplexity, args["limit"].(*int64), args["beforeOrAfter"].(*primitive.ObjectID), args["reversed"].(*bool), args["meterNumber"].(*string)), true
 
 	case "Query.meters":
 		if e.complexity.Query.Meters == nil {
@@ -684,7 +684,8 @@ type PageInfo {
 extend type Query {
   getTokens(
     limit: Int = 30
-    after: ID = null
+    beforeOrAfter: ID = null
+    reversed: Boolean
     meterNumber: String
   ): TokenConnection!
 }
@@ -882,23 +883,32 @@ func (ec *executionContext) field_Query_getTokens_args(ctx context.Context, rawA
 	}
 	args["limit"] = arg0
 	var arg1 *primitive.ObjectID
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["beforeOrAfter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("beforeOrAfter"))
 		arg1, err = ec.unmarshalOID2ᚖgoᚗmongodbᚗorgᚋmongoᚑdriverᚋbsonᚋprimitiveᚐObjectID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["after"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["meterNumber"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("meterNumber"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	args["beforeOrAfter"] = arg1
+	var arg2 *bool
+	if tmp, ok := rawArgs["reversed"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("reversed"))
+		arg2, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["meterNumber"] = arg2
+	args["reversed"] = arg2
+	var arg3 *string
+	if tmp, ok := rawArgs["meterNumber"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("meterNumber"))
+		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["meterNumber"] = arg3
 	return args, nil
 }
 
@@ -1877,7 +1887,7 @@ func (ec *executionContext) _Query_getTokens(ctx context.Context, field graphql.
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetTokens(rctx, args["limit"].(*int64), args["after"].(*primitive.ObjectID), args["meterNumber"].(*string))
+		return ec.resolvers.Query().GetTokens(rctx, args["limit"].(*int64), args["beforeOrAfter"].(*primitive.ObjectID), args["reversed"].(*bool), args["meterNumber"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

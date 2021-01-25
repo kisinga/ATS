@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, after *primitive.ObjectID, meterNumber *string) (*models.TokenConnection, error) {
+func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAfter *primitive.ObjectID, reversed *bool, meterNumber *string) (*models.TokenConnection, error) {
 	//Make sure that the provided limit doesnt exceed 50
 	if *limit > 50 {
 		*limit = int64(50)
@@ -20,14 +20,18 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, after *prim
 	//This step is very important, as fetching n+1 tuples always gives information about whether there is an element after the specified limit
 	*limit = *limit + 1
 	afterID := primitive.NewObjectID()
-	if after != nil {
-		afterID = *after
+	if beforeOrAfter != nil {
+		afterID = *beforeOrAfter
 	}
 	count, err := r.domain.Token.Count(ctx)
 	if err != nil {
 		return nil, err
 	}
-	k, l := r.domain.Token.GetMany(ctx, afterID, limit)
+	rev := false
+	if reversed != nil {
+		rev = *reversed
+	}
+	k, l := r.domain.Token.GetMany(ctx, afterID, limit, rev)
 	connection := models.TokenConnection{
 		Data: k,
 	}

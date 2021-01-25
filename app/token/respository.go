@@ -14,7 +14,7 @@ type Repository interface {
 	Create(context.Context, models.Token) (*models.Token, error)
 	// Read(context.Context, string) (*models.Token, error)
 	ReadByID(context.Context, primitive.ObjectID) (*models.Token, error)
-	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Token, error)
+	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
 	Update(ctx context.Context, newMeter models.Token) (*models.Token, error)
 	tokenCreatedChan() chan *models.Token
 	Count(ctx context.Context) (int64, error)
@@ -55,10 +55,14 @@ func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*model
 	return &token, r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"_id": ID}).Decode(&token)
 }
 
-func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Token, error) {
+func (r repository) ReadMany(ctx context.Context, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
 	tokens := []*models.Token{}
+	direcction := bson.M{"$lt": beforeOrAfter}
+	if reversed {
+		direcction = bson.M{"$gt": beforeOrAfter}
+	}
 	DataCursor, dataErr := r.db.Client.Collection("tokens").Find(ctx,
-		bson.M{"_id": bson.M{"$lt": after}},
+		bson.M{"_id": direcction},
 		&options.FindOptions{Limit: limit, Sort: bson.M{"_id": -1}})
 
 	if dataErr != nil {

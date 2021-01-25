@@ -112,7 +112,7 @@ export class UserService {
     return this.apollo
       .query<UsersQueryResult>({
         query: UsersQuery,
-        variables: { inputs },
+        variables: inputs,
         fetchPolicy,
       })
       .toPromise();

@@ -23,7 +23,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
   tokensPage: TokensQueryModel;
   loading: Boolean = false;
   comopnentDestroyed: ReplaySubject<boolean> = new ReplaySubject<boolean>();
-
+  currentPage = 0;
   displayedColumns: string[] = [
     "meter_number",
     "tokenNumber",
@@ -34,25 +34,45 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private tokenService: TokenService) {
-    this.getTokens({ limit: 2 }, "cache-first");
+    this.getTokens({ limit: 10 }, "cache-first");
   }
   ngAfterViewInit() {
     this.paginator.page
       .pipe(takeUntil(this.comopnentDestroyed))
-      .subscribe(() => {
-        this.getTokens(
-          {
-            limit: 10,
-            after: this.tokensPage.pageInfo.endCursor,
-          },
-          "network-only"
-        );
+      .subscribe((page) => {
+        if (page.pageIndex == 0 && page.pageIndex > this.currentPage) {
+          //  The user had scrolled forwad and is now back to page 1, hence no pagination data
+          this.getTokens({ limit: 10 }, "cache-first");
+        } else {
+          // The user is not on the first page
+          if (page.pageIndex > this.currentPage) {
+            // User has clicked next
+            this.getTokens(
+              {
+                limit: 10,
+                beforeOrAfter: this.tokensPage.pageInfo.endCursor,
+              },
+              "cache-first"
+            );
+          } else {
+            // User has clicked next
+            this.getTokens(
+              {
+                limit: 10,
+                beforeOrAfter: this.tokensPage.pageInfo.startCursor,
+                reversed: true,
+              },
+              "cache-first"
+            );
+          }
+        }
+        this.currentPage = page.pageIndex;
       });
   }
   getTokens(params: GetTokensQueryInput, fetchPolicy: FetchPolicy) {
     this.loading = true;
     this.tokenService.getTokens(params, fetchPolicy).then((r) => {
-      console.log(r.data);
+      // console.log(r.data);
       this.tokensPage = r.data.getTokens;
       this.loading = false;
     });

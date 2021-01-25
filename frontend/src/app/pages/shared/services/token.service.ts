@@ -20,7 +20,7 @@ export class TokenService {
     return this.apollo
       .query<TokensQueryResult>({
         query: TokensQuery,
-        variables: { inputs },
+        variables: inputs,
         fetchPolicy,
       })
       .toPromise();

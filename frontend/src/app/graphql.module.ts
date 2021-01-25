@@ -43,7 +43,7 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
     },
   }));
   const token = window.localStorage.getItem("token");
-  console.log(token);
+  // console.log(token);
   const auth = setContext((operation, context) => {
     if (token === null) {
       return {};

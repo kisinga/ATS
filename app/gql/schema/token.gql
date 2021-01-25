@@ -9,7 +9,8 @@ type Token {
 extend type Query {
   getTokens(
     limit: Int = 30
-    after: ID = null
+    beforeOrAfter: ID = null
+    reversed: Boolean
     meterNumber: String
   ): TokenConnection!
 }

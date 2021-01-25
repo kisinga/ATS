@@ -24,7 +24,7 @@ export class MeterService {
     return this.apollo
       .query<MetersQueryResult>({
         query: MetersQuery,
-        variables: { inputs },
+        variables: inputs,
         fetchPolicy,
       })
       .toPromise();
