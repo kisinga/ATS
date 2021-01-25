@@ -75,11 +75,15 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitiv
 	if after != nil {
 		afterID = *after
 	}
+	count, err := r.domain.Token.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
 	k, l := r.domain.User.GetMany(ctx, afterID, limit)
 	connection := models.UsersConnection{
 		Data: k,
 	}
-	connection.CreateConection(*limit)
+	connection.CreateConection(*limit, count)
 	return &connection, l
 }
 

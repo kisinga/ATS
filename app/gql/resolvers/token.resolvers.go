@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r *queryResolver) Tokens(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.TokenConnection, error) {
+func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, after *primitive.ObjectID, meterNumber *string) (*models.TokenConnection, error) {
 	//Make sure that the provided limit doesnt exceed 50
 	if *limit > 50 {
 		*limit = int64(50)
@@ -23,11 +23,15 @@ func (r *queryResolver) Tokens(ctx context.Context, limit *int64, after *primiti
 	if after != nil {
 		afterID = *after
 	}
+	count, err := r.domain.Token.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
 	k, l := r.domain.Token.GetMany(ctx, afterID, limit)
 	connection := models.TokenConnection{
 		Data: k,
 	}
-	connection.CreateConection(*limit)
+	connection.CreateConection(*limit, count)
 	return &connection, l
 }
 

@@ -70,11 +70,15 @@ func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primiti
 	if after != nil {
 		afterID = *after
 	}
+	count, err := r.domain.Token.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
 	k, l := r.domain.Meter.GetMany(ctx, afterID, limit)
 	connection := models.MeterConnection{
 		Data: k,
 	}
-	connection.CreateConection(*limit)
+	connection.CreateConection(*limit, count)
 	return &connection, l
 }
 
