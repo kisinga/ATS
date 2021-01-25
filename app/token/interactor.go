@@ -16,6 +16,7 @@ type Interactor interface {
 	AddToken(ctx context.Context, input models.NewToken, apiKey primitive.ObjectID) (*models.Token, error)
 	UpdateTokenStatus(ctx context.Context, tokenID primitive.ObjectID, status models.TokenStatus) (*models.Token, error)
 	ListenForNew(ctx context.Context, consumer chan<- *models.Token)
+	Count(ctx context.Context) (int64, error)
 }
 
 type interactor struct {
@@ -31,6 +32,10 @@ func NewIterator(repo Repository, meterRepo meter.Repository) Interactor {
 	go tokenCreated(i, repo.tokenCreatedChan())
 	return i
 
+}
+
+func (i *interactor) Count(ctx context.Context) (int64, error) {
+	return i.repository.Count(ctx)
 }
 
 func (i *interactor) ListenForNew(ctx context.Context, consumer chan<- *models.Token) {

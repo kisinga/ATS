@@ -16,6 +16,7 @@ type Repository interface {
 	ReadByID(context.Context, primitive.ObjectID) (*models.Meter, error)
 	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Meter, error)
 	Update(ctx context.Context, meterNumber string, newMeter models.Meter) (*models.Meter, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 func NewRepository(database *storage.Database) Repository {
@@ -33,6 +34,10 @@ func (r repository) Create(ctx context.Context, meter models.Meter) (*models.Met
 	}
 	meter.ID = res.InsertedID.(primitive.ObjectID)
 	return &meter, nil
+}
+
+func (r repository) Count(ctx context.Context) (int64, error) {
+	return r.db.Client.Collection("meters").CountDocuments(ctx, bson.M{})
 }
 
 func (r repository) Read(ctx context.Context, meterNumber string) (*models.Meter, error) {

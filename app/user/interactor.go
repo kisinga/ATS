@@ -14,6 +14,7 @@ type Interactor interface {
 	GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
 	AddUser(ctx context.Context, user models.NewUser, creatorEmail string) (*models.User, error)
 	UpdateUser(ctx context.Context, email string, newUser models.User) (*models.User, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 type interactor struct {
@@ -25,7 +26,9 @@ func NewIterator(repo Repository) Interactor {
 		repository: repo,
 	}
 }
-
+func (i *interactor) Count(ctx context.Context) (int64, error) {
+	return i.repository.Count(ctx)
+}
 func (i *interactor) GetUser(ctx context.Context, email string) (*models.User, error) {
 	return i.repository.Read(ctx, email)
 }

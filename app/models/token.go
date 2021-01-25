@@ -22,10 +22,11 @@ type NewToken struct {
 type TokenStatus int
 
 const (
-	StatusNew    TokenStatus = iota
-	StatusSent   TokenStatus = iota
-	StatusError  TokenStatus = iota
-	StatusLoaded TokenStatus = iota
+	StatusNew     TokenStatus = iota
+	StatusSent    TokenStatus = iota
+	StatusError   TokenStatus = iota
+	StatusLoading TokenStatus = iota
+	StatusLoaded  TokenStatus = iota
 )
 
 func (y *TokenStatus) UnmarshalGQL(v interface{}) error {

@@ -13,6 +13,7 @@ type Interactor interface {
 	GetMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Meter, error)
 	AddMeter(ctx context.Context, meter models.NewMeter, creatorID primitive.ObjectID) (*models.Meter, error)
 	UpdateMeter(ctx context.Context, meterNumber string, newMeter models.Meter) (*models.Meter, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 type interactor struct {
@@ -21,6 +22,10 @@ type interactor struct {
 
 func NewIterator(repo Repository) Interactor {
 	return &interactor{repo}
+}
+
+func (i *interactor) Count(ctx context.Context) (int64, error) {
+	return i.repository.Count(ctx)
 }
 
 func (i *interactor) GetMeter(ctx context.Context, meterNumber string) (*models.Meter, error) {

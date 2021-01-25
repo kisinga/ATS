@@ -16,6 +16,7 @@ type Repository interface {
 	ReadByID(context.Context, primitive.ObjectID) (*models.User, error)
 	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error)
 	Update(ctx context.Context, email string, newUser models.User) (*models.User, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 func NewRepository(database *storage.Database) Repository {
@@ -38,6 +39,10 @@ func (r repository) Create(ctx context.Context, user models.User) (*models.User,
 func (r repository) Read(ctx context.Context, email string) (*models.User, error) {
 	user := models.User{}
 	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
+}
+
+func (r repository) Count(ctx context.Context) (int64, error) {
+	return r.db.Client.Collection("users").CountDocuments(ctx, bson.M{})
 }
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.User, error) {
