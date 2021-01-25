@@ -60,8 +60,9 @@ Merits:
 
 Obtain the Active API-Key from the dashboad
 Run the terminal
-`curl --request POST \ --url https://atske.herokuapp.com/token \ --header 'Authorization: 60096f4761f03000e23ec280' \ --header 'Content-Type: application/json' \ --data '{ "meterNumber": "[TARGET METER NUMBER]", "tokenString": "[TOKEN]" }'`
+`curl --request POST \ --url https://atske.herokuapp.com/token \ --header 'Authorization: [API KEY]' \ --header 'Content-Type: application/json' \ --data '{ "meterNumber": "[TARGET METER NUMBER]", "tokenString": "[TOKEN]" }'`
 
+Replace [API KEY] With the value obtained from the dashboard  
 Replace "https://atske.herokuapp.com/token" with "http://localhost:4242/token" if your server is srunning locally  
 Replace [TARGET METER NUMBER] with the meter number
 Replace [TOKEN] with the token Number
@@ -69,5 +70,5 @@ Replace [TOKEN] with the token Number
 If you get the response "Success" the operation was successful, hence refresh your page and the token should shouw up.  
 Otherwise, please NOTE:
 
-1.  Token number scannot repeat
-2.  Meter Number MUST be a valid one
+1.  Token number cannot repeat
+2.  Meter Number MUST be valid one
