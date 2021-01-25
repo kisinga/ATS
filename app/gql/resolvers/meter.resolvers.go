@@ -13,6 +13,9 @@ import (
 )
 
 func (r *meterResolver) UpdatedBy(ctx context.Context, obj *models.Meter) (*models.User, error) {
+	if obj.UpdatedBy.IsZero() {
+		return models.EmptyUser(), nil
+	}
 	return r.domain.User.GetUserByID(ctx, obj.UpdatedBy)
 }
 

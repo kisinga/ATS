@@ -11,6 +11,10 @@ type User struct {
 	Active    bool               `json:"active" bson:"active"`
 }
 
+func EmptyUser() *User {
+	return &User{}
+}
+
 func (User) IsBaseObject() {}
 
 type UsersConnection struct {

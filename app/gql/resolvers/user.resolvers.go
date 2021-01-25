@@ -84,6 +84,9 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitiv
 }
 
 func (r *userResolver) UpdatedBy(ctx context.Context, obj *models.User) (*models.User, error) {
+	if obj.UpdatedBy.IsZero() {
+		return models.EmptyUser(), nil
+	}
 	return r.domain.User.GetUserByID(ctx, obj.UpdatedBy)
 }
 
