@@ -24,7 +24,7 @@ Infrastructure
 Backend: GoLang (Hosted on Heroku)  
 FrontEnd: angular/javascript, SPA  
 API: GraphQL  
-WebHooks: (GraphQL, JSON, REST) either  
+WebHooks: REST (JSON, XML)  
 Database: MongoDB (Hosted on Atlas)  
 Design Concept: (Domain Driven Design + Test Driven Design), Agile
 
@@ -39,7 +39,7 @@ user
 
 Every type is isolated in it's own package  
 Every package associated with these types has 2 go files: interactor and repository  
-Respository contains a private pointer to the database implementation, as well as methods of all the possible operations on this type  
+Respository contains a private pointer to the database implementation (dependency injection), as well as methods of all the possible operations on this type  
 This allows for the package to implement the database locally, and the only externally visible methods are the operations.  
 Interactor contains all the higher-level abstractions of the possible operations that might include interacting with other packages.  
 This allows for inter-package communication as well as grouping several operations into one function. The same method might be visible from different packages  
