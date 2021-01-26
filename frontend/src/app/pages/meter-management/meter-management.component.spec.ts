@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MeterManagementComponent } from './meter-management.component';
+import {MeterManagementComponent} from './meter-management.component';
 
 describe('MeterManagementComponent', () => {
   let component: MeterManagementComponent;
@@ -8,9 +8,9 @@ describe('MeterManagementComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MeterManagementComponent ]
+      declarations: [MeterManagementComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

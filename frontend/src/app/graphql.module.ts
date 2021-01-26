@@ -1,11 +1,11 @@
 import { APOLLO_OPTIONS } from "apollo-angular";
 import { HttpLink } from "apollo-angular/http";
 import {
-  split,
   ApolloClientOptions,
   ApolloLink,
   DefaultOptions,
   InMemoryCache,
+  split,
 } from "@apollo/client/core";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";

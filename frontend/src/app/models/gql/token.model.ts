@@ -1,7 +1,7 @@
-import { Apollo, gql } from "apollo-angular";
-import { Token } from "../token.model";
-import { pageInfoFragment } from "./page-info.fragment";
-import { PageInfoModel } from "./page-info.model";
+import {gql} from "apollo-angular";
+import {Token} from "../token.model";
+import {pageInfoFragment} from "./page-info.fragment";
+import {PageInfoModel} from "./page-info.model";
 
 export const TokensQuery = gql`
   query getTokens(

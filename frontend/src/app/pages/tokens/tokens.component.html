@@ -1,35 +1,36 @@
-<table [nbSpinner]="loading" nbSpinnerStatus="primary" mat-table [dataSource]="tokensPage?.data" class="mat-elevation-z8">
+<table [dataSource]="tokensPage?.data" [nbSpinner]="loading" class="mat-elevation-z8" mat-table
+       nbSpinnerStatus="primary">
 
-    <ng-container matColumnDef="meter_number">
-        <th mat-header-cell *matHeaderCellDef>Meter Number </th>
-        <td mat-cell *matCellDef="let element"> {{element.meterNumber}} </td>
-    </ng-container>
-
-
-    <ng-container matColumnDef="tokenNumber">
-        <th mat-header-cell *matHeaderCellDef> Token Number </th>
-        <td mat-cell *matCellDef="let element"> {{element.tokenString}} </td>
-    </ng-container>
+  <ng-container matColumnDef="meter_number">
+    <th *matHeaderCellDef mat-header-cell>Meter Number</th>
+    <td *matCellDef="let element" mat-cell> {{element.meterNumber}} </td>
+  </ng-container>
 
 
-    <ng-container matColumnDef="apiKey">
-        <th mat-header-cell *matHeaderCellDef> API Key </th>
-        <td mat-cell *matCellDef="let element"> {{element.apiKey}} </td>
-    </ng-container>
+  <ng-container matColumnDef="tokenNumber">
+    <th *matHeaderCellDef mat-header-cell> Token Number</th>
+    <td *matCellDef="let element" mat-cell> {{element.tokenString}} </td>
+  </ng-container>
 
-    <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.ID | dateFromObjectId | date: "short"}} </td>
-    </ng-container>
 
-  
-    <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef> Status</th>
-        <td mat-cell *matCellDef="let element"> {{tokenStatus[element.status]}} </td>
-    </ng-container>
+  <ng-container matColumnDef="apiKey">
+    <th *matHeaderCellDef mat-header-cell> API Key</th>
+    <td *matCellDef="let element" mat-cell> {{element.apiKey}} </td>
+  </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-meter': !row.active}"></tr>
+  <ng-container matColumnDef="date">
+    <th *matHeaderCellDef mat-header-cell> Date</th>
+    <td *matCellDef="let element" mat-cell> {{element.ID | dateFromObjectId | date: "short"}} </td>
+  </ng-container>
+
+
+  <ng-container matColumnDef="status">
+    <th *matHeaderCellDef mat-header-cell> Status</th>
+    <td *matCellDef="let element" mat-cell> {{tokenStatus[element.status]}} </td>
+  </ng-container>
+
+  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+  <tr *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-meter': !row.active}" mat-row></tr>
 </table>
 
 <mat-paginator [length]="tokensPage?.pageInfo?.count" [pageSize]="3"></mat-paginator>

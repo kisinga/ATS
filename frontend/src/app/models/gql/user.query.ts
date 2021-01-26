@@ -1,7 +1,7 @@
-import { Apollo, gql } from "apollo-angular";
-import { User } from "../user.model";
-import { pageInfoFragment } from "./page-info.fragment";
-import { PageInfoModel } from "./page-info.model";
+import {gql} from "apollo-angular";
+import {User} from "../user.model";
+import {pageInfoFragment} from "./page-info.fragment";
+import {PageInfoModel} from "./page-info.model";
 
 export const UsersQuery = gql`
   query getUsers($limit: Int, $afterID: ID) {
@@ -76,6 +76,7 @@ export interface GetUsersQueryInput {
   limit?: number;
   after?: string;
 }
+
 export interface NewUserInput {
   name: string;
   email: string;

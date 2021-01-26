@@ -74,7 +74,8 @@ You may need to update your permissions in case you run into EACCESS Errors on n
 3. Termina2(/frontend) execute ` ng serve`  
    This will run the frontend angular app on port 4200  
    Open your browser of choice and navigate to the url "localhost:4200/"  
-   You should be prompted to login if this is your first time running the app locally.
+   You should be prompted to login if this is your first time running the app locally.  
+   The app is configured to automatically detect localhost instances and direct all API Requests to the local server
 
 # Creating A Sample Token
 

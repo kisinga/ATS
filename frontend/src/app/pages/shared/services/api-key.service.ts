@@ -1,15 +1,11 @@
 import { Injectable } from "@angular/core";
 import { ApolloQueryResult, FetchResult } from "@apollo/client/core";
 import { Apollo, QueryRef } from "apollo-angular";
-import { APIKey } from "app/models/api-key.model";
 import {
   APIKeyGenerate,
   APIKeyGenerateResult,
   APIKeyQuery,
   APIKeyQueryResult,
-  APIKeySubscription,
-  APIKeySubscriptionQuery,
-  APIKeySubscriptionResult,
 } from "app/models/gql/api-key.model";
 import { Observable } from "rxjs";
 
@@ -40,6 +36,7 @@ export class ApiKeyService {
       mutation: APIKeyGenerate,
     });
   }
+
   refetch() {
     return this.currentWatcher.refetch();
   }

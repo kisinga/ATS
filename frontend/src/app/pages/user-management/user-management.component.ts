@@ -1,14 +1,12 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { NbDialogService } from "@nebular/theme";
-import { Apollo, gql } from "apollo-angular";
-import { GetUsersQueryInput } from "app/models/gql/user.query";
-import { User } from "app/models/user.model";
-import { StateService } from "app/pages/shared/services/state.service";
-import { ReplaySubject } from "rxjs";
-import { NewUserInput } from "app/models/gql/user.query";
-import { UserService } from "../shared/services/user.service";
-import { NewUserComponent } from "./dialogs/new-user/new-user.component";
-import { FetchPolicy } from "@apollo/client/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {NbDialogService} from "@nebular/theme";
+import {GetUsersQueryInput} from "app/models/gql/user.query";
+import {User} from "app/models/user.model";
+import {StateService} from "app/pages/shared/services/state.service";
+import {ReplaySubject} from "rxjs";
+import {UserService} from "../shared/services/user.service";
+import {NewUserComponent} from "./dialogs/new-user/new-user.component";
+import {FetchPolicy} from "@apollo/client/core";
 
 @Component({
   templateUrl: "./user-management.component.html",
@@ -20,6 +18,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ["email", "name", "createdby", "date", "delete"];
   loadingUser = "";
   loading: Boolean = false;
+
   constructor(
     private state: StateService,
     private dialogService: NbDialogService,
@@ -28,18 +27,21 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.getUsers({}, "cache-first");
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
+
   ngOnDestroy(): void {
     this.comopnentDestroyed.next(true);
   }
+
   openNewUserModal() {
     this.dialogService
       .open(NewUserComponent)
       .onClose.subscribe((refresh: boolean) => {
-        if (refresh) {
-          this.getUsers({}, "network-only");
-        }
-      });
+      if (refresh) {
+        this.getUsers({}, "network-only");
+      }
+    });
   }
 
   getUsers(params: GetUsersQueryInput, fetchPolicy: FetchPolicy) {
@@ -49,6 +51,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.loading = false;
     });
   }
+
   enableUser(email: string) {
     this.loadingUser = email;
     this.userService
@@ -61,6 +64,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.getUsers({}, "network-only");
       });
   }
+
   disableUser(email: string) {
     this.loadingUser = email;
     this.userService
@@ -73,5 +77,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.getUsers({}, "network-only");
       });
   }
-  generateKey() {}
+
+  generateKey() {
+  }
 }

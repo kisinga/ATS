@@ -1,37 +1,41 @@
-import { Component, OnInit } from "@angular/core";
-import { FetchPolicy } from "@apollo/client/core";
-import { NbDialogService } from "@nebular/theme";
-import { GetMetersQueryInput } from "app/models/gql/meter.model";
-import { Meter } from "app/models/meter.model";
-import { MeterService } from "../shared/services/meter.service";
-import { NewMeterComponent } from "./dialogs/new-meter/new-meter.component";
+import {Component, OnInit} from "@angular/core";
+import {FetchPolicy} from "@apollo/client/core";
+import {NbDialogService} from "@nebular/theme";
+import {GetMetersQueryInput} from "app/models/gql/meter.model";
+import {Meter} from "app/models/meter.model";
+import {MeterService} from "../shared/services/meter.service";
+import {NewMeterComponent} from "./dialogs/new-meter/new-meter.component";
 
 @Component({
   templateUrl: "./meter-management.component.html",
   styleUrls: ["./meter-management.component.scss"],
 })
 export class MeterManagementComponent implements OnInit {
+  loading: Boolean = false;
+  loadingMeter = "";
+  meters: Meter[];
+  displayedColumns: string[] = ["meter_number", "createdby", "date", "delete"];
+
   constructor(
     private dialogService: NbDialogService,
     private meterService: MeterService
   ) {
     this.getMeters({}, "cache-first");
   }
-  loading: Boolean = false;
-  loadingMeter = "";
-  meters: Meter[];
-  displayedColumns: string[] = ["meter_number", "createdby", "date", "delete"];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
+
   openNewMeterModal() {
     this.dialogService
       .open(NewMeterComponent)
       .onClose.subscribe((refresh: boolean) => {
-        if (refresh) {
-          this.getMeters({}, "network-only");
-        }
-      });
+      if (refresh) {
+        this.getMeters({}, "network-only");
+      }
+    });
   }
+
   getMeters(params: GetMetersQueryInput, fetchPolicy: FetchPolicy) {
     this.loading = true;
     this.meterService.getMeters(params, fetchPolicy).then((r) => {
@@ -39,6 +43,7 @@ export class MeterManagementComponent implements OnInit {
       this.loading = false;
     });
   }
+
   enableMeter(meterNumber: string) {
     this.loadingMeter = meterNumber;
     this.meterService
@@ -51,6 +56,7 @@ export class MeterManagementComponent implements OnInit {
         this.getMeters({}, "network-only");
       });
   }
+
   disableMeter(meterNumber: string) {
     this.loadingMeter = meterNumber;
     this.meterService

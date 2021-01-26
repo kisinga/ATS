@@ -1,17 +1,13 @@
-import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
-import { NbDialogRef } from "@nebular/theme";
-import { UserService } from "app/pages/shared/services/user.service";
+import {Component, OnInit} from "@angular/core";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {NbDialogRef} from "@nebular/theme";
+import {UserService} from "app/pages/shared/services/user.service";
 
 @Component({
   templateUrl: "./new-user.component.html",
   styleUrls: ["./new-user.component.scss"],
 })
 export class NewUserComponent implements OnInit {
-  constructor(
-    protected ref: NbDialogRef<NewUserComponent>,
-    private userService: UserService
-  ) {}
   creationError = null;
   newUserForm = new FormGroup({
     name: new FormControl(
@@ -24,11 +20,19 @@ export class NewUserComponent implements OnInit {
     ),
   });
 
-  ngOnInit(): void {}
+  constructor(
+    protected ref: NbDialogRef<NewUserComponent>,
+    private userService: UserService
+  ) {
+  }
+
+  ngOnInit(): void {
+  }
 
   cancel() {
     this.ref.close();
   }
+
   submit() {
     this.creationError = null;
     if (this.newUserForm.valid) {

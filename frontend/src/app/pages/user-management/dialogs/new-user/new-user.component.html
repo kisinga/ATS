@@ -1,31 +1,31 @@
 <nb-card>
-    <nb-card-header>Add new user</nb-card-header>
-    <nb-card-body>
-        <div>
-            <form [formGroup]="newUserForm">
-                <input type="text" nbInput name="name" fullWidth status="basic" placeholder="Name" required
-                    minlength="4" formControlName="name">
-                <input type="text" nbInput name="email" fullWidth status="basic" formControlName="email" required
-                    placeholder="Email">
-            </form>
-        </div>
-        <nb-alert *ngIf="!newUserForm.valid && newUserForm.touched" status="danger">
+  <nb-card-header>Add new user</nb-card-header>
+  <nb-card-body>
+    <div>
+      <form [formGroup]="newUserForm">
+        <input formControlName="name" fullWidth minlength="4" name="name" nbInput placeholder="Name" required
+               status="basic" type="text">
+        <input formControlName="email" fullWidth name="email" nbInput placeholder="Email" required status="basic"
+               type="text">
+      </form>
+    </div>
+    <nb-alert *ngIf="!newUserForm.valid && newUserForm.touched" status="danger">
             <span *ngIf="!newUserForm.controls['name'].valid">
                 <p></p>
                 Name must be more than 4 characters
             </span>
-            <br>
-            <span *ngIf="!newUserForm.controls['email'].valid">
+      <br>
+      <span *ngIf="!newUserForm.controls['email'].valid">
                 Invalid Email
             </span>
-        </nb-alert>
-        <nb-alert *ngIf="creationError" status="danger">
-            {{creationError}}
-        </nb-alert>
+    </nb-alert>
+    <nb-alert *ngIf="creationError" status="danger">
+      {{creationError}}
+    </nb-alert>
 
-    </nb-card-body>
-    <nb-card-footer>
-        <button type="button" class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
-        <button type="submit" nbButton status="success" (click)="submit()">Submit</button>
-    </nb-card-footer>
+  </nb-card-body>
+  <nb-card-footer>
+    <button (click)="cancel()" class="cancel" nbButton status="danger" type="button">Cancel</button>
+    <button (click)="submit()" nbButton status="success" type="submit">Submit</button>
+  </nb-card-footer>
 </nb-card>

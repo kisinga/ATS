@@ -1,5 +1,5 @@
-import { Pipe, PipeTransform } from "@angular/core";
-import { ObjectID } from "bson";
+import {Pipe, PipeTransform} from "@angular/core";
+import {ObjectID} from "bson";
 
 @Pipe({
   name: "dateFromObjectId",

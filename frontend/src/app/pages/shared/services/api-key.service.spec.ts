@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ApiKeyService } from './api-key.service';
+import {ApiKeyService} from './api-key.service';
 
 describe('ApiKeyService', () => {
   let service: ApiKeyService;

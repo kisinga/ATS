@@ -4,7 +4,6 @@ import { Apollo } from "apollo-angular";
 import {
   GetTokensQueryInput,
   TokensQuery,
-  TokensQueryModel,
   TokensQueryResult,
 } from "app/models/gql/token.model";
 
@@ -13,6 +12,7 @@ import {
 })
 export class TokenService {
   constructor(private apollo: Apollo) {}
+
   getTokens(
     inputs: GetTokensQueryInput,
     fetchPolicy: FetchPolicy

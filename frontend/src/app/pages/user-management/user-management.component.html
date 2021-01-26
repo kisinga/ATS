@@ -1,55 +1,55 @@
-<button nbButton hero status="primary" (click)="openNewUserModal()">ADD NEW</button>
+<button (click)="openNewUserModal()" hero nbButton status="primary">ADD NEW</button>
 
-<table [nbSpinner]="loading" nbSpinnerStatus="primary" mat-table [dataSource]="users" class="mat-elevation-z8">
+<table [dataSource]="users" [nbSpinner]="loading" class="mat-elevation-z8" mat-table nbSpinnerStatus="primary">
 
-    <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name </th>
-        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-    </ng-container>
+  <ng-container matColumnDef="name">
+    <th *matHeaderCellDef mat-header-cell>Name</th>
+    <td *matCellDef="let element" mat-cell> {{element.name}} </td>
+  </ng-container>
 
-    <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef> Email </th>
-        <td mat-cell *matCellDef="let element"> {{element.email}} </td>
-    </ng-container>
+  <ng-container matColumnDef="email">
+    <th *matHeaderCellDef mat-header-cell> Email</th>
+    <td *matCellDef="let element" mat-cell> {{element.email}} </td>
+  </ng-container>
 
-    <ng-container matColumnDef="createdby">
-        <th mat-header-cell *matHeaderCellDef> Created By </th>
-        <td mat-cell *matCellDef="let element"> {{element.createdBy?.name}} </td>
-    </ng-container>
+  <ng-container matColumnDef="createdby">
+    <th *matHeaderCellDef mat-header-cell> Created By</th>
+    <td *matCellDef="let element" mat-cell> {{element.createdBy?.name}} </td>
+  </ng-container>
 
-    <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.ID | dateFromObjectId | date: "short"}} </td>
-    </ng-container>
+  <ng-container matColumnDef="date">
+    <th *matHeaderCellDef mat-header-cell> Date</th>
+    <td *matCellDef="let element" mat-cell> {{element.ID | dateFromObjectId | date: "short"}} </td>
+  </ng-container>
 
-    <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef> Action </th>
-        <td mat-cell *matCellDef="let element">
+  <ng-container matColumnDef="delete">
+    <th *matHeaderCellDef mat-header-cell> Action</th>
+    <td *matCellDef="let element" mat-cell>
 
-            <div *ngIf="element.email === loadingUser;else other_content">
-                <button [nbSpinner]="true" ghost nbSpinnerStatus="primary" nbButton>
-                    <!-- Saving -->
-                </button>
-            </div>
+      <div *ngIf="element.email === loadingUser;else other_content">
+        <button [nbSpinner]="true" ghost nbButton nbSpinnerStatus="primary">
+          <!-- Saving -->
+        </button>
+      </div>
 
-            <ng-template #other_content>
-                <div *ngIf="!element.active;else other_content">
-                    <button nbButton ghost status="primary" nbTooltip="Enable User"  (click)="enableUser(element.email)">
-                        <nb-icon icon="checkmark-circle-outline"></nb-icon>
-                    </button>
-                </div>
+      <ng-template #other_content>
+        <div *ngIf="!element.active;else other_content">
+          <button (click)="enableUser(element.email)" ghost nbButton nbTooltip="Enable User" status="primary">
+            <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          </button>
+        </div>
 
-                <ng-template #other_content>
-                    <button nbButton ghost status="danger"  nbTooltip="Disable User"  (click)="disableUser(element.email)">
-                        <nb-icon icon="slash-outline"></nb-icon>
-                    </button>
-                </ng-template>
-            </ng-template>
-        </td>
-    </ng-container>
+        <ng-template #other_content>
+          <button (click)="disableUser(element.email)" ghost nbButton nbTooltip="Disable User" status="danger">
+            <nb-icon icon="slash-outline"></nb-icon>
+          </button>
+        </ng-template>
+      </ng-template>
+    </td>
+  </ng-container>
 
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-user': !row.active}"
-    ></tr>
+  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+  <tr *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-user': !row.active}" mat-row
+  ></tr>
 </table>

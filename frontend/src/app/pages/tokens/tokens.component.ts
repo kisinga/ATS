@@ -34,9 +34,11 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   tokenStatus = TokenStatus;
+
   constructor(private tokenService: TokenService) {
     this.getTokens({ limit: 10 }, "cache-first");
   }
+
   ngAfterViewInit() {
     this.paginator.page
       .pipe(takeUntil(this.comopnentDestroyed))
@@ -70,6 +72,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentPage = page.pageIndex;
       });
   }
+
   getTokens(params: GetTokensQueryInput, fetchPolicy: FetchPolicy) {
     this.loading = true;
     this.tokenService.getTokens(params, fetchPolicy).then((r) => {
@@ -78,8 +81,10 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loading = false;
     });
   }
+
   ngOnDestroy(): void {
     this.comopnentDestroyed.next(true);
   }
+
   ngOnInit(): void {}
 }

@@ -1,4 +1,4 @@
-import { DateFromObjectIdPipe } from './date-from-object-id.pipe';
+import {DateFromObjectIdPipe} from './date-from-object-id.pipe';
 
 describe('DateFromObjectIdPipe', () => {
   it('create an instance', () => {

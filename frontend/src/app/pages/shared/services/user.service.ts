@@ -1,11 +1,11 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { Router } from "@angular/router";
+import {HttpClient} from "@angular/common/http";
+import {Injectable} from "@angular/core";
+import {AngularFireAuth} from "@angular/fire/auth";
+import {Router} from "@angular/router";
 import firebase from "firebase/app";
-import { of, ReplaySubject } from "rxjs";
-import { Apollo } from "apollo-angular";
-import { catchError } from "rxjs/operators";
+import {of, ReplaySubject} from "rxjs";
+import {Apollo} from "apollo-angular";
+import {catchError} from "rxjs/operators";
 import dayjs from "dayjs";
 import {
   DisableUserMutation,
@@ -16,8 +16,8 @@ import {
   UsersQuery,
   UsersQueryResult,
 } from "app/models/gql/user.query";
-import { ApolloQueryResult, FetchPolicy } from "@apollo/client/core";
-import { User } from "app/models/user.model";
+import {ApolloQueryResult, FetchPolicy} from "@apollo/client/core";
+import {User} from "app/models/user.model";
 
 @Injectable({
   providedIn: "root",
@@ -50,22 +50,24 @@ export class UserService {
       }
     });
   }
+
   disableUser(email: string) {
     return this.apollo.mutate({
       mutation: DisableUserMutation,
-      variables: { email },
+      variables: {email},
     });
   }
+
   enableUser(email: string) {
     return this.apollo.mutate({
       mutation: EnableUserMutation,
-      variables: { email },
+      variables: {email},
     });
   }
 
   fetchToken(email: string, id: string) {
     this.http
-      .post("https://atske.herokuapp.com/sessionInit", { id, email })
+      .post("https://atske.herokuapp.com/sessionInit", {id, email})
       .pipe(
         catchError((e) => {
           this.auth.signOut();
@@ -105,6 +107,7 @@ export class UserService {
     window.localStorage.removeItem("token");
     window.localStorage.removeItem("tokenExpiry");
   }
+
   getUsers(
     inputs: GetUsersQueryInput,
     fetchPolicy: FetchPolicy
@@ -117,11 +120,12 @@ export class UserService {
       })
       .toPromise();
   }
+
   createUser(input: NewUserInput) {
     return this.apollo
       .mutate<User>({
         mutation: NewUserMutation,
-        variables: { input },
+        variables: {input},
       })
       .toPromise();
   }

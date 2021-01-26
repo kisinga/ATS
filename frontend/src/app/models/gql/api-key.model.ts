@@ -1,7 +1,6 @@
-import { Apollo, gql } from "apollo-angular";
-import { APIKey } from "../api-key.model";
-import { Subscription } from "apollo-angular";
-import { Injectable } from "@angular/core";
+import {gql, Subscription} from "apollo-angular";
+import {APIKey} from "../api-key.model";
+import {Injectable} from "@angular/core";
 
 @Injectable({
   providedIn: "root",
@@ -9,6 +8,7 @@ import { Injectable } from "@angular/core";
 export class APIKeySubscription extends Subscription {
   document = APIKeySubscriptionQuery;
 }
+
 export const APIKeyGenerate = gql`
   mutation generateAPIKey {
     generateAPIKey {
@@ -48,6 +48,7 @@ export interface APIKeySubscriptionResult {
 export interface APIKeyGenerateResult {
   generateAPIKey?: APIKey;
 }
+
 export interface APIKeyQueryResult {
   currentAPIKey?: APIKey;
 }

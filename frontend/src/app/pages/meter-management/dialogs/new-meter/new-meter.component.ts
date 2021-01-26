@@ -1,18 +1,13 @@
-import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
-import { NbDialogRef } from "@nebular/theme";
-import { MeterService } from "app/pages/shared/services/meter.service";
-import { UserService } from "app/pages/shared/services/user.service";
+import {Component, OnInit} from "@angular/core";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {NbDialogRef} from "@nebular/theme";
+import {MeterService} from "app/pages/shared/services/meter.service";
 
 @Component({
   templateUrl: "./new-meter.component.html",
   styleUrls: ["./new-meter.component.scss"],
 })
 export class NewMeterComponent implements OnInit {
-  constructor(
-    protected ref: NbDialogRef<NewMeterComponent>,
-    private meterService: MeterService
-  ) {}
   creationError = null;
   newMeterForm = new FormGroup({
     meterNumber: new FormControl(
@@ -21,11 +16,19 @@ export class NewMeterComponent implements OnInit {
     ),
   });
 
-  ngOnInit(): void {}
+  constructor(
+    protected ref: NbDialogRef<NewMeterComponent>,
+    private meterService: MeterService
+  ) {
+  }
+
+  ngOnInit(): void {
+  }
 
   cancel() {
     this.ref.close();
   }
+
   submit() {
     this.creationError = null;
     if (this.newMeterForm.valid) {

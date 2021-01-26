@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
-import { ApolloQueryResult, FetchPolicy } from "@apollo/client/core";
-import { Apollo } from "apollo-angular";
+import {Injectable} from "@angular/core";
+import {ApolloQueryResult, FetchPolicy} from "@apollo/client/core";
+import {Apollo} from "apollo-angular";
 import {
   DisableMeterMutation,
   EnableMeterMutation,
@@ -10,13 +10,15 @@ import {
   NewMeterInput,
   NewMeterMutation,
 } from "app/models/gql/meter.model";
-import { Meter } from "app/models/meter.model";
+import {Meter} from "app/models/meter.model";
 
 @Injectable({
   providedIn: "root",
 })
 export class MeterService {
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo) {
+  }
+
   getMeters(
     inputs: GetMetersQueryInput,
     fetchPolicy: FetchPolicy
@@ -29,11 +31,12 @@ export class MeterService {
       })
       .toPromise();
   }
+
   createMeter(input: NewMeterInput) {
     return this.apollo
       .mutate<Meter>({
         mutation: NewMeterMutation,
-        variables: { input },
+        variables: {input},
       })
       .toPromise();
   }
@@ -41,14 +44,14 @@ export class MeterService {
   disableMeter(meterNumber: string) {
     return this.apollo.mutate({
       mutation: DisableMeterMutation,
-      variables: { meterNumber },
+      variables: {meterNumber},
     });
   }
 
   enableMeter(meterNumber: string) {
     return this.apollo.mutate({
       mutation: EnableMeterMutation,
-      variables: { meterNumber },
+      variables: {meterNumber},
     });
   }
 }
