@@ -1,6 +1,16 @@
 # ATS ![logo](assets/logo/orange.png)
 
-This hosts code for Automated Token System
+This hosts code for Automated Token System.
+ATS automates the process of loading KPLC tokens to the meter by augmenting keypresses on the CIU.  
+In order for this process to happen, the system relies on KPLC sending the token and meter number on purchase.  
+Every KPLC Request MUST contain an API Key in the header, something managed by the system.  
+The system keeps an independent database of registered meters.
+
+# Simplified Logic
+
+![structure](assets/logicv2.png)
+
+# Backend Documentation
 
 Folder structure  
 /app containes server-side code  
@@ -52,20 +62,31 @@ Merits:
 4. We can leverage on the free hosting as well (Hence leave backend to host API ONLY)
 5. The backend retains full control
 
-# Logic
+# Running the server locally
 
-![structure](assets/logicv2.png)
+Make sure Golang, Node and Angular CLI are installed on your system.  
+You may need to update your permissions in case you run into EACCESS Errors on npm.
+
+1. Navigate to the project folder, then on two separate terminals, navigate to the /cmd and /frontend folders.
+2. Terminal1(/cmd) execute `go run *.go`  
+   This will run the backend golang app on open port 4242 (Unless you've specified an environment variable "PORT" in which case it will use the port specified. Make sure it is not in use by another program)  
+   Make sure you have internet so that the app can connect to a cloud hosted instance of Mongodb
+3. Termina2(/frontend) execute ` ng serve`  
+   This will run the frontend angular app on port 4200  
+   Open your browser of choice and navigate to the url "localhost:4200/"  
+   You should be prompted to login if this is your first time running the app locally.
 
 # Creating A Sample Token
 
-Obtain the Active API-Key from the dashboad  
-Run on the terminal  
+Obtain the Active API-Key from the dashboad
+
+Run this command on the terminal  
 `curl --request POST \ --url https://atske.herokuapp.com/token \ --header 'Authorization: [API KEY]' \ --header 'Content-Type: application/json' \ --data '{ "meterNumber": "[TARGET METER NUMBER]", "tokenString": "[TOKEN]" }'`
 
 Replace [API KEY] With the value obtained from the dashboard  
-Replace "https://atske.herokuapp.com/token" with "http://localhost:4242/token" if your server is srunning locally  
-Replace [TARGET METER NUMBER] with the meter number
+Replace [TARGET METER NUMBER] with the meter number  
 Replace [TOKEN] with the token Number
+Replace "https://atske.herokuapp.com/token" with "http://localhost:4242/token" if your server is srunning locally
 
 If you get the response "Success" the operation was successful, hence refresh your page and the token should shouw up.  
 Otherwise, please NOTE:
