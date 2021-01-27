@@ -14,7 +14,7 @@ type Repository interface {
 	Create(context.Context, models.Token) (*models.Token, error)
 	// Read(context.Context, string) (*models.Token, error)
 	ReadByID(context.Context, primitive.ObjectID) (*models.Token, error)
-	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
+	ReadMany(ctx context.Context, meterNumber *string, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
 	Update(ctx context.Context, newMeter models.Token) (*models.Token, error)
 	tokenCreatedChan() chan *models.Token
 	Count(ctx context.Context) (int64, error)
@@ -55,7 +55,7 @@ func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*model
 	return &token, r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"_id": ID}).Decode(&token)
 }
 
-func (r repository) ReadMany(ctx context.Context, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
+func (r repository) ReadMany(ctx context.Context, meterNumber *string, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
 	tokens := []*models.Token{}
 	direcction := bson.M{"$lt": beforeOrAfter}
 	sort := bson.M{"_id": -1}
@@ -63,8 +63,12 @@ func (r repository) ReadMany(ctx context.Context, beforeOrAfter primitive.Object
 		direcction = bson.M{"$gte": beforeOrAfter}
 		sort = bson.M{"_id": 1}
 	}
+	query := bson.M{"_id": direcction}
+	if meterNumber != nil {
+		query = bson.M{"_id": direcction, "meterNumber": *meterNumber}
+	}
 	DataCursor, dataErr := r.db.Client.Collection("tokens").Find(ctx,
-		bson.M{"_id": direcction},
+		query,
 		&options.FindOptions{Limit: limit, Sort: sort})
 
 	if dataErr != nil {

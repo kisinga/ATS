@@ -31,7 +31,7 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAft
 	if reversed != nil {
 		rev = *reversed
 	}
-	k, l := r.domain.Token.GetMany(ctx, afterID, limit, rev)
+	k, l := r.domain.Token.GetMany(ctx, meterNumber, afterID, limit, rev)
 	connection := models.TokenConnection{
 		Data: k,
 	}

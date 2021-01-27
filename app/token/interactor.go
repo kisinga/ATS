@@ -12,7 +12,7 @@ import (
 
 type Interactor interface {
 	GetToken(ctx context.Context, ID primitive.ObjectID) (*models.Token, error)
-	GetMany(ctx context.Context, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
+	GetMany(ctx context.Context, meterNumber *string, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
 	AddToken(ctx context.Context, input models.NewToken, apiKey primitive.ObjectID) (*models.Token, error)
 	UpdateTokenStatus(ctx context.Context, tokenID primitive.ObjectID, status models.TokenStatus) (*models.Token, error)
 	ListenForNew(ctx context.Context, consumer chan<- *models.Token)
@@ -92,7 +92,7 @@ func (i *interactor) UpdateTokenStatus(ctx context.Context, tokenID primitive.Ob
 	return i.repository.Update(ctx, *token)
 }
 
-func (i *interactor) GetMany(ctx context.Context, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
-	return i.repository.ReadMany(ctx, beforeOrAfter, limit, reversed)
+func (i *interactor) GetMany(ctx context.Context, meterNumber *string, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
+	return i.repository.ReadMany(ctx, meterNumber, beforeOrAfter, limit, reversed)
 
 }
