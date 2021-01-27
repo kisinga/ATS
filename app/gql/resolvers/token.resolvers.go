@@ -9,6 +9,7 @@ import (
 
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -23,7 +24,13 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAft
 	if beforeOrAfter != nil {
 		afterID = *beforeOrAfter
 	}
-	count, err := r.domain.Token.Count(ctx)
+	query := bson.M{}
+	if meterNumber != nil {
+		query = bson.M{
+			"meterNumber": *meterNumber,
+		}
+	}
+	count, err := r.domain.Token.Count(ctx, query)
 	if err != nil {
 		return nil, err
 	}

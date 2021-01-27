@@ -1,10 +1,11 @@
-import {Component, OnInit} from "@angular/core";
-import {FetchPolicy} from "@apollo/client/core";
-import {NbDialogService} from "@nebular/theme";
-import {GetMetersQueryInput} from "app/models/gql/meter.model";
-import {Meter} from "app/models/meter.model";
-import {MeterService} from "../shared/services/meter.service";
-import {NewMeterComponent} from "./dialogs/new-meter/new-meter.component";
+import { Component, OnInit } from "@angular/core";
+import { FetchPolicy } from "@apollo/client/core";
+import { NbDialogService } from "@nebular/theme";
+import { GetMetersQueryInput } from "app/models/gql/meter.model";
+import { Meter } from "app/models/meter.model";
+import { MeterService } from "../shared/services/meter.service";
+import { TokensComponent } from "../tokens/tokens.component";
+import { NewMeterComponent } from "./dialogs/new-meter/new-meter.component";
 
 @Component({
   templateUrl: "./meter-management.component.html",
@@ -23,17 +24,16 @@ export class MeterManagementComponent implements OnInit {
     this.getMeters({}, "cache-first");
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   openNewMeterModal() {
     this.dialogService
       .open(NewMeterComponent)
       .onClose.subscribe((refresh: boolean) => {
-      if (refresh) {
-        this.getMeters({}, "network-only");
-      }
-    });
+        if (refresh) {
+          this.getMeters({}, "network-only");
+        }
+      });
   }
 
   getMeters(params: GetMetersQueryInput, fetchPolicy: FetchPolicy) {
@@ -68,5 +68,12 @@ export class MeterManagementComponent implements OnInit {
         }
         this.getMeters({}, "network-only");
       });
+  }
+  showTokens(meterNumber: string) {
+    this.dialogService.open(TokensComponent, {
+      dialogClass: "model-full",
+
+      context: { meterNumber },
+    });
   }
 }

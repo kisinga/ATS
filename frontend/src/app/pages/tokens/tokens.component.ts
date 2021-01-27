@@ -1,6 +1,8 @@
 import {
   AfterViewInit,
   Component,
+  Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -20,7 +22,8 @@ import { takeUntil } from "rxjs/operators";
   templateUrl: "./tokens.component.html",
   styleUrls: ["./tokens.component.scss"],
 })
-export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
+export class TokensComponent
+  implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   tokensPage: TokensQueryModel;
   loading: Boolean = false;
   comopnentDestroyed: ReplaySubject<boolean> = new ReplaySubject<boolean>();
@@ -34,10 +37,9 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   tokenStatus = TokenStatus;
+  @Input() meterNumber: string;
 
-  constructor(private tokenService: TokenService) {
-    this.getTokens({ limit: 10 }, "cache-first");
-  }
+  constructor(private tokenService: TokenService) {}
 
   ngAfterViewInit() {
     this.paginator.page
@@ -53,6 +55,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
             this.getTokens(
               {
                 limit: 10,
+                meterNumber: this.meterNumber,
                 beforeOrAfter: this.tokensPage.pageInfo.endCursor,
               },
               "cache-first"
@@ -62,6 +65,7 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
             this.getTokens(
               {
                 limit: 10,
+                meterNumber: this.meterNumber,
                 beforeOrAfter: this.tokensPage.pageInfo.startCursor,
                 reversed: true,
               },
@@ -81,10 +85,12 @@ export class TokensComponent implements OnInit, AfterViewInit, OnDestroy {
       this.loading = false;
     });
   }
-
+  ngOnChanges() {}
   ngOnDestroy(): void {
     this.comopnentDestroyed.next(true);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getTokens({ limit: 10, meterNumber: this.meterNumber }, "cache-first");
+  }
 }

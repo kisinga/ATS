@@ -9,6 +9,7 @@ import (
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/handlers/auth"
 	"github.com/kisinga/ATS/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -70,7 +71,7 @@ func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primiti
 	if after != nil {
 		afterID = *after
 	}
-	count, err := r.domain.Token.Count(ctx)
+	count, err := r.domain.Token.Count(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}

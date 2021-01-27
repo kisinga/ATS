@@ -75,7 +75,7 @@ func (r *queryResolver) Users(ctx context.Context, limit *int64, after *primitiv
 	if after != nil {
 		afterID = *after
 	}
-	count, err := r.domain.Token.Count(ctx)
+	count, err := r.domain.User.Count(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@
 
   <ng-container matColumnDef="meter_number">
     <th *matHeaderCellDef mat-header-cell>Meter Number</th>
-    <td *matCellDef="let element" mat-cell> {{element.meterNumber}} </td>
+    <td *matCellDef="let element" mat-cell class="meter" (click)="showTokens(element.meterNumber)"> {{element.meterNumber}} </td>
   </ng-container>
 
 

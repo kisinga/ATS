@@ -7,6 +7,7 @@ import (
 	"github.com/kisinga/ATS/app/meter"
 
 	"github.com/kisinga/ATS/app/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,7 +17,7 @@ type Interactor interface {
 	AddToken(ctx context.Context, input models.NewToken, apiKey primitive.ObjectID) (*models.Token, error)
 	UpdateTokenStatus(ctx context.Context, tokenID primitive.ObjectID, status models.TokenStatus) (*models.Token, error)
 	ListenForNew(ctx context.Context, consumer chan<- *models.Token)
-	Count(ctx context.Context) (int64, error)
+	Count(ctx context.Context, query bson.M) (int64, error)
 }
 
 type interactor struct {
@@ -34,8 +35,8 @@ func NewIterator(repo Repository, meterRepo meter.Repository) Interactor {
 
 }
 
-func (i *interactor) Count(ctx context.Context) (int64, error) {
-	return i.repository.Count(ctx)
+func (i *interactor) Count(ctx context.Context, query bson.M) (int64, error) {
+	return i.repository.Count(ctx, query)
 }
 
 func (i *interactor) ListenForNew(ctx context.Context, consumer chan<- *models.Token) {

@@ -1,6 +1,6 @@
-<table [dataSource]="tokensPage?.data" [nbSpinner]="loading" class="mat-elevation-z8" mat-table
+<table [dataSource]="tokensPage?.data" [nbSpinner]="loading" class="mat-elevation-z8 model-full" mat-table
        nbSpinnerStatus="primary">
-
+      
   <ng-container matColumnDef="meter_number">
     <th *matHeaderCellDef mat-header-cell>Meter Number</th>
     <td *matCellDef="let element" mat-cell> {{element.meterNumber}} </td>
@@ -33,4 +33,4 @@
   <tr *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-meter': !row.active}" mat-row></tr>
 </table>
 
-<mat-paginator [length]="tokensPage?.pageInfo?.count" [pageSize]="3"></mat-paginator>
+<mat-paginator [length]="tokensPage?.pageInfo?.count" [pageSize]="10"></mat-paginator>

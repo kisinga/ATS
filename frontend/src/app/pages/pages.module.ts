@@ -1,8 +1,9 @@
-import {NgModule} from "@angular/core";
+import { NgModule } from "@angular/core";
 import {
   NbAlertModule,
   NbButtonModule,
   NbCardModule,
+  NbDialogModule,
   NbIconModule,
   NbInputModule,
   NbLayoutModule,
@@ -11,20 +12,20 @@ import {
   NbTooltipModule,
 } from "@nebular/theme";
 
-import {ThemeModule} from "../@theme/theme.module";
-import {PagesComponent} from "./pages.component";
-import {PagesRoutingModule} from "./pages-routing.module";
-import {UserManagementComponent} from "./user-management/user-management.component";
-import {MeterManagementComponent} from "./meter-management/meter-management.component";
-import {DashboardComponent} from "./dashboard/dashboard.component";
-import {NbEvaIconsModule} from "@nebular/eva-icons";
-import {MatTableModule} from "@angular/material/table";
-import {DateFromObjectIdPipe} from "app/pages/shared/pipes/date-from-object-id.pipe";
-import {NewUserComponent} from "./user-management/dialogs/new-user/new-user.component";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {NewMeterComponent} from "./meter-management/dialogs/new-meter/new-meter.component";
-import {TokensComponent} from "./tokens/tokens.component";
-import {MatPaginatorModule} from "@angular/material/paginator";
+import { ThemeModule } from "../@theme/theme.module";
+import { PagesComponent } from "./pages.component";
+import { PagesRoutingModule } from "./pages-routing.module";
+import { UserManagementComponent } from "./user-management/user-management.component";
+import { MeterManagementComponent } from "./meter-management/meter-management.component";
+import { DashboardComponent } from "./dashboard/dashboard.component";
+import { NbEvaIconsModule } from "@nebular/eva-icons";
+import { MatTableModule } from "@angular/material/table";
+import { DateFromObjectIdPipe } from "app/pages/shared/pipes/date-from-object-id.pipe";
+import { NewUserComponent } from "./user-management/dialogs/new-user/new-user.component";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NewMeterComponent } from "./meter-management/dialogs/new-meter/new-meter.component";
+import { TokensComponent } from "./tokens/tokens.component";
+import { MatPaginatorModule } from "@angular/material/paginator";
 
 @NgModule({
   imports: [
@@ -47,6 +48,7 @@ import {MatPaginatorModule} from "@angular/material/paginator";
     FormsModule,
     ReactiveFormsModule,
     NbAlertModule,
+    NbDialogModule.forRoot(),
   ],
   exports: [DateFromObjectIdPipe],
   declarations: [
@@ -61,5 +63,4 @@ import {MatPaginatorModule} from "@angular/material/paginator";
   ],
   providers: [],
 })
-export class PagesModule {
-}
+export class PagesModule {}

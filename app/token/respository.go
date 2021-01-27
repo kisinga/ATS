@@ -17,7 +17,7 @@ type Repository interface {
 	ReadMany(ctx context.Context, meterNumber *string, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
 	Update(ctx context.Context, newMeter models.Token) (*models.Token, error)
 	tokenCreatedChan() chan *models.Token
-	Count(ctx context.Context) (int64, error)
+	Count(ctx context.Context, query bson.M) (int64, error)
 }
 
 func NewRepository(database *storage.Database) Repository {
@@ -46,8 +46,8 @@ func (r repository) tokenCreatedChan() chan *models.Token {
 // 	token := models.Token{}
 // 	return &token, r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"meterNumber": meterNumber}).Decode(&token)
 // }
-func (r repository) Count(ctx context.Context) (int64, error) {
-	return r.db.Client.Collection("tokens").CountDocuments(ctx, bson.M{})
+func (r repository) Count(ctx context.Context, query bson.M) (int64, error) {
+	return r.db.Client.Collection("tokens").CountDocuments(ctx, query)
 }
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.Token, error) {
