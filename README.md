@@ -71,7 +71,9 @@ You may need to update your permissions in case you run into EACCESS Errors on n
 2. Terminal1(/cmd) execute `go run *.go`  
    This will run the backend golang app on open port 4242 (Unless you've specified an environment variable "PORT" in which case it will use the port specified. Make sure it is not in use by another program)  
    Make sure you have internet so that the app can connect to a cloud hosted instance of Mongodb
-3. Termina2(/frontend) execute ` ng serve`  
+3. Termina2(/frontend) 
+   Install dependencies by running `npm i`  
+   Execute ` ng serve`  
    This will run the frontend angular app on port 4200  
    Open your browser of choice and navigate to the url "localhost:4200/"  
    You should be prompted to login if this is your first time running the app locally.  
