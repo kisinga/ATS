@@ -26,6 +26,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NewMeterComponent } from "./meter-management/dialogs/new-meter/new-meter.component";
 import { TokensComponent } from "./tokens/tokens.component";
 import { MatPaginatorModule } from "@angular/material/paginator";
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   imports: [
@@ -60,6 +61,7 @@ import { MatPaginatorModule } from "@angular/material/paginator";
     NewUserComponent,
     NewMeterComponent,
     TokensComponent,
+    ProfileComponent,
   ],
   providers: [],
 })
