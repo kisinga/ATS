@@ -3,6 +3,7 @@ package token
 import (
 	"context"
 
+	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,30 +17,27 @@ type Repository interface {
 	ReadByID(context.Context, primitive.ObjectID) (*models.Token, error)
 	ReadMany(ctx context.Context, meterNumber *string, after primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error)
 	Update(ctx context.Context, newMeter models.Token) (*models.Token, error)
-	tokenCreatedChan() chan *models.Token
+	// tokenCreatedChan() chan *models.Token
 	Count(ctx context.Context, query bson.M) (int64, error)
 }
 
-func NewRepository(database *storage.Database) Repository {
-	return &repository{database, make(chan *models.Token, 0)}
+func NewRepository(database *storage.Database, tokenActions *actions.TokenActions) Repository {
+	return &repository{database, tokenActions}
 }
 
 type repository struct {
 	db           *storage.Database
-	tokenCreated chan *models.Token
+	tokenActions *actions.TokenActions
 }
 
 func (r repository) Create(ctx context.Context, token models.Token) (*models.Token, error) {
 	_, err := r.db.Client.Collection("tokens").InsertOne(ctx, token)
 	if err == nil {
 		go func() {
-			r.tokenCreated <- &token
+			r.tokenActions.EmitCreate(&token)
 		}()
 	}
 	return &token, err
-}
-func (r repository) tokenCreatedChan() chan *models.Token {
-	return r.tokenCreated
 }
 
 // func (r repository) Read(ctx context.Context, meterNumber string) (*models.Token, error) {
