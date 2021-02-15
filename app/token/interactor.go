@@ -73,6 +73,7 @@ func (i *interactor) GetToken(ctx context.Context, ID primitive.ObjectID) (*mode
 }
 
 func (i *interactor) AddToken(ctx context.Context, input models.NewToken, apiKey primitive.ObjectID) (*models.Token, error) {
+
 	newToken := models.Token{
 		ID:          primitive.NewObjectID(),
 		MeterNumber: input.MeterNumber,

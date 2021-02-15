@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"regexp"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -9,6 +10,9 @@ import (
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/registry"
 )
+
+// TokenRegex is used to validate the format of a token string
+var TokenRegex = regexp.MustCompile(`^(?:\w{4}-){4}\w{4}$`)
 
 func TokenHandler(domain *registry.Domain) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -31,6 +35,11 @@ func TokenHandler(domain *registry.Domain) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid request")
 			return
 		}
+		if !TokenRegex.Match([]byte(token.TokenString)) {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid token")
+			return
+		}
+
 		meter, err := domain.Meter.GetMeter(c.Request.Context(), token.MeterNumber)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusNotAcceptable, "Invalid meter number")

@@ -13,7 +13,7 @@ import { Subject } from "rxjs";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { UserService } from "app/pages/shared/services/user.service";
 import firebase from "firebase/app";
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "ngx-header",
@@ -60,7 +60,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private themeService: NbThemeService,
     private userService: UserService,
     // private nbAuth: NbAuthService,
-    private router :Router,
+    private router: Router,
     public auth: AngularFireAuth,
     private breakpointService: NbMediaBreakpointsService
   ) {}
@@ -92,7 +92,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
             this.auth.signOut();
             return;
           case "Profile":
-            this.router.navigate(["/profile"])
+            this.router.navigate(["/profile"]);
             return;
           default:
             break;
