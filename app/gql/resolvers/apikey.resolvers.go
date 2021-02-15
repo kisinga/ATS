@@ -29,10 +29,10 @@ func (r *queryResolver) CurrentAPIKey(ctx context.Context) (*models.APIKey, erro
 
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
 	kk := make(chan *models.APIKey)
-	r.domain.APIKey.ListenForNew(ctx, kk)
-	go func() {
-		kk <- r.domain.APIKey.GetLatest()
-	}()
+	// r.domain.APIKey.ListenForNew(ctx, kk)
+	// go func() {
+	// 	kk <- r.domain.APIKey.GetLatest()
+	// }()
 	return kk, nil
 }
 

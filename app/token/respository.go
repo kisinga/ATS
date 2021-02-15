@@ -33,9 +33,7 @@ type repository struct {
 func (r repository) Create(ctx context.Context, token models.Token) (*models.Token, error) {
 	_, err := r.db.Client.Collection("tokens").InsertOne(ctx, token)
 	if err == nil {
-		go func() {
-			r.tokenActions.EmitCreate(&token)
-		}()
+		r.tokenActions.EmitCreate(&token)
 	}
 	return &token, err
 }

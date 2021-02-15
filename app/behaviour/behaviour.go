@@ -3,6 +3,7 @@ package behaviour
 import (
 	"context"
 
+	"github.com/kisinga/ATS/app/apiKey"
 	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/behaviour/effects"
 	"github.com/kisinga/ATS/app/behaviour/listeners"
@@ -10,19 +11,28 @@ import (
 )
 
 type Behaviours struct {
-	Token *effects.TokenEffects
+	Token  *effects.TokenEffects
+	APIKey *effects.APIKeyEffects
 }
 
 func New() *Behaviours {
-	actions := actions.New()
-	myListeners := listeners.New()
+	tokenActions := actions.NewTokenActions()
+	APIKeyActions := actions.NewAPIKeyActions()
+	tokenListeners := listeners.NewTokenListeners()
+	APIKeyListeners := listeners.NewAPIKeyListeners()
 
-	systemListener := make(chan *models.Token)
-	myListeners.AddListener(context.Background(), systemListener, listeners.Create)
+	systemTokensListener := make(chan *models.Token)
+	systemAPIKeyListener := make(chan *models.APIKey)
 
-	go effects.TransmitToken(systemListener)
+	tokenListeners.AddListener(context.Background(), systemTokensListener, listeners.TokenCreate)
+	APIKeyListeners.AddListener(context.Background(), systemAPIKeyListener, listeners.KeyCreate)
+
+	go effects.TransmitToken(systemTokensListener)
+
+	go effects.UpdateCache(apiKey.UpdateCache, systemAPIKeyListener)
 
 	return &Behaviours{
-		Token: effects.New(actions, myListeners),
+		Token:  effects.NewTokenEffects(tokenActions, tokenListeners),
+		APIKey: effects.NewAPIKeyEffects(APIKeyActions, APIKeyListeners),
 	}
 }

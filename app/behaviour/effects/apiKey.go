@@ -1,36 +1,36 @@
 package effects
 
 import (
-	"fmt"
-
 	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/behaviour/listeners"
 	"github.com/kisinga/ATS/app/models"
 )
 
 // TokenEffects are all the posible operations performed whenever a specific action even occurs
-type TokenEffects struct {
-	Actions   *actions.TokenActions
-	Listeners *listeners.TokenListeners
+type APIKeyEffects struct {
+	Actions   *actions.APIKeyActions
+	Listeners *listeners.APIKeyListeners
 }
 
+type CacheUpdater func(channel chan *models.APIKey)
+
 // New creates an instance of TokenEffects given a pointer to the actions and listeners
-func NewTokenEffects(actions *actions.TokenActions, listeners *listeners.TokenListeners) *TokenEffects {
-	effects := TokenEffects{
+func NewAPIKeyEffects(actions *actions.APIKeyActions, listeners *listeners.APIKeyListeners) *APIKeyEffects {
+	effects := APIKeyEffects{
 		Actions:   actions,
 		Listeners: listeners,
 	}
-	go effects.listenNewTokens()
+	go effects.listenNewApiKey()
 	return &effects
 }
 
-func (e TokenEffects) listenNewTokens() {
+func (e APIKeyEffects) listenNewApiKey() {
 	for {
 		select {
 		case key := <-e.Actions.GetCreate():
 			e.Listeners.Mu.Lock()
 			for _, listener := range e.Listeners.Create {
-				go func(l chan<- *models.Token) {
+				go func(l chan<- *models.APIKey) {
 					l <- key
 				}(listener)
 			}
@@ -39,13 +39,7 @@ func (e TokenEffects) listenNewTokens() {
 	}
 }
 
-// TransmitToken a special system listener that sends the token downstram to the CIU whenever a new token is created
-func TransmitToken(channel <-chan *models.Token) {
-	for {
-		select {
-		case token := <-channel:
-			fmt.Println(token)
-			// TransmitToken(*token)
-		}
-	}
+// UpdateCache a special system listener that keeps the cache updated with the latest API Key
+func UpdateCache(updater CacheUpdater, channel chan *models.APIKey) {
+	updater(channel)
 }

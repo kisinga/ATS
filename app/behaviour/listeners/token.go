@@ -11,8 +11,8 @@ import (
 //TokenTopics defines a subscribable event type
 type TokenTopics int
 
-// Create is a topic emitted when a token is created
-const Create TokenTopics = iota
+// TokenCreate is a topic emitted when a token is created
+const TokenCreate TokenTopics = iota
 
 // TokenListeners is the list of subscribers to a certain effecttype(topic)
 type TokenListeners struct {
@@ -20,8 +20,8 @@ type TokenListeners struct {
 	Mu     sync.Mutex
 }
 
-// New creates an instance of listeners
-func New() *TokenListeners {
+// NewTokenListeners creates an instance of listeners
+func NewTokenListeners() *TokenListeners {
 	return &TokenListeners{
 		Create: make(map[primitive.ObjectID]chan<- *models.Token),
 		Mu:     sync.Mutex{},
@@ -32,7 +32,7 @@ func New() *TokenListeners {
 func (t *TokenListeners) AddListener(ctx context.Context, listener chan<- *models.Token, topic TokenTopics) {
 	id := primitive.NewObjectID()
 	switch topic {
-	case Create:
+	case TokenCreate:
 		t.Mu.Lock()
 		t.Create[id] = listener
 		t.Mu.Unlock()

@@ -20,7 +20,7 @@ func NewDomain(db *storage.Database, bh *behaviour.Behaviours) *Domain {
 
 	meterRepo := meter.NewRepository(db)
 	userRepo := user.NewRepository(db)
-	apikeyRepo := apiKey.NewRepository(db)
+	apikeyRepo := apiKey.NewRepository(db, bh.APIKey.Actions)
 	tokenRepo := token.NewRepository(db, bh.Token.Actions)
 
 	return &Domain{

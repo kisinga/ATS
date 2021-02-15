@@ -3,6 +3,7 @@ package apiKey
 import (
 	"context"
 
+	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,31 +17,24 @@ type Repository interface {
 	ReadByID(context.Context, primitive.ObjectID) (*models.APIKey, error)
 	ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.APIKey, error)
 	Update(ctx context.Context, newMeter models.APIKey) (*models.APIKey, error)
-	apiKeyChan() chan *models.APIKey
 }
 
-func NewRepository(database *storage.Database) Repository {
-	return &repository{database, make(chan *models.APIKey, 0)}
+func NewRepository(database *storage.Database, apiKeyActions *actions.APIKeyActions) Repository {
+	return &repository{database, apiKeyActions}
 }
 
 type repository struct {
 	db            *storage.Database
-	apiKeyCreated chan *models.APIKey
+	apiKeyActions *actions.APIKeyActions
 }
 
 func (r repository) Create(ctx context.Context, token models.APIKey) (*models.APIKey, error) {
 	_, err := r.db.Client.Collection("apikeys").InsertOne(ctx, token)
 	// send to chanel via a goroutine so it doesnt block
 	if err == nil {
-		go func() {
-			r.apiKeyCreated <- &token
-		}()
+		r.apiKeyActions.EmitCreate(&token)
 	}
 	return &token, err
-}
-
-func (r repository) apiKeyChan() chan *models.APIKey {
-	return r.apiKeyCreated
 }
 
 // func (r repository) Read(ctx context.Context, meterNumber string) (*models.APIKey, error) {

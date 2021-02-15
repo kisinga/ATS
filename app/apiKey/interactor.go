@@ -20,19 +20,14 @@ type Interactor interface {
 	GetLatest() *models.APIKey
 	getLatestFromDB(ctx context.Context) (*models.APIKey, error)
 	Generate(ctx context.Context, user models.User) (*models.APIKey, error)
-	ListenForNew(ctx context.Context, consumer chan<- *models.APIKey)
 }
 
 type interactor struct {
 	repository Repository
-	listeners  map[primitive.ObjectID]chan<- *models.APIKey
-	mu         sync.Mutex
 }
 
 func NewIterator(repo Repository) Interactor {
-	kk := make(map[primitive.ObjectID]chan<- *models.APIKey, 0)
-	i := &interactor{repository: repo, listeners: kk}
-
+	i := &interactor{repository: repo}
 	// Fetch the latest key for in-memory cache
 	go func() {
 		key, err := i.getLatestFromDB(context.Background())
@@ -43,12 +38,14 @@ func NewIterator(repo Repository) Interactor {
 		latestKey.key = key
 		latestKey.mu.Unlock()
 	}()
-	go keyCreated(i, repo.apiKeyChan())
+
+	// go UpdateCache(i, repo.apiKeyChan())
+
 	return i
 
 }
 
-func keyCreated(i *interactor, channel chan *models.APIKey) {
+func UpdateCache(channel chan *models.APIKey) {
 	for {
 		select {
 		case key := <-channel:
@@ -56,13 +53,6 @@ func keyCreated(i *interactor, channel chan *models.APIKey) {
 			latestKey.mu.Lock()
 			latestKey.key = key
 			latestKey.mu.Unlock()
-			i.mu.Lock()
-			for _, listener := range i.listeners {
-				go func(l chan<- *models.APIKey) {
-					l <- key
-				}(listener)
-			}
-			i.mu.Unlock()
 		}
 	}
 }
@@ -72,21 +62,6 @@ func (i *interactor) GetLatest() *models.APIKey {
 	key := latestKey.key
 	latestKey.mu.RUnlock()
 	return key
-}
-
-func (i *interactor) ListenForNew(ctx context.Context, consumer chan<- *models.APIKey) {
-	id := primitive.NewObjectID()
-	i.mu.Lock()
-	i.listeners[id] = consumer
-	i.mu.Unlock()
-	go func() {
-		<-ctx.Done()
-		i.mu.Lock()
-		if _, ok := i.listeners[id]; ok {
-			delete(i.listeners, id)
-			i.mu.Unlock()
-		}
-	}()
 }
 
 func (i *interactor) getLatestFromDB(ctx context.Context) (*models.APIKey, error) {
