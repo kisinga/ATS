@@ -16,12 +16,12 @@ type Domain struct {
 	APIKey apiKey.Interactor
 }
 
-func NewDomain(db *storage.Database) *Domain {
-	behaviour := behaviour.New()
+func NewDomain(db *storage.Database, bh *behaviour.Behaviours) *Domain {
+
 	meterRepo := meter.NewRepository(db)
 	userRepo := user.NewRepository(db)
 	apikeyRepo := apiKey.NewRepository(db)
-	tokenRepo := token.NewRepository(db, behaviour.Token.Actions)
+	tokenRepo := token.NewRepository(db, bh.Token.Actions)
 
 	return &Domain{
 		Meter:  meter.NewIterator(meterRepo),

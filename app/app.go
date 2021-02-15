@@ -16,6 +16,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/kisinga/ATS/app/behaviour"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/gql/resolvers"
 	"github.com/kisinga/ATS/app/handlers/auth"
@@ -27,8 +28,9 @@ import (
 func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
 	// ctx := context.Background()
 	router := gin.Default()
+	bh := behaviour.New()
 
-	domain := registry.NewDomain(db)
+	domain := registry.NewDomain(db, bh)
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
@@ -39,9 +41,10 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	}))
 	router.Use(auth.GinContextToContextMiddleware())
 	router.Use(gin.Recovery()) // add Recovery middleware
+
 	apiRoutes := router.Group("/api",
 		auth.Middleware(firebase),
-		graphqlHandler(domain, firebase))
+		graphqlHandler(domain, bh, firebase))
 	{
 		apiRoutes.Any("")
 	}
@@ -60,9 +63,9 @@ func playgroundHandler() gin.HandlerFunc {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
-func graphqlHandler(domain *registry.Domain, fb *firebase.App) gin.HandlerFunc {
+func graphqlHandler(domain *registry.Domain, bh *behaviour.Behaviours, fb *firebase.App) gin.HandlerFunc {
 
-	r := resolvers.NewResolver(domain)
+	r := resolvers.NewResolver(domain, bh)
 
 	h := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: r}))
 	h.AddTransport(transport.Websocket{
