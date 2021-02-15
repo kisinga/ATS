@@ -5,8 +5,8 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/kisinga/ATS/app/behaviour/listeners"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -47,7 +47,9 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAft
 }
 
 func (r *subscriptionResolver) TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error) {
-	panic(fmt.Errorf("not implemented"))
+	channel := make(chan *models.Token)
+	r.behaviours.Token.Listeners.AddListener(ctx, channel, listeners.Create)
+	return channel, nil
 }
 
 func (r *tokenResolver) Status(ctx context.Context, obj *models.Token) (int64, error) {

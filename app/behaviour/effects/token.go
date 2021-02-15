@@ -11,14 +11,14 @@ import (
 // TokenEffects are all the posible operations performed whenever a specific action even occurs
 type TokenEffects struct {
 	Actions   *actions.TokenActions
-	listeners *listeners.TokenListeners
+	Listeners *listeners.TokenListeners
 }
 
 // New creates an instance of TokenEffects given a pointer to the actions and listeners
 func New(actions *actions.TokenActions, listeners *listeners.TokenListeners) *TokenEffects {
 	effects := TokenEffects{
 		Actions:   actions,
-		listeners: listeners,
+		Listeners: listeners,
 	}
 	go effects.listen()
 	return &effects
@@ -28,13 +28,13 @@ func (e TokenEffects) listen() {
 	for {
 		select {
 		case key := <-e.Actions.GetCreate():
-			e.listeners.Mu.Lock()
-			for _, listener := range e.listeners.Create {
+			e.Listeners.Mu.Lock()
+			for _, listener := range e.Listeners.Create {
 				go func(l chan<- *models.Token) {
 					l <- key
 				}(listener)
 			}
-			e.listeners.Mu.Unlock()
+			e.Listeners.Mu.Unlock()
 		}
 	}
 }
