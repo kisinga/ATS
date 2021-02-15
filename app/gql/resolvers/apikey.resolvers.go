@@ -6,6 +6,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/kisinga/ATS/app/behaviour/listeners"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/handlers/auth"
 	"github.com/kisinga/ATS/app/models"
@@ -28,12 +29,9 @@ func (r *queryResolver) CurrentAPIKey(ctx context.Context) (*models.APIKey, erro
 }
 
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
-	kk := make(chan *models.APIKey)
-	// r.domain.APIKey.ListenForNew(ctx, kk)
-	// go func() {
-	// 	kk <- r.domain.APIKey.GetLatest()
-	// }()
-	return kk, nil
+	channel := make(chan *models.APIKey)
+	r.behaviours.APIKey.Listeners.AddListener(ctx, channel, listeners.KeyCreate)
+	return channel, nil
 }
 
 // APIKey returns generated.APIKeyResolver implementation.

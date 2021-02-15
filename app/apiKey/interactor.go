@@ -38,11 +38,7 @@ func NewIterator(repo Repository) Interactor {
 		latestKey.key = key
 		latestKey.mu.Unlock()
 	}()
-
-	// go UpdateCache(i, repo.apiKeyChan())
-
 	return i
-
 }
 
 func UpdateCache(channel chan *models.APIKey) {
