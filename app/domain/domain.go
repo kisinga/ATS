@@ -25,22 +25,22 @@ func New(db *storage.Database) *Domain {
 	apiKeyTopics := apiKey.NewTopics(apiKey.NewCrudChannels())
 	apiKeyRepo := apiKey.NewRepository(db, apiKeyTopics)
 	apiKeyListeners := apiKey.NewListeners()
-	apiKeyEffects := apiKey.NewEffects(&apiKey.RequiredRepos{APIKey: apiKeyRepo}, apiKeyTopics, apiKeyListeners)
+	apiKeyEffects := apiKey.NewEffects(&apiKey.Dependencies{APIKeyRepository: apiKeyRepo}, apiKeyTopics, apiKeyListeners)
 
 	meterTopics := meter.NewTopics(meter.NewCrudChannels())
 	meterRepo := meter.NewRepository(db, meterTopics)
 	meterListeners := meter.NewListeners()
-	meterEffects := meter.NewEffects(&meter.RequiredRepos{Meter: meterRepo}, meterTopics, meterListeners)
+	meterEffects := meter.NewEffects(&meter.Dependencies{MeterRepository: meterRepo}, meterTopics, meterListeners)
 
 	tokenTopics := token.NewTopics(token.NewCrudChannels())
 	tokenRepo := token.NewRepository(db, tokenTopics)
 	tokenListeners := token.NewListeners()
-	tokenEffects := token.NewEffects(&token.RequiredRepos{Token: tokenRepo}, tokenTopics, tokenListeners)
+	tokenEffects := token.NewEffects(&token.Dependencies{TokenRepository: tokenRepo}, tokenTopics, tokenListeners)
 
 	userTopics := user.NewTopics(user.NewCrudChannels())
 	userRepo := user.NewRepository(db, userTopics)
 	userListeners := user.NewListeners()
-	userEffects := user.NewEffects(&user.RequiredRepos{User: userRepo}, userTopics, userListeners)
+	userEffects := user.NewEffects(&user.Dependencies{UserRepository: userRepo}, userTopics, userListeners)
 
 	return &Domain{
 		APIKey: apiKey.NewIterator(apiKeyRepo, apiKeyEffects),

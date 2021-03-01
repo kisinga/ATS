@@ -11,7 +11,7 @@ import (
 type effects struct {
 	topics    *Topics
 	listeners *Listeners
-	repos     *RequiredRepos
+	deps      *Dependencies
 }
 
 type Effects interface {
@@ -20,15 +20,15 @@ type Effects interface {
 }
 
 // RequiredRepos is the list of repositories required by this package to carry out the listed effects
-type RequiredRepos struct {
-	Token Repository
+type Dependencies struct {
+	TokenRepository Repository
 }
 
-func NewEffects(repos *RequiredRepos, topics *Topics, listeners *Listeners) Effects {
+func NewEffects(deps *Dependencies, topics *Topics, listeners *Listeners) Effects {
 	effects := effects{
 		topics:    topics,
 		listeners: listeners,
-		repos:     repos,
+		deps:      deps,
 	}
 	effects.listen()
 	return &effects
