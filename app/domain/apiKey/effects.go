@@ -16,6 +16,7 @@ type effects struct {
 
 type Effects interface {
 	listen()
+	Listeners() *Listeners
 }
 
 // RequiredRepos is the list of repositories required by this package to carry out the listed effects
@@ -31,6 +32,10 @@ func NewEffects(repos *RequiredRepos, topics *Topics, listeners *Listeners) Effe
 	}
 	effects.listen()
 	return &effects
+}
+
+func (e *effects) Listeners() *Listeners {
+	return e.listeners
 }
 
 func (e *effects) listen() {

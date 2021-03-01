@@ -31,7 +31,7 @@ func (r *queryResolver) CurrentAPIKey(ctx context.Context) (*models.APIKey, erro
 
 func (r *subscriptionResolver) APIKeyChanged(ctx context.Context) (<-chan *models.APIKey, error) {
 	channel := make(chan *models.APIKey)
-	r.domain.Listeners.APIKey.AddListener(ctx, channel, apiKey.TopicNames(crudModels.Create))
+	r.domain.APIKey.AddListener(ctx, channel, apiKey.TopicNames(crudModels.Create))
 	return channel, nil
 }
 

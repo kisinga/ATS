@@ -14,14 +14,19 @@ type Interactor interface {
 	AddMeter(ctx context.Context, meter models.NewMeter, creatorID primitive.ObjectID) (*models.Meter, error)
 	UpdateMeter(ctx context.Context, meterNumber string, newMeter models.Meter) (*models.Meter, error)
 	Count(ctx context.Context) (int64, error)
+	AddListener(ctx context.Context, channel chan<- *models.Meter, effectName TopicNames) primitive.ObjectID
 }
 
 type interactor struct {
 	repository Repository
+	effects    Effects
 }
 
-func NewIterator(repo Repository) Interactor {
-	return &interactor{repo}
+func NewIterator(repo Repository, effects Effects) Interactor {
+	return &interactor{repo, effects}
+}
+func (i *interactor) AddListener(ctx context.Context, channel chan<- *models.Meter, effectName TopicNames) primitive.ObjectID {
+	return i.effects.Listeners().AddListener(ctx, channel, effectName)
 }
 
 func (i *interactor) Count(ctx context.Context) (int64, error) {

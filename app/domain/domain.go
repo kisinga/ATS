@@ -8,12 +8,6 @@ import (
 	"github.com/kisinga/ATS/app/storage"
 )
 
-type effects struct {
-	apiKey apiKey.Effects
-	user   user.Effects
-	meter  meter.Effects
-	token  token.Effects
-}
 type Listeners struct {
 	Meter  *meter.Listeners
 	User   *user.Listeners
@@ -21,39 +15,38 @@ type Listeners struct {
 	APIKey *apiKey.Listeners
 }
 type Domain struct {
-	Meter     meter.Interactor
-	User      user.Interactor
-	Token     token.Interactor
-	APIKey    apiKey.Interactor
-	effects   effects
-	Listeners Listeners
+	Meter  meter.Interactor
+	User   user.Interactor
+	Token  token.Interactor
+	APIKey apiKey.Interactor
 }
 
 func New(db *storage.Database) *Domain {
 	apiKeyTopics := apiKey.NewTopics(apiKey.NewCrudChannels())
 	apiKeyRepo := apiKey.NewRepository(db, apiKeyTopics)
 	apiKeyListeners := apiKey.NewListeners()
+	apiKeyEffects := apiKey.NewEffects(&apiKey.RequiredRepos{APIKey: apiKeyRepo}, apiKeyTopics, apiKeyListeners)
 
 	meterTopics := meter.NewTopics(meter.NewCrudChannels())
 	meterRepo := meter.NewRepository(db, meterTopics)
 	meterListeners := meter.NewListeners()
+	meterEffects := meter.NewEffects(&meter.RequiredRepos{Meter: meterRepo}, meterTopics, meterListeners)
 
 	tokenTopics := token.NewTopics(token.NewCrudChannels())
 	tokenRepo := token.NewRepository(db, tokenTopics)
 	tokenListeners := token.NewListeners()
+	tokenEffects := token.NewEffects(&token.RequiredRepos{Token: tokenRepo}, tokenTopics, tokenListeners)
 
 	userTopics := user.NewTopics(user.NewCrudChannels())
 	userRepo := user.NewRepository(db, userTopics)
 	userListeners := user.NewListeners()
+	userEffects := user.NewEffects(&user.RequiredRepos{User: userRepo}, userTopics, userListeners)
 
 	return &Domain{
-		APIKey: apiKey.NewIterator(apiKeyRepo),
-		effects: effects{
-			apiKey: apiKey.NewEffects(&apiKey.RequiredRepos{APIKey: apiKeyRepo}, apiKeyTopics, apiKeyListeners),
-			meter:  meter.NewEffects(&meter.RequiredRepos{Meter: meterRepo}, meterTopics, meterListeners),
-			token:  token.NewEffects(&token.RequiredRepos{Token: tokenRepo}, tokenTopics, tokenListeners),
-			user:   user.NewEffects(&user.RequiredRepos{User: userRepo}, userTopics, userListeners),
-		},
+		APIKey: apiKey.NewIterator(apiKeyRepo, apiKeyEffects),
+		Meter:  meter.NewIterator(meterRepo, meterEffects),
+		Token:  token.NewIterator(tokenRepo, tokenEffects),
+		User:   user.NewIterator(userRepo, userEffects),
 	}
 
 }

@@ -27,8 +27,7 @@ import (
 func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
 	// ctx := context.Background()
 	router := gin.Default()
-
-	domain := domain.New(db)
+	router.Use(gin.Recovery()) // add Recovery middleware
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"},
@@ -38,8 +37,8 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 		MaxAge:           12 * time.Hour,
 	}))
 	router.Use(auth.GinContextToContextMiddleware())
-	router.Use(gin.Recovery()) // add Recovery middleware
 
+	domain := domain.New(db)
 	apiRoutes := router.Group("/api",
 		auth.Middleware(firebase),
 		graphqlHandler(domain, firebase))

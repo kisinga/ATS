@@ -20,14 +20,15 @@ type Interactor interface {
 	GetLatest() *models.APIKey
 	getLatestFromDB(ctx context.Context) (*models.APIKey, error)
 	Generate(ctx context.Context, user models.User) (*models.APIKey, error)
+	AddListener(ctx context.Context, channel chan<- *models.APIKey, effectName TopicNames) primitive.ObjectID
 }
-
 type interactor struct {
 	repository Repository
+	effects    Effects
 }
 
-func NewIterator(repo Repository) Interactor {
-	i := &interactor{repository: repo}
+func NewIterator(repo Repository, effects Effects) Interactor {
+	i := &interactor{repo, effects}
 	// Fetch the latest key for in-memory cache
 	go func() {
 		key, err := i.getLatestFromDB(context.Background())
@@ -51,6 +52,10 @@ func UpdateCache(channel chan *models.APIKey) {
 			latestKey.mu.Unlock()
 		}
 	}
+}
+
+func (i *interactor) AddListener(ctx context.Context, channel chan<- *models.APIKey, effectName TopicNames) primitive.ObjectID {
+	return i.effects.Listeners().AddListener(ctx, channel, effectName)
 }
 
 func (i *interactor) GetLatest() *models.APIKey {

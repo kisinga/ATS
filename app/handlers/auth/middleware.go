@@ -14,6 +14,8 @@ import (
 	"github.com/kisinga/ATS/app/models"
 )
 
+//Middleware adds the user to the current context
+//https://gqlgen.com/recipes/authentication/
 func Middleware(firebase *firebase.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Passthrough websocket requests
@@ -54,6 +56,7 @@ func Middleware(firebase *firebase.App) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
 func GetUserFromToken(ctx context.Context, firebase *firebase.App, token string) (*models.User, error) {
 	// Verify the session cookie. In this case an additional check is added to detect
 	// if the user's Firebase session was revoked, user deleted/disabled, etc.

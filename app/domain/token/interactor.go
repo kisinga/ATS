@@ -3,7 +3,6 @@ package token
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/domain/meter"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,19 +15,20 @@ type Interactor interface {
 	UpdateTokenStatus(ctx context.Context, tokenID primitive.ObjectID, status models.TokenStatus) (*models.Token, error)
 	// ListenForNew(ctx context.Context, consumer chan<- *models.Token)
 	Count(ctx context.Context, query bson.M) (int64, error)
+	AddListener(ctx context.Context, channel chan<- *models.Token, effectName TopicNames) primitive.ObjectID
 }
 
 type interactor struct {
-	repository      Repository
-	meterRepository meter.Repository
+	repository Repository
+	effects    Effects
 }
 
-func NewIterator(repo Repository, meterRepo meter.Repository) Interactor {
-	// kk := make(map[primitive.ObjectID]chan<- *models.Token, 0)
-	i := &interactor{repository: repo, meterRepository: meterRepo}
-	// go tokenCreated(i, repo.tokenCreatedChan())
-	return i
+func NewIterator(repo Repository, effects Effects) Interactor {
+	return &interactor{repo, effects}
+}
 
+func (i *interactor) AddListener(ctx context.Context, channel chan<- *models.Token, effectName TopicNames) primitive.ObjectID {
+	return i.effects.Listeners().AddListener(ctx, channel, effectName)
 }
 
 func (i *interactor) Count(ctx context.Context, query bson.M) (int64, error) {

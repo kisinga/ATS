@@ -49,7 +49,7 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAft
 
 func (r *subscriptionResolver) TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error) {
 	channel := make(chan *models.Token)
-	r.domain.Listeners.Token.AddListener(ctx, channel, token.TopicNames(crudModels.Create))
+	r.domain.Token.AddListener(ctx, channel, token.TopicNames(crudModels.Create))
 	return channel, nil
 }
 

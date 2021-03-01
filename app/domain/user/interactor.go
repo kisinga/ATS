@@ -15,20 +15,26 @@ type Interactor interface {
 	AddUser(ctx context.Context, user models.NewUser, creatorEmail string) (*models.User, error)
 	UpdateUser(ctx context.Context, email string, newUser models.User) (*models.User, error)
 	Count(ctx context.Context) (int64, error)
+	AddListener(ctx context.Context, channel chan<- *models.User, effectName TopicNames) primitive.ObjectID
 }
 
 type interactor struct {
 	repository Repository
+	effects    Effects
 }
 
-func NewIterator(repo Repository) Interactor {
-	return &interactor{
-		repository: repo,
-	}
+func NewIterator(repo Repository, effects Effects) Interactor {
+	return &interactor{repo, effects}
 }
+
+func (i *interactor) AddListener(ctx context.Context, channel chan<- *models.User, effectName TopicNames) primitive.ObjectID {
+	return i.effects.Listeners().AddListener(ctx, channel, effectName)
+}
+
 func (i *interactor) Count(ctx context.Context) (int64, error) {
 	return i.repository.Count(ctx)
 }
+
 func (i *interactor) GetUser(ctx context.Context, email string) (*models.User, error) {
 	return i.repository.Read(ctx, email)
 }

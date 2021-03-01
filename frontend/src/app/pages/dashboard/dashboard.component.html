@@ -29,7 +29,7 @@
               {{apiKey?.ID}}
             </h3>
             <p>
-              {{apiKey?.createdBy.email}}
+              {{apiKey?.createdBy?.email}}
             </p>
           </div>
           <button (click)="generateKey()" nbButton status="danger">
