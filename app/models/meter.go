@@ -10,7 +10,9 @@ type Meter struct {
 	CreatedBy   primitive.ObjectID `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
 	UpdatedBy   primitive.ObjectID `json:"updatedBy,omitempty" bson:"updatedBy,omitempty"`
 	Active      bool               `json:"active" bson:"active"`
+	Phone       string             `json:"phone"`
 }
+
 type MeterConnection struct {
 	// A list of the meters, paginated by the provided values
 	Data []*Meter `json:"data"`

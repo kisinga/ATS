@@ -24,14 +24,6 @@ type SendError struct {
 	Text string
 }
 type Text struct {
-	Phone string `json:"phone" binding:"required"`
-	//From is the value of the senderID in case the company has bought one
-	From    string `json:"from" binding:"required"`
+	Phone   string `json:"phone" binding:"required"`
 	Message string `json:"message" binding:"required"`
-	Status  `json:"-"`
-	Cost    float64 `json:"-"`
-	//MessageID is a value assigned to the message by the 3rd party provider
-	MessageID string `json:"-"`
-	//BatchID represents the ID of every batch of SMS
-	//Every request with an arrays of SMS's is treated as a batch
 }

@@ -1,9 +1,12 @@
 package token
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/kisinga/ATS/app/communication/sms"
 	"github.com/kisinga/ATS/app/domain/crudModels"
+	"github.com/kisinga/ATS/app/domain/meter"
 	"github.com/kisinga/ATS/app/models"
 )
 
@@ -22,6 +25,8 @@ type Effects interface {
 // RequiredRepos is the list of repositories required by this package to carry out the listed effects
 type Dependencies struct {
 	TokenRepository Repository
+	MeterRepository meter.Repository
+	SMS             sms.SMS
 }
 
 func NewEffects(deps *Dependencies, topics *Topics, listeners *Listeners) Effects {
@@ -41,10 +46,20 @@ func (e *effects) listen() {
 	go func() {
 		for {
 			select {
-			case Token := <-e.topics.Created:
+			case token := <-e.topics.Created:
 				// emit the value to all the listeners
-				emitToListeners(e.listeners, TopicNames(crudModels.Create), &Token)
-				fmt.Println(Token)
+				emitToListeners(e.listeners, TopicNames(crudModels.Create), &token)
+				ctx := context.Background()
+				meter, err := e.deps.MeterRepository.Read(ctx, token.MeterNumber)
+				if err != nil {
+					// Critical error, log
+				}
+				_, err = e.deps.SMS.Send(models.Text{Phone: meter.Phone, Message: token.String()})
+				if err != nil {
+					token.Status = models.StatusSent
+					e.deps.TokenRepository.Update(ctx, token)
+				}
+				fmt.Println(token)
 				break
 			case Token := <-e.topics.Read:
 				emitToListeners(e.listeners, TopicNames(crudModels.Read), &Token)

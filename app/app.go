@@ -16,6 +16,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/kisinga/ATS/app/communication/sms"
 	"github.com/kisinga/ATS/app/domain"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/gql/resolvers"
@@ -38,7 +39,8 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	}))
 	router.Use(auth.GinContextToContextMiddleware())
 
-	domain := domain.New(db)
+	domain := domain.New(db, sms.NewSMS(sms.AfricasTalking{}))
+
 	apiRoutes := router.Group("/api",
 		auth.Middleware(firebase),
 		graphqlHandler(domain, firebase))

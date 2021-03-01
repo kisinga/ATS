@@ -13,6 +13,7 @@ type BaseObject interface {
 type NewMeter struct {
 	MeterNumber string  `json:"meterNumber"`
 	Location    *string `json:"location"`
+	PhoneNumber string  `json:"phoneNumber"`
 }
 
 type NewUser struct {

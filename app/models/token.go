@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -15,6 +16,12 @@ type Token struct {
 	Status      TokenStatus        `json:"status,omitempty" bson:"status,omitempty"`
 	APIKey      primitive.ObjectID `json:"apiKey,omitempty" bson:"apiKey,omitempty"`
 }
+
+// String returns the token string without the dashes
+func (t Token) String() string {
+	return strings.ReplaceAll(t.TokenString, "-", "")
+}
+
 type NewToken struct {
 	MeterNumber string `json:"meterNumber,omitempty" binding:"required"`
 	TokenString string `json:"tokenString,omitempty" binding:"required"`

@@ -3,13 +3,16 @@ type Meter implements BaseObject {
   ID: ID!
   updatedBy: User
   createdBy: User
+  phone: String!
   active: Boolean!
 }
 
 input NewMeter {
   meterNumber: String!
   location: String
+  phoneNumber: String!
 }
+
 
 extend type Query {
   meters(limit: Int = 30, after: ID = null): MeterConnection!
@@ -19,7 +22,7 @@ extend type Mutation {
   createMeter(input: NewMeter!): Meter!
   disableMeter(meterNumber: String!): Meter!
   enableMeter(meterNumber: String!): Meter!
-  # updateMeter(input: NewMeter!): Meter!
+  updateMeter(input: NewMeter!): Meter!
 }
 
 type MeterConnection {

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/kisinga/ATS/app/communication/sms"
 	"github.com/kisinga/ATS/app/domain/apiKey"
 	"github.com/kisinga/ATS/app/domain/meter"
 	"github.com/kisinga/ATS/app/domain/token"
@@ -21,7 +22,8 @@ type Domain struct {
 	APIKey apiKey.Interactor
 }
 
-func New(db *storage.Database) *Domain {
+func New(db *storage.Database, sms sms.SMS) *Domain {
+
 	apiKeyTopics := apiKey.NewTopics(apiKey.NewCrudChannels())
 	apiKeyRepo := apiKey.NewRepository(db, apiKeyTopics)
 	apiKeyListeners := apiKey.NewListeners()
@@ -35,7 +37,7 @@ func New(db *storage.Database) *Domain {
 	tokenTopics := token.NewTopics(token.NewCrudChannels())
 	tokenRepo := token.NewRepository(db, tokenTopics)
 	tokenListeners := token.NewListeners()
-	tokenEffects := token.NewEffects(&token.Dependencies{TokenRepository: tokenRepo}, tokenTopics, tokenListeners)
+	tokenEffects := token.NewEffects(&token.Dependencies{TokenRepository: tokenRepo, MeterRepository: meterRepo, SMS: sms}, tokenTopics, tokenListeners)
 
 	userTopics := user.NewTopics(user.NewCrudChannels())
 	userRepo := user.NewRepository(db, userTopics)

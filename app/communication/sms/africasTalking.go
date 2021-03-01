@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/kisinga/ATS/app/models"
@@ -74,12 +73,12 @@ func (a *AfricasTalking) Send(text models.Text) (models.Text, error) {
 		return text, errors.New("nil recipient response")
 	}
 
-	text.Cost, err = strconv.ParseFloat(strings.Split(response.SMSMessageData.Recipients[0].Cost, " ")[1], 64)
-	if err != nil {
-		return text, err
-	}
-	text.MessageID = response.SMSMessageData.Recipients[0].MessageID
-	text.Status = response.SMSMessageData.Recipients[0].StatusCode
+	// text.Cost, err = strconv.ParseFloat(strings.Split(response.SMSMessageData.Recipients[0].Cost, " ")[1], 64)
+	// if err != nil {
+	// 	return text, err
+	// }
+	// text.MessageID = response.SMSMessageData.Recipients[0].MessageID
+	// text.Status = response.SMSMessageData.Recipients[0].StatusCode
 
 	return text, nil
 }
