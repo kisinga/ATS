@@ -6,7 +6,8 @@ package resolvers
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/behaviour/listeners"
+	"github.com/kisinga/ATS/app/domain/crudModels"
+	"github.com/kisinga/ATS/app/domain/token"
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -48,7 +49,7 @@ func (r *queryResolver) GetTokens(ctx context.Context, limit *int64, beforeOrAft
 
 func (r *subscriptionResolver) TokenCreated(ctx context.Context, meterNumber *string) (<-chan *models.Token, error) {
 	channel := make(chan *models.Token)
-	r.behaviours.Token.Listeners.AddListener(ctx, channel, listeners.TokenCreate)
+	r.domain.Listeners.Token.AddListener(ctx, channel, token.TopicNames(crudModels.Create))
 	return channel, nil
 }
 

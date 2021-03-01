@@ -10,8 +10,8 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
+	"github.com/kisinga/ATS/app/domain"
 	"github.com/kisinga/ATS/app/models"
-	"github.com/kisinga/ATS/app/registry"
 )
 
 func Middleware(firebase *firebase.App) gin.HandlerFunc {
@@ -118,7 +118,7 @@ func GetUser(ctx *gin.Context) *models.User {
 	return vv
 }
 
-func GetUserFromContext(ctx context.Context, domain *registry.Domain) (*models.User, error) {
+func GetUserFromContext(ctx context.Context, domain *domain.Domain) (*models.User, error) {
 	cc, err := GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err

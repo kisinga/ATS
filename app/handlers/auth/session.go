@@ -8,7 +8,7 @@ import (
 
 	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
-	"github.com/kisinga/ATS/app/registry"
+	"github.com/kisinga/ATS/app/domain"
 )
 
 // Token ...
@@ -23,7 +23,7 @@ type data struct {
 }
 
 // SessionInit validates the provided userID using the firebase Admin API, then sets a cookie that is used to validate every request
-func SessionInit(firebase *firebase.App, domain *registry.Domain) gin.HandlerFunc {
+func SessionInit(firebase *firebase.App, domain *domain.Domain) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get the ID token sent by the client
 		defer c.Request.Body.Close()

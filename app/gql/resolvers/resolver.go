@@ -3,7 +3,7 @@
 package resolvers
 
 import (
-	"github.com/kisinga/ATS/app/registry"
+	"github.com/kisinga/ATS/app/domain"
 )
 
 // This file will not be regenerated automatically.
@@ -18,9 +18,9 @@ type contextKey struct {
 	name string
 }
 type Resolver struct {
-	domain *registry.Domain
+	domain *domain.Domain
 }
 
-func NewResolver(domain *registry.Domain) *Resolver {
+func NewResolver(domain *domain.Domain) *Resolver {
 	return &Resolver{domain}
 }

@@ -4,17 +4,16 @@ import (
 	"net/http"
 	"regexp"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"github.com/gin-gonic/gin"
+	"github.com/kisinga/ATS/app/domain"
 	"github.com/kisinga/ATS/app/models"
-	"github.com/kisinga/ATS/app/registry"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // TokenRegex is used to validate the format of a token string
 var TokenRegex = regexp.MustCompile(`^(?:\w{4}-){4}\w{4}$`)
 
-func TokenHandler(domain *registry.Domain) gin.HandlerFunc {
+func TokenHandler(domain *domain.Domain) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rawKey := c.Request.Header.Get("Authorization")
 		if len(rawKey) == 0 {

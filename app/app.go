@@ -21,7 +21,6 @@ import (
 	"github.com/kisinga/ATS/app/gql/resolvers"
 	"github.com/kisinga/ATS/app/handlers/auth"
 	handlers "github.com/kisinga/ATS/app/handlers/token"
-	"github.com/kisinga/ATS/app/registry"
 	"github.com/kisinga/ATS/app/storage"
 )
 
@@ -43,7 +42,7 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 
 	apiRoutes := router.Group("/api",
 		auth.Middleware(firebase),
-		graphqlHandler(domain, bh, firebase))
+		graphqlHandler(domain, firebase))
 	{
 		apiRoutes.Any("")
 	}
@@ -62,9 +61,9 @@ func playgroundHandler() gin.HandlerFunc {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
-func graphqlHandler(domain *registry.Domain, bh *behaviour.Behaviours, fb *firebase.App) gin.HandlerFunc {
+func graphqlHandler(domain *domain.Domain, fb *firebase.App) gin.HandlerFunc {
 
-	r := resolvers.NewResolver(domain, bh)
+	r := resolvers.NewResolver(domain)
 
 	h := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: r}))
 	h.AddTransport(transport.Websocket{
