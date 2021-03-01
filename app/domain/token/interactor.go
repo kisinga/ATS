@@ -3,8 +3,7 @@ package token
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/meter"
-
+	"github.com/kisinga/ATS/app/domain/meter"
 	"github.com/kisinga/ATS/app/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

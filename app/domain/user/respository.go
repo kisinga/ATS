@@ -19,12 +19,30 @@ type Repository interface {
 	Count(ctx context.Context) (int64, error)
 }
 
-func NewRepository(database *storage.Database) Repository {
-	return &repository{database}
+// CrudChannels keeps a list of channels to which values are emitted when certain CRUD operations are performed
+type CrudChannels struct {
+	Created chan models.User
+	Read    chan models.User
+	Updated chan models.User
+	Deleted chan models.User
+}
+
+// NewCrudChannels creates an instance of CrudChannels
+func NewCrudChannels() *CrudChannels {
+	return &CrudChannels{
+		Created: make(chan models.User),
+		Read:    make(chan models.User),
+		Updated: make(chan models.User),
+		Deleted: make(chan models.User),
+	}
+}
+func NewRepository(database *storage.Database, topics *Topics) Repository {
+	return &repository{database, topics}
 }
 
 type repository struct {
-	db *storage.Database
+	db     *storage.Database
+	topics *Topics
 }
 
 func (r repository) Create(ctx context.Context, user models.User) (*models.User, error) {
@@ -33,12 +51,18 @@ func (r repository) Create(ctx context.Context, user models.User) (*models.User,
 		return nil, err
 	}
 	user.ID = res.InsertedID.(primitive.ObjectID)
+	r.topics.Emit(r.topics.Created, user)
 	return &user, nil
 }
 
 func (r repository) Read(ctx context.Context, email string) (*models.User, error) {
 	user := models.User{}
-	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	err := r.db.Client.Collection("users").FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, user)
+	return &user, nil
 }
 
 func (r repository) Count(ctx context.Context) (int64, error) {
@@ -47,7 +71,12 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.User, error) {
 	user := models.User{}
-	return &user, r.db.Client.Collection("users").FindOne(ctx, bson.M{"_id": ID}).Decode(&user)
+	err := r.db.Client.Collection("users").FindOne(ctx, bson.M{"_id": ID}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, user)
+	return &user, nil
 }
 
 func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.User, error) {
@@ -67,6 +96,9 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 		}
 		users = append(users, &elem)
 	}
+	for _, user := range users {
+		r.topics.Emit(r.topics.Read, *user)
+	}
 	return users, nil
 }
 func (r repository) Update(ctx context.Context, email string, newUser models.User) (*models.User, error) {
@@ -80,5 +112,6 @@ func (r repository) Update(ctx context.Context, email string, newUser models.Use
 	if err != nil {
 		return nil, err
 	}
+	r.topics.Emit(r.topics.Updated, user)
 	return &user, nil
 }

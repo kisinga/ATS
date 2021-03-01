@@ -3,7 +3,6 @@ package apiKey
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,32 +18,56 @@ type Repository interface {
 	Update(ctx context.Context, newMeter models.APIKey) (*models.APIKey, error)
 }
 
-func NewRepository(database *storage.Database, apiKeyActions *actions.APIKeyActions) Repository {
-	return &repository{database, apiKeyActions}
+// CrudChannels keeps a list of channels to which values are emitted when certain CRUD operations are performed
+type CrudChannels struct {
+	Created chan models.APIKey
+	Read    chan models.APIKey
+	Updated chan models.APIKey
+	Deleted chan models.APIKey
+}
+
+// NewCrudChannels creates an instance of CrudChannels
+func NewCrudChannels() *CrudChannels {
+	return &CrudChannels{
+		Created: make(chan models.APIKey),
+		Read:    make(chan models.APIKey),
+		Updated: make(chan models.APIKey),
+		Deleted: make(chan models.APIKey),
+	}
+}
+
+func NewRepository(database *storage.Database, topics *Topics) Repository {
+	return &repository{database, topics}
 }
 
 type repository struct {
-	db            *storage.Database
-	apiKeyActions *actions.APIKeyActions
+	db     *storage.Database
+	topics *Topics
 }
 
-func (r repository) Create(ctx context.Context, token models.APIKey) (*models.APIKey, error) {
-	_, err := r.db.Client.Collection("apikeys").InsertOne(ctx, token)
+func (r repository) Create(ctx context.Context, apiKey models.APIKey) (*models.APIKey, error) {
+	_, err := r.db.Client.Collection("apikeys").InsertOne(ctx, apiKey)
 	// send to chanel via a goroutine so it doesnt block
-	if err == nil {
-		r.apiKeyActions.EmitCreate(&token)
+	if err != nil {
+		return nil, err
 	}
-	return &token, err
+	r.topics.Emit(r.topics.Created, apiKey)
+	return &apiKey, err
 }
 
 // func (r repository) Read(ctx context.Context, meterNumber string) (*models.APIKey, error) {
-// 	token := models.APIKey{}
-// 	return &token, r.db.Client.Collection("apikeys").FindOne(ctx, bson.M{"meterNumber": meterNumber}).Decode(&token)
+// 	apiKey := models.APIKey{}
+// 	return &apiKey, r.db.Client.Collection("apikeys").FindOne(ctx, bson.M{"meterNumber": meterNumber}).Decode(&apiKey)
 // }
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.APIKey, error) {
-	token := models.APIKey{}
-	return &token, r.db.Client.Collection("apikeys").FindOne(ctx, bson.M{"_id": ID}).Decode(&token)
+	apiKey := models.APIKey{}
+	err := r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"_id": ID}).Decode(&apiKey)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, apiKey)
+	return &apiKey, err
 }
 
 func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.APIKey, error) {
@@ -64,13 +87,17 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 		}
 		apikeys = append(apikeys, &elem)
 	}
+	for _, apiKey := range apikeys {
+		r.topics.Emit(r.topics.Read, *apiKey)
+	}
 	return apikeys, nil
 }
 func (r repository) Update(ctx context.Context, newToken models.APIKey) (*models.APIKey, error) {
-	token := models.APIKey{}
-	err := r.db.Client.Collection("apikeys").FindOneAndUpdate(ctx, bson.M{"_id": newToken.ID}, newToken).Decode(&token)
+	apiKey := models.APIKey{}
+	err := r.db.Client.Collection("apikeys").FindOneAndUpdate(ctx, bson.M{"_id": newToken.ID}, newToken).Decode(&apiKey)
 	if err != nil {
 		return nil, err
 	}
-	return &token, nil
+	r.topics.Emit(r.topics.Updated, apiKey)
+	return &apiKey, nil
 }

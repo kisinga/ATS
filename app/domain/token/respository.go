@@ -3,7 +3,6 @@ package token
 import (
 	"context"
 
-	"github.com/kisinga/ATS/app/behaviour/actions"
 	"github.com/kisinga/ATS/app/models"
 	"github.com/kisinga/ATS/app/storage"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,20 +20,38 @@ type Repository interface {
 	Count(ctx context.Context, query bson.M) (int64, error)
 }
 
-func NewRepository(database *storage.Database, tokenActions *actions.TokenActions) Repository {
-	return &repository{database, tokenActions}
+// CrudChannels keeps a list of channels to which values are emitted when certain CRUD operations are performed
+type CrudChannels struct {
+	Created chan models.Token
+	Read    chan models.Token
+	Updated chan models.Token
+	Deleted chan models.Token
+}
+
+// NewCrudChannels creates an instance of CrudChannels
+func NewCrudChannels() *CrudChannels {
+	return &CrudChannels{
+		Created: make(chan models.Token),
+		Read:    make(chan models.Token),
+		Updated: make(chan models.Token),
+		Deleted: make(chan models.Token),
+	}
+}
+func NewRepository(database *storage.Database, topics *Topics) Repository {
+	return &repository{database, topics}
 }
 
 type repository struct {
-	db           *storage.Database
-	tokenActions *actions.TokenActions
+	db     *storage.Database
+	topics *Topics
 }
 
 func (r repository) Create(ctx context.Context, token models.Token) (*models.Token, error) {
 	_, err := r.db.Client.Collection("tokens").InsertOne(ctx, token)
-	if err == nil {
-		r.tokenActions.EmitCreate(&token)
+	if err != nil {
+		return nil, err
 	}
+	r.topics.Emit(r.topics.Created, token)
 	return &token, err
 }
 
@@ -48,7 +65,12 @@ func (r repository) Count(ctx context.Context, query bson.M) (int64, error) {
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.Token, error) {
 	token := models.Token{}
-	return &token, r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"_id": ID}).Decode(&token)
+	err := r.db.Client.Collection("tokens").FindOne(ctx, bson.M{"_id": ID}).Decode(&token)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, token)
+	return &token, err
 }
 
 func (r repository) ReadMany(ctx context.Context, meterNumber *string, beforeOrAfter primitive.ObjectID, limit *int64, reversed bool) ([]*models.Token, error) {
@@ -84,7 +106,9 @@ func (r repository) ReadMany(ctx context.Context, meterNumber *string, beforeOrA
 			tokens[i], tokens[j] = tokens[j], tokens[i]
 		}
 	}
-
+	for _, token := range tokens {
+		r.topics.Emit(r.topics.Read, *token)
+	}
 	return tokens, nil
 }
 func (r repository) Update(ctx context.Context, newToken models.Token) (*models.Token, error) {
@@ -93,5 +117,6 @@ func (r repository) Update(ctx context.Context, newToken models.Token) (*models.
 	if err != nil {
 		return nil, err
 	}
+	r.topics.Emit(r.topics.Updated, token)
 	return &token, nil
 }

@@ -3,7 +3,6 @@
 package resolvers
 
 import (
-	"github.com/kisinga/ATS/app/behaviour"
 	"github.com/kisinga/ATS/app/registry"
 )
 
@@ -19,10 +18,9 @@ type contextKey struct {
 	name string
 }
 type Resolver struct {
-	domain     *registry.Domain
-	behaviours *behaviour.Behaviours
+	domain *registry.Domain
 }
 
-func NewResolver(domain *registry.Domain, behaviours *behaviour.Behaviours) *Resolver {
-	return &Resolver{domain, behaviours}
+func NewResolver(domain *registry.Domain) *Resolver {
+	return &Resolver{domain}
 }

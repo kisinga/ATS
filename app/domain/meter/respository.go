@@ -19,12 +19,30 @@ type Repository interface {
 	Count(ctx context.Context) (int64, error)
 }
 
-func NewRepository(database *storage.Database) Repository {
-	return &repository{database}
+// CrudChannels keeps a list of channels to which values are emitted when certain CRUD operations are performed
+type CrudChannels struct {
+	Created chan models.Meter
+	Read    chan models.Meter
+	Updated chan models.Meter
+	Deleted chan models.Meter
+}
+
+// NewCrudChannels creates an instance of CrudChannels
+func NewCrudChannels() *CrudChannels {
+	return &CrudChannels{
+		Created: make(chan models.Meter),
+		Read:    make(chan models.Meter),
+		Updated: make(chan models.Meter),
+		Deleted: make(chan models.Meter),
+	}
+}
+func NewRepository(database *storage.Database, topics *Topics) Repository {
+	return &repository{database, topics}
 }
 
 type repository struct {
-	db *storage.Database
+	db     *storage.Database
+	topics *Topics
 }
 
 func (r repository) Create(ctx context.Context, meter models.Meter) (*models.Meter, error) {
@@ -33,6 +51,7 @@ func (r repository) Create(ctx context.Context, meter models.Meter) (*models.Met
 		return nil, err
 	}
 	meter.ID = res.InsertedID.(primitive.ObjectID)
+	r.topics.Emit(r.topics.Created, meter)
 	return &meter, nil
 }
 
@@ -41,13 +60,23 @@ func (r repository) Count(ctx context.Context) (int64, error) {
 }
 
 func (r repository) Read(ctx context.Context, meterNumber string) (*models.Meter, error) {
-	user := models.Meter{}
-	return &user, r.db.Client.Collection("meters").FindOne(ctx, bson.M{"meterNumber": meterNumber}).Decode(&user)
+	meter := models.Meter{}
+	err := r.db.Client.Collection("meters").FindOne(ctx, bson.M{"meterNumber": meterNumber}).Decode(&meter)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, meter)
+	return &meter, err
 }
 
 func (r repository) ReadByID(ctx context.Context, ID primitive.ObjectID) (*models.Meter, error) {
-	user := models.Meter{}
-	return &user, r.db.Client.Collection("meters").FindOne(ctx, bson.M{"_id": ID}).Decode(&user)
+	meter := models.Meter{}
+	err := r.db.Client.Collection("meters").FindOne(ctx, bson.M{"_id": ID}).Decode(&meter)
+	if err != nil {
+		return nil, err
+	}
+	r.topics.Emit(r.topics.Read, meter)
+	return &meter, err
 }
 
 func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limit *int64) ([]*models.Meter, error) {
@@ -70,10 +99,12 @@ func (r repository) ReadMany(ctx context.Context, after primitive.ObjectID, limi
 	return meters, nil
 }
 func (r repository) Update(ctx context.Context, meterNumber string, newMeter models.Meter) (*models.Meter, error) {
-	user := models.Meter{}
-	err := r.db.Client.Collection("meters").FindOneAndUpdate(ctx, bson.M{"meterNumber": meterNumber}, bson.M{"$set": newMeter}).Decode(&user)
+	meter := models.Meter{}
+	err := r.db.Client.Collection("meters").FindOneAndUpdate(ctx, bson.M{"meterNumber": meterNumber}, bson.M{"$set": newMeter}).Decode(&meter)
 	if err != nil {
 		return nil, err
 	}
-	return &user, nil
+	r.topics.Emit(r.topics.Updated, meter)
+	return &meter, err
+	return &meter, nil
 }
