@@ -54,7 +54,7 @@ func (e *effects) listen() {
 				if err != nil {
 					// Critical error, log
 				}
-				_, err = e.deps.SMS.Send(models.Text{Phone: meter.Phone, Message: token.String()})
+				_, err = e.deps.SMS.Send(models.Text{Phone: meter.Phone, Message: "#" + token.String()})
 				if err != nil {
 					token.Status = models.StatusSent
 					e.deps.TokenRepository.Update(ctx, token)

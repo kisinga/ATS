@@ -25,7 +25,7 @@ import (
 	"github.com/kisinga/ATS/app/storage"
 )
 
-func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool) error {
+func Serve(db *storage.Database, sms sms.SMS, firebase *firebase.App, port string, prod bool) error {
 	// ctx := context.Background()
 	router := gin.Default()
 	router.Use(gin.Recovery()) // add Recovery middleware
@@ -39,7 +39,7 @@ func Serve(db *storage.Database, firebase *firebase.App, port string, prod bool)
 	}))
 	router.Use(auth.GinContextToContextMiddleware())
 
-	domain := domain.New(db, sms.NewSMS(sms.AfricasTalking{}))
+	domain := domain.New(db, sms)
 
 	apiRoutes := router.Group("/api",
 		auth.Middleware(firebase),

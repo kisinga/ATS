@@ -14,7 +14,7 @@ type Database struct {
 	Client *mongo.Database
 }
 
-func New(ctx context.Context, prod bool, live bool) (*Database, *firebase.App, error) {
+func New(ctx context.Context, uri string, prod bool, live bool) (*Database, *firebase.App, error) {
 	firebase, err := newFirebase(live)
 	if err != nil {
 		return nil, nil, err
@@ -27,8 +27,6 @@ func New(ctx context.Context, prod bool, live bool) (*Database, *firebase.App, e
 	} else {
 		env = "test"
 	}
-	// I know that this should be in a config somewhere, but I'll put it here for now
-	uri := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
 
 	clientOptions := options.Client().ApplyURI(uri)
 	clientvar, err := mongo.Connect(ctx, clientOptions)

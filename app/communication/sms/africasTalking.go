@@ -15,10 +15,9 @@ type SMS interface {
 }
 
 type AfricasTalking struct {
-	uri      string
+	URI      string
 	Username string
 	Key      string
-	SenderID string
 }
 
 func NewSMS(config AfricasTalking) SMS {
@@ -34,7 +33,7 @@ func (a *AfricasTalking) Send(text models.Text) (models.Text, error) {
 	}
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", a.uri, strings.NewReader(values.Encode()))
+	req, err := http.NewRequest("POST", a.URI, strings.NewReader(values.Encode()))
 	if err != nil {
 		return text, err
 	}

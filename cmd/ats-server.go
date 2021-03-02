@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/kisinga/ATS/app"
+	"github.com/kisinga/ATS/app/communication/sms"
 	"github.com/kisinga/ATS/app/storage"
 )
 
@@ -23,12 +24,20 @@ func main() {
 		live = true
 	}
 	// prod = true
+	// I know that this should be in a config somewhere, but I'll put it here for now
+	dburi := "mongodb+srv://backend:0SLbeeQ1Z0gg@cluster0.zq04m.mongodb.net/prod?retryWrites=true&w=majority"
 
-	db, firebase, err := storage.New(context.Background(), prod, live)
+	db, firebase, err := storage.New(context.Background(), dburi, prod, live)
 	if err != nil {
 		log.Fatalln("Error", err)
 	}
-	err = app.Serve(db, firebase, getPort(), prod)
+
+	sms := sms.NewSMS(sms.AfricasTalking{
+		URI:      "https://api.africastalking.com/version1/messaging",
+		Username: "atske",
+		Key:      "40e4a22c0a93284f930443076b5dba7cf7f287098ee90baa4fb101c582de3994",
+	})
+	err = app.Serve(db, sms, firebase, getPort(), prod)
 	if err != nil {
 		log.Fatalln("Error", err)
 	}
