@@ -114,7 +114,6 @@ export interface GetMetersQueryInput {
 export interface NewMeterInput {
   meterNumber: string;
   phone: string;
-  location: string;
 }
 
 export interface MetersQueryModel {

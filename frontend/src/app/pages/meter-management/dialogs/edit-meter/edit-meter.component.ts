@@ -40,7 +40,6 @@ export class EditMeterComponent implements OnInit {
         .updateMeter({
           meterNumber: this.meterNumber,
           phone: this.newMeterForm.controls.phone.value,
-          location: "",
         })
         .toPromise()
         .then((r) => {
