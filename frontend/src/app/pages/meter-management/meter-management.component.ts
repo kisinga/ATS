@@ -5,6 +5,7 @@ import { GetMetersQueryInput } from "app/models/gql/meter.model";
 import { Meter } from "app/models/meter.model";
 import { MeterService } from "../shared/services/meter.service";
 import { TokensComponent } from "../tokens/tokens.component";
+import { EditMeterComponent } from "./dialogs/edit-meter/edit-meter.component";
 import { NewMeterComponent } from "./dialogs/new-meter/new-meter.component";
 
 @Component({
@@ -15,7 +16,7 @@ export class MeterManagementComponent implements OnInit {
   loading: Boolean = false;
   loadingMeter = "";
   meters: Meter[];
-  displayedColumns: string[] = ["meter_number","phone", "createdby", "date", "delete"];
+  displayedColumns: string[] = ["meter_number","phone", "createdby", "date", "action"];
 
   constructor(
     private dialogService: NbDialogService,
@@ -54,6 +55,18 @@ export class MeterManagementComponent implements OnInit {
           this.loadingMeter = "";
         }
         this.getMeters({}, "network-only");
+      });
+  }
+
+  editMeter(meterNumber: string) {
+    this.dialogService
+      .open(EditMeterComponent,  { 
+        context: { meterNumber },
+      })
+      .onClose.subscribe((refresh: boolean) => {
+        if (refresh) {
+          this.getMeters({}, "network-only");
+        }
       });
   }
 

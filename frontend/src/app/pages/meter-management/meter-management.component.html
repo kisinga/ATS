@@ -1,55 +1,95 @@
-<button (click)="openNewMeterModal()" hero nbButton status="primary">ADD NEW</button>
+<button (click)="openNewMeterModal()" hero nbButton status="primary">
+  ADD NEW
+</button>
 
-<table [dataSource]="meters" [nbSpinner]="loading" class="mat-elevation-z8" mat-table nbSpinnerStatus="primary">
-
+<table
+  [dataSource]="meters"
+  [nbSpinner]="loading"
+  class="mat-elevation-z8"
+  mat-table
+  nbSpinnerStatus="primary"
+>
   <ng-container matColumnDef="meter_number">
     <th *matHeaderCellDef mat-header-cell>Meter Number</th>
-    <td *matCellDef="let element" mat-cell class="meter" (click)="showTokens(element.meterNumber)"> {{element.meterNumber}} </td>
+    <td
+      *matCellDef="let element"
+      mat-cell
+      class="meter"
+      (click)="showTokens(element.meterNumber)"
+    >
+      {{ element.meterNumber }}
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="phone">
     <th *matHeaderCellDef mat-header-cell>Phone</th>
-    <td *matCellDef="let element" mat-cell class="meter" > {{element.phone}} </td>
+    <td *matCellDef="let element" mat-cell class="meter">
+      {{ element.phone }}
+    </td>
   </ng-container>
-
 
   <ng-container matColumnDef="createdby">
-    <th *matHeaderCellDef mat-header-cell> Created By</th>
-    <td *matCellDef="let element" mat-cell> {{element.createdBy?.name}} </td>
+    <th *matHeaderCellDef mat-header-cell>Created By</th>
+    <td *matCellDef="let element" mat-cell>{{ element.createdBy?.name }}</td>
   </ng-container>
-
 
   <ng-container matColumnDef="date">
-    <th *matHeaderCellDef mat-header-cell> Date</th>
-    <td *matCellDef="let element" mat-cell> {{element.ID | dateFromObjectId | date: "short"}} </td>
+    <th *matHeaderCellDef mat-header-cell>Date</th>
+    <td *matCellDef="let element" mat-cell>
+      {{ element.ID | dateFromObjectId | date: "short" }}
+    </td>
   </ng-container>
 
-  <ng-container matColumnDef="delete">
-    <th *matHeaderCellDef mat-header-cell> Action</th>
+  <ng-container matColumnDef="action">
+    <th *matHeaderCellDef mat-header-cell>Action</th>
     <td *matCellDef="let element" mat-cell>
-
-      <div *ngIf="element.meterNumber === loadingMeter;else other_content">
+      <div *ngIf="element.meterNumber === loadingMeter; else other_content">
         <button [nbSpinner]="true" ghost nbButton nbSpinnerStatus="primary">
           <!-- Saving -->
         </button>
       </div>
 
       <ng-template #other_content>
-        <div *ngIf="!element.active;else other_content">
-          <button (click)="enableMeter(element.meterNumber)" ghost nbButton nbTooltip="Enable Meter" status="primary">
+        <div>
+          <button
+            *ngIf="!element.active; else other_content"
+            (click)="enableMeter(element.meterNumber)"
+            ghost
+            nbButton
+            nbTooltip="Enable Meter"
+            status="primary"
+          >
             <nb-icon icon="checkmark-circle-outline"></nb-icon>
           </button>
+          <ng-template #other_content>
+            <button
+              (click)="disableMeter(element.meterNumber)"
+              ghost
+              nbButton
+              nbTooltip="Disable Meter"
+              status="danger"
+            >
+              <nb-icon icon="slash-outline"></nb-icon>
+            </button>
+            <button
+              (click)="editMeter(element.meterNumber)"
+              ghost
+              nbButton
+              nbTooltip="Edit Meter"
+              status="primary"
+            >
+              <nb-icon icon="edit-outline"></nb-icon>
+            </button>
+          </ng-template>
         </div>
-
-        <ng-template #other_content>
-          <button (click)="disableMeter(element.meterNumber)" ghost nbButton nbTooltip="Disable Meter" status="danger">
-            <nb-icon icon="slash-outline"></nb-icon>
-          </button>
-        </ng-template>
       </ng-template>
     </td>
   </ng-container>
 
   <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-  <tr *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'disabled-meter': !row.active}" mat-row></tr>
+  <tr
+    *matRowDef="let row; columns: displayedColumns"
+    [ngClass]="{ 'disabled-meter': !row.active }"
+    mat-row
+  ></tr>
 </table>

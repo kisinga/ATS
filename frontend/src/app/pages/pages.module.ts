@@ -27,6 +27,7 @@ import { NewMeterComponent } from "./meter-management/dialogs/new-meter/new-mete
 import { TokensComponent } from "./tokens/tokens.component";
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { ProfileComponent } from './profile/profile.component';
+import { EditMeterComponent } from './meter-management/dialogs/edit-meter/edit-meter.component';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import { ProfileComponent } from './profile/profile.component';
     NewMeterComponent,
     TokensComponent,
     ProfileComponent,
+    EditMeterComponent,
   ],
   providers: [],
 })

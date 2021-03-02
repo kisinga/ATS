@@ -14,7 +14,7 @@ export class NewMeterComponent implements OnInit {
       "",
       Validators.compose([Validators.required, Validators.min(5)])
     ),
-     phoneNumber: new FormControl(
+    phone: new FormControl(
       "",
       Validators.compose([Validators.required, Validators.min(10)])
     ),
@@ -23,11 +23,9 @@ export class NewMeterComponent implements OnInit {
   constructor(
     protected ref: NbDialogRef<NewMeterComponent>,
     private meterService: MeterService
-  ) {
-  }
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   cancel() {
     this.ref.close();

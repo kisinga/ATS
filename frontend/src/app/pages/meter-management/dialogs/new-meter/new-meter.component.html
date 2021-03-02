@@ -3,27 +3,60 @@
   <nb-card-body>
     <div>
       <form [formGroup]="newMeterForm">
-        <input formControlName="meterNumber" fullWidth minlength="4" name="meterNumber" nbInput placeholder="Meter Number" required
-               status="basic" type="text">
-        <input formControlName="phoneNumber" fullWidth minlength="10" name="phoneNumber" nbInput placeholder="Phone Number" required
-               status="basic" type="text">
+        <input
+          formControlName="meterNumber"
+          fullWidth
+          minlength="4"
+          name="meterNumber"
+          nbInput
+          placeholder="Meter Number"
+          required
+          status="basic"
+          type="text"
+        />
+        <input
+          formControlName="phone"
+          fullWidth
+          minlength="10"
+          name="phoneNumber"
+          nbInput
+          placeholder="Phone Number"
+          required
+          status="basic"
+          type="text"
+        />
       </form>
     </div>
-    <nb-alert *ngIf="!newMeterForm.valid && newMeterForm.touched" status="danger">
-            <span *ngIf="!newMeterForm.controls['meterNumber'].valid">
-                <p></p>
-                Invalid Meter Number
-            </span>
-      <br>
-
+    <nb-alert
+      *ngIf="!newMeterForm.valid && newMeterForm.touched"
+      status="danger"
+    >
+      <span *ngIf="!newMeterForm.controls['meterNumber'].valid">
+        <p></p>
+        Invalid Meter Number
+      </span>
+      <span *ngIf="!newMeterForm.controls['phone'].valid">
+        <p></p>
+        Invalid Phone Number
+      </span>
+      <br />
     </nb-alert>
     <nb-alert *ngIf="creationError" status="danger">
-      {{creationError}}
+      {{ creationError }}
     </nb-alert>
-
   </nb-card-body>
   <nb-card-footer>
-    <button (click)="cancel()" class="cancel" nbButton status="danger" type="button">Cancel</button>
-    <button (click)="submit()" nbButton status="success" type="submit">Submit</button>
+    <button
+      (click)="cancel()"
+      class="cancel"
+      nbButton
+      status="danger"
+      type="button"
+    >
+      Cancel
+    </button>
+    <button (click)="submit()" nbButton status="success" type="submit">
+      Submit
+    </button>
   </nb-card-footer>
 </nb-card>
