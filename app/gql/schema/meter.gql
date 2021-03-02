@@ -9,10 +9,8 @@ type Meter implements BaseObject {
 
 input NewMeter {
   meterNumber: String!
-  location: String
-  phoneNumber: String!
+  phone: String!
 }
-
 
 extend type Query {
   meters(limit: Int = 30, after: ID = null): MeterConnection!

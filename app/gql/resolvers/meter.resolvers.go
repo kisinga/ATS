@@ -5,7 +5,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kisinga/ATS/app/gql/generated"
 	"github.com/kisinga/ATS/app/handlers/auth"
@@ -62,7 +61,17 @@ func (r *mutationResolver) EnableMeter(ctx context.Context, meterNumber string) 
 }
 
 func (r *mutationResolver) UpdateMeter(ctx context.Context, input models.NewMeter) (*models.Meter, error) {
-	panic(fmt.Errorf("not implemented"))
+	me, err := auth.GetUserFromContext(ctx, r.domain)
+	if err != nil {
+		return nil, err
+	}
+	target, err := r.domain.Meter.GetMeter(ctx, input.MeterNumber)
+	if err != nil {
+		return nil, err
+	}
+	target.Phone = input.Phone
+	target.UpdatedBy = me.ID
+	return r.domain.Meter.UpdateMeter(ctx, input.MeterNumber, *target)
 }
 
 func (r *queryResolver) Meters(ctx context.Context, limit *int64, after *primitive.ObjectID) (*models.MeterConnection, error) {

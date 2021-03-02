@@ -657,10 +657,8 @@ extend type Subscription {
 
 input NewMeter {
   meterNumber: String!
-  location: String
-  phoneNumber: String!
+  phone: String!
 }
-
 
 extend type Query {
   meters(limit: Int = 30, after: ID = null): MeterConnection!
@@ -3845,19 +3843,11 @@ func (ec *executionContext) unmarshalInputNewMeter(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "location":
+		case "phone":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "phoneNumber":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phoneNumber"))
-			it.PhoneNumber, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			it.Phone, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

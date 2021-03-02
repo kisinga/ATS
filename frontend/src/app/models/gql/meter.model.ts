@@ -1,7 +1,7 @@
-import {gql} from "apollo-angular";
-import {Meter} from "../meter.model";
-import {pageInfoFragment} from "./page-info.fragment";
-import {PageInfoModel} from "./page-info.model";
+import { gql } from "apollo-angular";
+import { Meter } from "../meter.model";
+import { pageInfoFragment } from "./page-info.fragment";
+import { PageInfoModel } from "./page-info.model";
 
 export const MetersQuery = gql`
   query getMeters($limit: Int, $afterID: ID) {
@@ -9,6 +9,7 @@ export const MetersQuery = gql`
       data {
         meterNumber
         ID
+        phone
         updatedBy {
           name
           email
@@ -32,6 +33,7 @@ export const NewMeterMutation = gql`
     createMeter(input: $input) {
       meterNumber
       ID
+      phone
       updatedBy {
         name
         email
@@ -53,6 +55,7 @@ export const DisableMeterMutation = gql`
     disableMeter(meterNumber: $meterNumber) {
       meterNumber
       ID
+      phone
       updatedBy {
         name
         email
@@ -71,6 +74,25 @@ export const EnableMeterMutation = gql`
     enableMeter(meterNumber: $meterNumber) {
       meterNumber
       ID
+      phone
+      updatedBy {
+        name
+        email
+      }
+      active
+      createdBy {
+        name
+        email
+      }
+    }
+  }
+`;
+export const UpdateMeterMutation = gql`
+  mutation updateMeter($input: NewMeter!) {
+    updateMeter(input: $input) {
+      meterNumber
+      ID
+      phone
       updatedBy {
         name
         email
@@ -91,6 +113,8 @@ export interface GetMetersQueryInput {
 
 export interface NewMeterInput {
   meterNumber: string;
+  phone: string;
+  location: string;
 }
 
 export interface MetersQueryModel {
