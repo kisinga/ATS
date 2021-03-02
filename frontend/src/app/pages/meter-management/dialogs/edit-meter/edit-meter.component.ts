@@ -5,7 +5,6 @@ import { MeterService } from "app/pages/shared/services/meter.service";
 import { NewMeterComponent } from "../new-meter/new-meter.component";
 
 @Component({
-  selector: "edit-meter",
   templateUrl: "./edit-meter.component.html",
   styleUrls: ["./edit-meter.component.scss"],
 })

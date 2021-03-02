@@ -16,7 +16,13 @@ export class MeterManagementComponent implements OnInit {
   loading: Boolean = false;
   loadingMeter = "";
   meters: Meter[];
-  displayedColumns: string[] = ["meter_number","phone", "createdby", "date", "action"];
+  displayedColumns: string[] = [
+    "meter_number",
+    "phone",
+    "createdby",
+    "date",
+    "action",
+  ];
 
   constructor(
     private dialogService: NbDialogService,
@@ -60,7 +66,7 @@ export class MeterManagementComponent implements OnInit {
 
   editMeter(meterNumber: string) {
     this.dialogService
-      .open(EditMeterComponent,  { 
+      .open(EditMeterComponent, {
         context: { meterNumber },
       })
       .onClose.subscribe((refresh: boolean) => {
