@@ -96,3 +96,10 @@ Otherwise, please NOTE:
 
 1.  Token number cannot repeat
 2.  Meter Number MUST be valid one
+
+
+# Credits  
+1. Radia Mkarye  
+2. Roselinda Nyaga  
+These are the two brains that originated with the idea and facilitated most of the equipment required to complete this phase.  
+This is just a phototype that clearly demonstrates the Proof Of Concept
