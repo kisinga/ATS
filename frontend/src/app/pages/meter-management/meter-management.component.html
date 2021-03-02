@@ -7,6 +7,11 @@
     <td *matCellDef="let element" mat-cell class="meter" (click)="showTokens(element.meterNumber)"> {{element.meterNumber}} </td>
   </ng-container>
 
+  <ng-container matColumnDef="phone">
+    <th *matHeaderCellDef mat-header-cell>Phone</th>
+    <td *matCellDef="let element" mat-cell class="meter" > {{element.phone}} </td>
+  </ng-container>
+
 
   <ng-container matColumnDef="createdby">
     <th *matHeaderCellDef mat-header-cell> Created By</th>

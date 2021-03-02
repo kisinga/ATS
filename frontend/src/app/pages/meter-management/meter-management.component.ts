@@ -15,7 +15,7 @@ export class MeterManagementComponent implements OnInit {
   loading: Boolean = false;
   loadingMeter = "";
   meters: Meter[];
-  displayedColumns: string[] = ["meter_number", "createdby", "date", "delete"];
+  displayedColumns: string[] = ["meter_number","phone", "createdby", "date", "delete"];
 
   constructor(
     private dialogService: NbDialogService,
