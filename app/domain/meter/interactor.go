@@ -48,6 +48,7 @@ func (i *interactor) GetMany(ctx context.Context, after primitive.ObjectID, limi
 func (i *interactor) AddMeter(ctx context.Context, meter models.NewMeter, creatorID primitive.ObjectID) (*models.Meter, error) {
 	newMeter := models.Meter{
 		CreatedBy:   creatorID,
+		Phone:       meter.Phone,
 		ID:          primitive.NewObjectID(),
 		MeterNumber: meter.MeterNumber,
 		Active:      true,
