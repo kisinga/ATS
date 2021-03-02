@@ -5,6 +5,8 @@
       <form [formGroup]="newMeterForm">
         <input formControlName="meterNumber" fullWidth minlength="4" name="meterNumber" nbInput placeholder="Meter Number" required
                status="basic" type="text">
+        <input formControlName="phoneNumber" fullWidth minlength="10" name="phoneNumber" nbInput placeholder="Phone Number" required
+               status="basic" type="text">
       </form>
     </div>
     <nb-alert *ngIf="!newMeterForm.valid && newMeterForm.touched" status="danger">

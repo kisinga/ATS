@@ -14,6 +14,10 @@ export class NewMeterComponent implements OnInit {
       "",
       Validators.compose([Validators.required, Validators.min(5)])
     ),
+     phoneNumber: new FormControl(
+      "",
+      Validators.compose([Validators.required, Validators.min(10)])
+    ),
   });
 
   constructor(
