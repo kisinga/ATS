@@ -97,6 +97,8 @@ Otherwise, please NOTE:
 1.  Token number cannot repeat
 2.  Meter Number MUST be valid one
 
+# Pin mapping
+![pin mapping](assets/pin-mapping.svg)
 
 # Credits  
 1. Radia Mkarye  
