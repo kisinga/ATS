@@ -35,15 +35,15 @@ void setup()
 
   // initialize serial communications and wait for port to open:
 
-  Serial.begin(9600);
+//  Serial.begin(9600);
 
-  while (!Serial)
-  {
+//  while (!Serial)
+//  {
+//
+//    ; // wait for serial port to connect. Needed for native USB port only
+//  }
 
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-
-  Serial.println("SMS Messages Receiver");
+//  Serial.println("SMS Messages Receiver");
 
   // connection state
 
@@ -62,13 +62,13 @@ void setup()
     else
     {
 
-      Serial.println("Not connected");
+//      Serial.println("Not connected");
 
       delay(1000);
     }
   }
-  Serial.println("GSM initialized");
-  Serial.println("Waiting for messages");
+//  Serial.println("GSM initialized");
+//  Serial.println("Waiting for messages");
 }
 
 // the loop function runs over and over again forever
@@ -83,16 +83,16 @@ void loop()
   if (sms.available())
   {
 
-    Serial.println("Message received from:");
+//    Serial.println("Message received from:");
     // Get remote number
     sms.remoteNumber(senderNumber, 20);
 
-    Serial.println(senderNumber);
+//    Serial.println(senderNumber);
 
     // Discard all messages that dont start with #
     if (sms.peek() != '#')
     {
-      Serial.println("Discarded SMS");
+//      Serial.println("Discarded SMS");
       sms.flush();
       return;
     }
@@ -105,25 +105,25 @@ void loop()
       //      Skip the first char as it is #
       if (first)
       {
-        Serial.print("Skipping #\n");
+//        Serial.print("Skipping #\n");
         first = false;
       }
       else
       {
         int num = (char)c - '0';
-        Serial.print(num);
+//        Serial.print(num);
         pressButton(num);
       }
     }
     //press ok
     pressButton(10);
-    Serial.println("\nEND OF MESSAGE");
+//    Serial.println("\nEND OF MESSAGE");
 
     // Delete message from modem memory
 
     sms.flush();
 
-    Serial.println("MESSAGE DELETED");
+//    Serial.println("MESSAGE DELETED");
   }
 }
 
