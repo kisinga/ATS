@@ -99,12 +99,21 @@ void loop()
 
     // Read message bytes and print them
     int c;
-
+    bool first = true;
     while ((c = sms.read()) != -1)
     {
-      int num = (char)c - '0';
-      Serial.print(num);
-      pressButton(num);
+      //      Skip the first char as it is #
+      if (first)
+      {
+        Serial.print("Skipping #\n");
+        first = false;
+      }
+      else
+      {
+        int num = (char)c - '0';
+        Serial.print(num);
+        pressButton(num);
+      }
     }
     //press ok
     pressButton(10);
