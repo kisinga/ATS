@@ -35,7 +35,7 @@ func TokenHandler(domain *domain.Domain) gin.HandlerFunc {
 			return
 		}
 		if !TokenRegex.Match([]byte(token.TokenString)) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid token")
+			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid token string")
 			return
 		}
 

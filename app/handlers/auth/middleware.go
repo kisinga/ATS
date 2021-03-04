@@ -36,7 +36,7 @@ func Middleware(firebase *firebase.App) gin.HandlerFunc {
 		}
 		if token == "" {
 			// Session is invalid. Force user to login.
-			c.AbortWithStatusJSON(http.StatusForbidden, "Invalid token")
+			c.AbortWithStatusJSON(http.StatusForbidden, "Invalid authtoken")
 			return
 		}
 		user, err := GetUserFromToken(c.Request.Context(), firebase, token)
