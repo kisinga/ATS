@@ -3,27 +3,18 @@ module github.com/kisinga/ATS
 go 1.16
 
 require (
+	cloud.google.com/go/firestore v1.1.1 // indirect
 	firebase.google.com/go v3.13.0+incompatible
-	firebase.google.com/go/v4 v4.1.0 // indirect
 	github.com/99designs/gqlgen v0.13.0
-	github.com/appleboy/gin-jwt v2.5.0+incompatible
-	github.com/appleboy/gin-jwt/v2 v2.6.4
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/go-chi/chi v3.3.2+incompatible
-	github.com/go-chi/cors v1.1.1
-	github.com/go-chi/jwtauth v1.1.1
 	github.com/gorilla/websocket v1.4.2
-	github.com/lestrrat-go/jwx v1.0.6-0.20201127121120-26218808f029
-	github.com/mitchellh/mapstructure v1.4.0
-	github.com/rs/cors v1.6.0
-	github.com/sirupsen/logrus v1.7.0
+	github.com/mitchellh/mapstructure v1.4.0 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	go.mongodb.org/mongo-driver v1.4.4
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
+	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5 // indirect
 	google.golang.org/api v0.30.0
-	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
-	gopkg.in/olahol/melody.v1 v1.0.0-20170518105555-d52139073376
 )
