@@ -98,6 +98,7 @@ Otherwise, please NOTE:
 2.  Meter Number MUST be valid one
 
 # Pin mapping
+
 ![pin mapping](assets/pin-mapping.svg)
 
 # Credits  
